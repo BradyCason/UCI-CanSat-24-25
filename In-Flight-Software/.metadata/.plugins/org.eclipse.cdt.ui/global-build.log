@@ -1,0 +1,13 @@
+11:35:37 **** Incremental Build of configuration Debug for project Sensor-Test-Brady ****
+make -j20 all 
+arm-none-eabi-gcc -o "Sensor-Test-Brady.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Sensor-Test-Brady\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Sensor-Test-Brady.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Sensor-Test-Brady.elf
+ 
+arm-none-eabi-size  Sensor-Test-Brady.elf 
+arm-none-eabi-objdump -h -S Sensor-Test-Brady.elf  > "Sensor-Test-Brady.list"
+   text	   data	    bss	    dec	    hex	filename
+  35068	    468	   2676	  38212	   9544	Sensor-Test-Brady.elf
+Finished building: default.size.stdout
+ 
+Finished building: Sensor-Test-Brady.list
+ 
