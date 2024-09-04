@@ -422,7 +422,7 @@ QPushButton:hover {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true"/>
+              <string notr="true">QPushButton{background-color: rgba(40, 167, 69, 1);} QPushButton:hover{background-color: rgba(36, 149, 62, 1);}</string>
              </property>
              <property name="text">
               <string>Simulation Enable</string>

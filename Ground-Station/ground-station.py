@@ -2,8 +2,10 @@ import sys
 import os
 import time
 import serial
+import threading
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import pyqtgraph as pg
+from csv import writer, reader
 
 TEAM_ID = "2057"
 
@@ -32,12 +34,16 @@ COM_PORT = 6
 
 MAC_ADDR = ""
 
-#ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
+SER_DEBUG = True       # Set as True whenever testing without XBee connected
+if (not SER_DEBUG):
+    ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
 
 # telemetry
 # strings as keys and values as values, only last stored
 # need to write all commands to csv files by last filled values
 telemetry = {}
+
+START_DELIMITER = 0x7E
 
 class GroundStationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -85,6 +91,13 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
 
+        # Connect non-sim buttons to update sim button colors
+        self.set_time_button.clicked.connect(self.non_sim_button_clicked)
+        self.calibrate_alt_button.clicked.connect(self.non_sim_button_clicked)
+        self.override_state_1_button.clicked.connect(self.non_sim_button_clicked)
+        self.override_state_2_button.clicked.connect(self.non_sim_button_clicked)
+        self.telemetry_toggle_button.clicked.connect(self.non_sim_button_clicked)
+
     def update(self):
         global telemetry
 
@@ -104,7 +117,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         button.setStyleSheet("QPushButton{background-color: rgba(33,125,182,1);} QPushButton:hover{background-color: rgba(27, 100, 150, 1);}")
 
     def handle_simulation(self, cmd):
-        global sim, sim_enable
+        global sim, sim_enable, csv_indexer
 
         if cmd == "ACTIVATE" and sim_enable == False or cmd == "ENABLE" and sim_enable == True:
             return
@@ -119,6 +132,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         elif cmd == "ACTIVATE":
             sim_enable = False
             sim = True
+            csv_indexer = 0
         
         self.update_sim_button_colors()
 
@@ -137,7 +151,11 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.make_button_green(self.sim_enable_button)
             self.make_button_blue(self.sim_activate_button)
             self.make_button_blue(self.sim_disable_button)
-        
+
+    def non_sim_button_clicked(self):
+        global sim_enable
+        sim_enable = False
+        self.update_sim_button_colors()
 
     def toggle_telemetry(self):
         global telemetry_on
@@ -197,16 +215,39 @@ class GraphWindow(pg.GraphicsLayoutWidget):
 
             self.previous_time = telemetry["GPS_TIME"]
 
+def calc_checksum(data):
+    return sum(data.encode()) % 256
 
-def parse_xbee(xbee_message):
-    pass
+def verify_checksum(data, checksum):
+    return checksum == calc_checksum(data)
+
+def parse_xbee(data):
+    for i in range(len(data)):
+        telemetry[TELEMETRY_FIELDS[i]] = data[i]
+
+    if data[3] == "S":
+        sim = True
+    else:
+        sim = False
+
+    # Add data to csv file
+    file = str(readable_time) + '.csv'
+    with open(file, 'a', newline='') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(telemetry.values())
 
 def read_xbee():
-    pass
+    while True:     # Keep running as long as the serial connection is open
+        if ser.inWaiting() > 0:
+            start_byte = ser.read(1)
+
+            if start_byte == START_DELIMITER:
+                frame = ser.read_until(b"\n").decode.strip()
+                data, checksum = frame.rsplit(",", 1)
+                if verify_checksum(data, checksum):
+                    parse_xbee(data.split(","))
 
 def write_xbee(cmd):
-    w.update_sim_button_colors()
-
     # Frame Format: ~<data>,<checksum>
 
     '''
@@ -220,20 +261,43 @@ def write_xbee(cmd):
     '''
 
     # Create Packet
-    start_delimiter = 0x7E
-    checksum = sum(cmd.encode()) % 256
-    frame = f"{chr(start_delimiter)}{cmd},{checksum:02X}"
+    checksum = calc_checksum(cmd)
+    frame = f"{chr(START_DELIMITER)}{cmd},{checksum:02X}"
 
     # Send to XBee
-    #ser.write(frame.encode())
+    if (not SER_DEBUG):
+        ser.write(frame.encode())
     print("Packet Sent: " + cmd)
 
+def send_simp_data():
+    global sim, running
+    global csv_indexer
+    csv_file = open(os.path.join(os.path.dirname(__file__), "pres.csv"), 'r')
+    csv_lines = csv_file.readlines()
+    csv_indexer = 0
+    while running:
+        if sim and csv_indexer < len(csv_lines):
+            csv_num = str(csv_lines[csv_indexer].strip())
+            write_xbee('CMD,' + TEAM_ID + ',SIMP,' + str(csv_num))
+            csv_indexer += 1
+            
+        time.sleep(1)
 
-if __name__ == "__main__":
+
+
+
+def main():
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)
     w = GroundStationWindow()
+
+    if (not SER_DEBUG):
+        threading.Thread(target=read_xbee).start()
+    threading.Thread(target=send_simp_data).start()
+
     w.show()
-    write_xbee("CMD,something,somethings")
     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    main()
