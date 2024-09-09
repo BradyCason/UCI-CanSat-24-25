@@ -50,7 +50,10 @@ typedef uint8_t bool;
 #define INA219_REG_POWER 0x03
 #define INA219_REG_CURRENT 0x04
 
-#define MPU_ADDRESS 0x69
+#define ADXL326_ADDRESS 0x1D << 1 // Replace with the correct I2C address (shifted for 8-bit address)
+#define ADXL326_REG_X 0x32        // Replace with the correct X-axis register
+#define ADXL326_REG_Y 0x34        // Replace with the correct Y-axis register
+#define ADXL326_REG_Z 0x36        // Replace with the correct Z-axis register
 
 #define PA_ADDRESS 0x42   // Adjust according to your PA1010D address
 #define PA_BFR_SIZE 255
@@ -62,8 +65,6 @@ typedef uint8_t bool;
 #define MMC5603_REG_Y_MSB 0x03
 #define MMC5603_REG_Z_LSB 0x04
 #define MMC5603_REG_Z_MSB 0x05
-
-#define PI 3.141592
 
 /* USER CODE END PD */
 
@@ -121,25 +122,6 @@ uint8_t gps_sats = 0;
 
 int16_t mag_x, mag_y, mag_z;
 
-// MPU 6050 DATA
-uint8_t mpu_buf[6];
-int16_t raw_accel_x;
-int16_t raw_accel_y;
-int16_t raw_accel_z;
-float accel_x;
-float accel_y;
-float accel_z;
-int16_t raw_gyro_x = 0;
-int16_t raw_gyro_y = 0;
-int16_t raw_gyro_z = 0;
-float gyro_x;
-float gyro_y;
-float gyro_z;
-float tilt_x = 0;
-float tilt_y = 0;
-float rot_z = 0;
-HAL_StatusTypeDef mpu_ret;
-
 float read_mcp9808(void) {
     uint8_t temp_reg = MCP9808_TEMP_REG; // Register to read
     uint8_t temp_data[2];                // Buffer to store temperature data
@@ -194,6 +176,40 @@ uint8_t read_ina219() {
     }
 
     return ina_ret;  // Return the I2C communication status
+}
+
+uint8_t read_adxl326() {
+    uint8_t reg_addr = ADXL326_REG_X; // Start with the X-axis register
+    uint8_t adxl_buf[6];              // Buffer to store the received data for X, Y, Z axes (2 bytes each)
+    uint8_t adxl_ret;                 // Return status of I2C communication
+
+    // Check if ADXL326 is ready for communication
+    adxl_ret = HAL_I2C_IsDeviceReady(&hi2c2, ADXL326_ADDRESS, 3, 5);
+    if (adxl_ret == HAL_OK) {
+        // Transmit the address of the X-axis register
+        adxl_ret = HAL_I2C_Master_Transmit(&hi2c2, ADXL326_ADDRESS, &reg_addr, 1, 100);
+        if (adxl_ret == HAL_OK) {
+            // Receive 6 bytes of data from the X, Y, and Z registers (2 bytes each)
+            HAL_I2C_Master_Receive(&hi2c2, ADXL326_ADDRESS, adxl_buf, 6, 100);
+
+            // Combine the received bytes into 16-bit values for each axis
+            int16_t raw_x = (int16_t)(adxl_buf[0] | (adxl_buf[1] << 8));
+            int16_t raw_y = (int16_t)(adxl_buf[2] | (adxl_buf[3] << 8));
+            int16_t raw_z = (int16_t)(adxl_buf[4] | (adxl_buf[5] << 8));
+
+            // Convert the raw values to g-forces (you may need to adjust the scale factor)
+            float x_g = raw_x * 0.004; // Assuming 4mg/LSB (adjust this based on your sensor configuration)
+            float y_g = raw_y * 0.004;
+            float z_g = raw_z * 0.004;
+
+            // Store or return the calculated g-forces as needed
+            x_axis = x_g;
+            y_axis = y_g;
+            z_axis = z_g;
+        }
+    }
+
+    return adxl_ret;  // Return the I2C communication status
 }
 
 uint8_t set_gps(char* buf, uint8_t order){
@@ -316,53 +332,6 @@ uint8_t read_mmc5603(void) {
     return mmc5603_ret;  // Return the I2C communication status
 }
 
-uint8_t read_mpu() {
-	uint8_t imu_addr = 0x3B;
-	uint8_t gyro_addr = 0x43;
-
-	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c2, (uint16_t)(MPU_ADDRESS<<1), 3, 5);
-    if (mpu_ret == HAL_OK){
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c2, (uint16_t)(MPU_ADDRESS << 1), &imu_addr, 1, 100);
-		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c2, (MPU_ADDRESS << 1), &mpu_buf, 6, 100);
-			if ( mpu_ret == HAL_OK ) {
-				// shift first byte left, add second byte
-				raw_accel_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf[1]);
-				raw_accel_y = (int16_t)(mpu_buf[2] << 8 | mpu_buf[3]);
-				raw_accel_z = (int16_t)(mpu_buf[4] << 8 | mpu_buf[5]);
-
-				// get float values in g
-				accel_x = raw_accel_x/16384.0;
-				accel_y = raw_accel_y/16384.0;
-				accel_z = raw_accel_z/16384.0;
-				tilt_x = atan(accel_y/accel_z)*180/PI;
-				tilt_y = atan(accel_x/accel_z)*180/PI;
-			}
-		}
-
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c2, (uint16_t)(MPU_ADDRESS << 1), &gyro_addr, 1, 100);
-		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c2, (MPU_ADDRESS << 1), &mpu_buf, 6, 100);
-			if ( mpu_ret == HAL_OK ) {
-				// shift first byte left, add second byte
-				raw_gyro_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf [1]);
-				raw_gyro_y = (int16_t)(mpu_buf[2] << 8 | mpu_buf [3]);
-				raw_gyro_z = (int16_t)(mpu_buf[4] << 8 | mpu_buf [5]);
-
-				// convert to deg/sec
-				gyro_x = raw_gyro_x/131.0;
-				gyro_y = raw_gyro_y/131.0;
-				gyro_z = raw_gyro_z/131.0;
-
-				rot_z = gyro_z;
-			}
-		}
-    }
-
-
-    return mpu_ret;
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -445,15 +414,6 @@ int main(void)
 		  // Handle error (e.g., print an error message)
 		  printf("Error reading MMC5603 data\n");
 	  }
-
-	  // Acceleration and Gyro-----------------------------------------------------
-	  read_mpu();
-	  printf("Accel_x: %.2f \n", accel_x);
-	  printf("Accel_y: %.2f \n", accel_y);
-	  printf("Accel_z: %.2f \n", accel_z);
-	  printf("Gyro_x: %.2f \n", gyro_x);
-	  printf("Gyro_y: %.2f \n", gyro_y);
-	  printf("Gyro_z: %.2f \n", gyro_z);
 
 	  // Cameras ----------------------------------------------------------
 

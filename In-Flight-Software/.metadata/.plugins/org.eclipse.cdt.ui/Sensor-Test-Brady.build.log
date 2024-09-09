@@ -1,16 +1,57 @@
-11:35:37 **** Incremental Build of configuration Debug for project Sensor-Test-Brady ****
+12:25:52 **** Incremental Build of configuration Debug for project Sensor-Test-Brady ****
 make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'set_gps':
+../Core/Src/main.c:214:31: warning: implicit declaration of function 'atoi' [-Wimplicit-function-declaration]
+  214 |                 gps_time_hr = atoi(tmp);
+      |                               ^~~~
+../Core/Src/main.c:222:32: warning: implicit declaration of function 'atof' [-Wimplicit-function-declaration]
+  222 |                 gps_latitude = atof(buf) / 100;
+      |                                ^~~~
+../Core/Src/main.c:201:14: warning: unused variable 'tmp2' [-Wunused-variable]
+  201 |         char tmp2[3];
+      |              ^~~~
+../Core/Src/main.c: In function 'read_pa1010d':
+../Core/Src/main.c:288:20: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  288 |         parse_nmea(pa_buf);
+      |                    ^~~~~~
+      |                    |
+      |                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:252:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  252 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'read_mpu':
+../Core/Src/main.c:327:86: warning: passing argument 3 of 'HAL_I2C_Master_Receive' from incompatible pointer type [-Wincompatible-pointer-types]
+  327 |                         mpu_ret = HAL_I2C_Master_Receive(&hi2c2, (MPU_ADDRESS << 1), &mpu_buf, 6, 100);
+      |                                                                                      ^~~~~~~~
+      |                                                                                      |
+      |                                                                                      uint8_t (*)[6] {aka unsigned char (*)[6]}
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:363,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h:567:97: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'uint8_t (*)[6]' {aka 'unsigned char (*)[6]'}
+  567 | HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                                        ~~~~~~~~~^~~~~
+../Core/Src/main.c:345:86: warning: passing argument 3 of 'HAL_I2C_Master_Receive' from incompatible pointer type [-Wincompatible-pointer-types]
+  345 |                         mpu_ret = HAL_I2C_Master_Receive(&hi2c2, (MPU_ADDRESS << 1), &mpu_buf, 6, 100);
+      |                                                                                      ^~~~~~~~
+      |                                                                                      |
+      |                                                                                      uint8_t (*)[6] {aka unsigned char (*)[6]}
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h:567:97: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'uint8_t (*)[6]' {aka 'unsigned char (*)[6]'}
+  567 | HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+      |                                                                                        ~~~~~~~~~^~~~~
 arm-none-eabi-gcc -o "Sensor-Test-Brady.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Sensor-Test-Brady\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Sensor-Test-Brady.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Sensor-Test-Brady.elf
  
 arm-none-eabi-size  Sensor-Test-Brady.elf 
 arm-none-eabi-objdump -h -S Sensor-Test-Brady.elf  > "Sensor-Test-Brady.list"
    text	   data	    bss	    dec	    hex	filename
-  35068	    468	   2676	  38212	   9544	Sensor-Test-Brady.elf
+  37076	    468	   2740	  40284	   9d5c	Sensor-Test-Brady.elf
 Finished building: default.size.stdout
  
 Finished building: Sensor-Test-Brady.list
  
 
-11:35:38 Build Finished. 0 errors, 0 warnings. (took 1s.362ms)
+12:25:53 Build Finished. 0 errors, 6 warnings. (took 1s.310ms)
 

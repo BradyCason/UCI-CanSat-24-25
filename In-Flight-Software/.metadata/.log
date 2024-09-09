@@ -16,3 +16,18 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2024-09-03 11:04:16.243
 !MESSAGE Indexed 'Sensor-Test-Brady' (24 sources, 84 headers) in 3.52 sec: 5,722 declarations; 36,514 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0047%)
+!SESSION 2024-09-09 12:09:29.422 -----------------------------------------------
+eclipse.buildId=Version 1.16.0
+java.version=17.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2024-09-09 12:09:38.530
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2024-09-09 12:09:38.532
+!MESSAGE Log4j2 initialized with config file C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-09-09 12:09:44.336
+!MESSAGE Started RMI Server, listening on port 41337
