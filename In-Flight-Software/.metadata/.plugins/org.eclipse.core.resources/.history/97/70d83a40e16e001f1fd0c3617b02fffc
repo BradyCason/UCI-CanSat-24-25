@@ -63,8 +63,6 @@ typedef uint8_t bool;
 #define MMC5603_REG_Z_LSB 0x04
 #define MMC5603_REG_Z_MSB 0x05
 
-#define PI 3.141592
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -135,10 +133,6 @@ int16_t raw_gyro_z = 0;
 float gyro_x;
 float gyro_y;
 float gyro_z;
-float tilt_x = 0;
-float tilt_y = 0;
-float rot_z = 0;
-HAL_StatusTypeDef mpu_ret;
 
 float read_mcp9808(void) {
     uint8_t temp_reg = MCP9808_TEMP_REG; // Register to read
@@ -447,7 +441,7 @@ int main(void)
 	  }
 
 	  // Acceleration and Gyro-----------------------------------------------------
-	  read_mpu();
+	  read_mpu()
 	  printf("Accel_x: %.2f \n", accel_x);
 	  printf("Accel_y: %.2f \n", accel_y);
 	  printf("Accel_z: %.2f \n", accel_z);

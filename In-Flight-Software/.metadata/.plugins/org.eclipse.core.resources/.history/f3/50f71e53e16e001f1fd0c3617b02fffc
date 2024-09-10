@@ -63,8 +63,6 @@ typedef uint8_t bool;
 #define MMC5603_REG_Z_LSB 0x04
 #define MMC5603_REG_Z_MSB 0x05
 
-#define PI 3.141592
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
