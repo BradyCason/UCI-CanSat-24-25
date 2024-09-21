@@ -27,6 +27,7 @@ running = True
 sim_enable = False
 telemetry_on = False
 csv_indexer = 0
+buzzer_on = False
 
 # xbee communication parameters
 BAUDRATE = 115200
@@ -89,6 +90,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         # self.override_state_1_button.clicked.connect(None)
         # self.override_state_2_button.clicked.connect(None)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
+        self.buzzer_toggle_button.clicked.connect(self.toggle_buzzer)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
 
         # Connect non-sim buttons to update sim button colors
@@ -100,12 +102,14 @@ class GroundStationWindow(QtWidgets.QMainWindow):
 
     def update(self):
         global telemetry
+        global telemetry_on
 
-        for field in TELEMETRY_FIELDS:
-            if field != "TEAM_ID":
-                self.telemetry_labels[field].setText(telemetry[field])
+        if telemetry_on:
+            for field in TELEMETRY_FIELDS:
+                if field != "TEAM_ID":
+                    self.telemetry_labels[field].setText(telemetry[field])
 
-        self.graph_window.update()
+            self.graph_window.update()
 
     def make_button_green(self, button):
         button.setStyleSheet("QPushButton{background-color: rgba(40, 167, 69, 1);} QPushButton:hover{background-color: rgba(36, 149, 62, 1);}")
@@ -169,7 +173,19 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             write_xbee("CMD,"+ TEAM_ID + ",CX,OFF")
             self.telemetry_toggle_button.setText("Telemetry Toggle: Off")
             self.make_button_red(self.telemetry_toggle_button)
-            self.make_button_red(self.telemetry_toggle_button)
+
+    def toggle_buzzer(self):
+        global buzzer_on
+        buzzer_on = not buzzer_on
+
+        if buzzer_on:
+            write_xbee("CMD,"+ TEAM_ID + ",BCN,ON")
+            self.buzzer_toggle_button.setText("Buzzer Toggle: On")
+            self.make_button_green(self.buzzer_toggle_button)
+        else:
+            write_xbee("CMD,"+ TEAM_ID + ",BCN,OFF")
+            self.buzzer_toggle_button.setText("Buzzer Toggle: Off")
+            self.make_button_red(self.buzzer_toggle_button)
 
 
 class GraphWindow(pg.GraphicsLayoutWidget):
@@ -222,6 +238,8 @@ def verify_checksum(data, checksum):
     return checksum == calc_checksum(data)
 
 def parse_xbee(data):
+    global sim
+
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
 
@@ -242,7 +260,7 @@ def read_xbee():
             start_byte = ser.read(1)
 
             if start_byte == START_DELIMITER:
-                frame = ser.read_until(b"\n").decode.strip()
+                frame = ser.read_until(b"\n").decode().strip()
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, checksum):
                     parse_xbee(data.split(","))
@@ -258,6 +276,9 @@ def write_xbee(cmd):
         CMD,<TEAM ID>,SIMP,<PRESSURE>           Simulated Pressure Data (to be used in Simulation Mode only)
         CMD,<TEAM ID>,CAL                       Calibrate Altitude to Zero
         CMD,<TEAM ID>,MEC,<DEVICE>,<ON_OFF>     Mechanism actuation command
+
+        Additional Commands:
+        CMD,<TEAM_ID>,BCN,<ON_OFF>              Turns the beacon on or off
     '''
 
     # Create Packet
@@ -293,8 +314,8 @@ def main():
     w = GroundStationWindow()
 
     if (not SER_DEBUG):
-        threading.Thread(target=read_xbee).start()
-    threading.Thread(target=send_simp_data).start()
+        threading.Thread(target=read_xbee, daemon=True).start()
+    threading.Thread(target=send_simp_data, daemon=True).start()
 
     w.show()
     sys.exit(app.exec_())
