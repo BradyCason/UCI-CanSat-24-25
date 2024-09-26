@@ -41,8 +41,8 @@ typedef uint8_t bool;
 #define false 0
 #define true 1
 
-#define MCP9808_ADDR    0x18   // MCP9808 I2C address (shifted left for 8-bit address)
-#define MCP9808_TEMP_REG 0x05 // Temperature register address
+#define MPL3115A2_PRESSURE_MSB 0x01
+#define MPL3115A2_ADDR 0x60
 
 #define INA219_ADDRESS 0x40
 #define INA219_REG_BUS_VOLTAGE  0x02
@@ -96,6 +96,7 @@ static void MX_I2C2_Init(void);
 /* USER CODE BEGIN 0 */
 
 float temperature = 0.0;
+float pressure = 0.0;
 
 float voltage = 0.0;
 
@@ -140,32 +141,34 @@ float tilt_y = 0;
 float rot_z = 0;
 HAL_StatusTypeDef mpu_ret;
 
-float read_mcp9808(void) {
-    uint8_t temp_reg = MCP9808_TEMP_REG; // Register to read
-    uint8_t temp_data[2];                // Buffer to store temperature data
+uint8_t read_mpl3115a2(void) {
+    uint8_t reg_addr = MPL3115A2_PRESSURE_MSB;  // Pressure MSB register
+    uint8_t mpl3115a2_buf[5];                   // Buffer to store pressure and temperature data
+    uint8_t ret;                                // Return status of I2C communication
+    uint32_t pressure_raw;
     uint16_t temp_raw;
-    float temperature = 0.0;
 
-    // Send register address
-    if (HAL_I2C_Master_Transmit(&hi2c2, MCP9808_ADDR, &temp_reg, 1, 100) != HAL_OK) {
-        return -1.0; // Transmission error, return an invalid temperature
+    // Check if MPL3115A2 is ready for communication
+    ret = HAL_I2C_IsDeviceReady(&hi2c2, MPL3115A2_ADDR << 1, 3, 5);
+    if (ret == HAL_OK) {
+        // Transmit the register address (starting from Pressure MSB)
+        ret = HAL_I2C_Master_Transmit(&hi2c2, MPL3115A2_ADDR << 1, &reg_addr, 1, 100);
+        if (ret == HAL_OK) {
+            // Receive 5 bytes (3 bytes for pressure, 2 bytes for temperature)
+            ret = HAL_I2C_Master_Receive(&hi2c2, MPL3115A2_ADDR << 1, mpl3115a2_buf, 5, 100);
+            if (ret == HAL_OK) {
+                // Combine the received bytes for pressure (20-bit value)
+                pressure_raw = ((mpl3115a2_buf[0] << 16) | (mpl3115a2_buf[1] << 8) | mpl3115a2_buf[2]) >> 4;
+                pressure = pressure_raw / 4.0;  // Convert raw pressure to Pascals
+
+                // Combine the received bytes for temperature (12-bit value)
+                temp_raw = (mpl3115a2_buf[3] << 8) | mpl3115a2_buf[4];
+                temperature = temp_raw / 256.0;  // Convert raw temperature to Celsius
+            }
+        }
     }
 
-    // Receive temperature data (2 bytes)
-    if (HAL_I2C_Master_Receive(&hi2c2, MCP9808_ADDR, temp_data, 2, 100) != HAL_OK) {
-        return -1.0; // Reception error, return an invalid temperature
-    }
-
-    // Combine the received data
-    temp_raw = (temp_data[0] << 8) | temp_data[1];
-
-    // Convert raw data to temperature in Celsius
-    temperature = (temp_raw & 0x0FFF) * 0.0625;
-    if (temp_raw & 0x1000) {
-        temperature -= 256.0;
-    }
-
-    return temperature;
+    return ret;  // Return the I2C communication status
 }
 
 uint8_t read_ina219() {
@@ -406,23 +409,17 @@ int main(void)
   while (1)
   {
     // Temperature ----------------------------------------------------------
-	  float temperature = read_mcp9808(); // Call the function and store the result
-
-	  if (temperature != -1.0) {
-		  // If reading is successful, process the temperature value
-		  printf("Temperature: %.2f°C\n", temperature);
-	  } else {
-		  // Handle the error if the sensor reading fails
-		  printf("Failed to read temperature from MCP9808\n");
-	  }
+	  if (read_mpl3115a2() == HAL_OK){
+      printf("Temperature: %.2f°C\n", temperature);
+      printf("Pressure: %.2f°C\n", pressure);
+    } else{
+      printf("Failed to read from mpl3115a2 sensor\n");
+    }
 
 	  // Voltage ----------------------------------------------------------
 	  if (read_ina219() == HAL_OK) {
-		  // If reading is successful, process the voltage value
-		  // For example, print the voltage value to the console
 		  printf("Bus Voltage: %.2f V\n", voltage);
 	  } else {
-		  // Handle the error if the sensor reading fails
 		  printf("Failed to read from INA219 sensor\n");
 	  }
 
@@ -439,10 +436,8 @@ int main(void)
 	  // Magnetic Field ----------------------------------------------------------
 	  uint8_t status = read_mmc5603();
 	  if (status == HAL_OK) {
-		  // Process and output the magnetic field data
 		  printf("Magnetic Field - X: %d, Y: %d, Z: %d\n", mag_x, mag_y, mag_z);
 	  } else {
-		  // Handle error (e.g., print an error message)
 		  printf("Error reading MMC5603 data\n");
 	  }
 
@@ -454,8 +449,6 @@ int main(void)
 	  printf("Gyro_x: %.2f \n", gyro_x);
 	  printf("Gyro_y: %.2f \n", gyro_y);
 	  printf("Gyro_z: %.2f \n", gyro_z);
-
-	  // Cameras ----------------------------------------------------------
 
 	  HAL_Delay(1000);
 
