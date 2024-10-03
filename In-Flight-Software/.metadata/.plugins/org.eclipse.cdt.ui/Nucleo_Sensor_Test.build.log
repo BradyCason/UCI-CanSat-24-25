@@ -1,10 +1,10 @@
-22:49:34 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
+23:39:36 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
 make -j20 all 
 arm-none-eabi-size  Nucleo_Sensor_Test.elf 
    text	   data	    bss	    dec	    hex	filename
-  36600	    552	   3904	  41056	   a060	Nucleo_Sensor_Test.elf
+  38908	    552	   3904	  43364	   a964	Nucleo_Sensor_Test.elf
 Finished building: default.size.stdout
  
 
-22:49:35 Build Finished. 0 errors, 0 warnings. (took 377ms)
+23:39:36 Build Finished. 0 errors, 0 warnings. (took 554ms)
 

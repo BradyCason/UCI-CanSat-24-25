@@ -54,7 +54,6 @@ typedef uint8_t bool;
 #define MPL3115A2_WHO_AM_I 0x0C
 #define MPL3115A2_CTRL_REG1 0x26
 #define MPL3115A2_OUT_P_MSB 0x01
-#define MPL3115A2_OUT_T_MSB 0x04
 
 // MPU6050 (Accel/ Tilt)
 #define MPU6050_ADDRESS (0x68 << 1)
@@ -64,6 +63,8 @@ typedef uint8_t bool;
 #define PA_BFR_SIZE 255
 
 #define PI 3.141592
+
+#define ALTITUDE_OFFSET 0;
 
 /* USER CODE END PD */
 
@@ -104,10 +105,10 @@ CMD_ECHO [,,OPTIONAL_DATA] */
 
 
 // Variables
-//float altitude;
+float altitude;
 float temperature;
 float pressure;
-//float voltage;
+float voltage; // Not implemented yet
 float gyro_x;
 float gyro_y;
 float gyro_z;
@@ -115,7 +116,7 @@ float accel_x;
 float accel_y;
 float accel_z;
 float mag_x, mag_y, mag_z;
-//float auto_gyro_rotation_rate;
+float auto_gyro_rotation_rate; // Not implemented yet
 uint8_t gps_time_hr;
 uint8_t gps_time_min;
 uint8_t gps_time_sec;
@@ -217,49 +218,67 @@ bool parse_nmea(char *buf){
 }
 
 void read_MMC5603(void) {
-    uint8_t mmc5603_ret;
     uint8_t mmc5603_buf[9];
-    int32_t rawX, rawY, rawZ;
+    uint8_t first_reg = 0x00;
+	int32_t raw_x, raw_y, raw_z;
 
-    // Check if MMC5603 is ready for communication
-    mmc5603_ret = HAL_I2C_IsDeviceReady(&hi2c2, MMC5603_ADDRESS, 3, 5);
-    if (mmc5603_ret == HAL_OK) {
-        mmc5603_ret = HAL_I2C_Mem_Read(&hi2c2, MMC5603_ADDRESS, (uint8_t)0x00, I2C_MEMADD_SIZE_8BIT, mmc5603_buf, 9, HAL_MAX_DELAY);
+	// Perform the I2C write (send the register address) then read 9 bytes of data
+	if (HAL_I2C_Master_Transmit(&hi2c2, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY) != HAL_OK) {
+		// Handle transmission error
+		return;
+	}
 
-		if (mmc5603_ret == HAL_OK) {
+	HAL_Delay(10);
 
-			rawX = ((uint32_t)mmc5603_buf[0] << 12) | ((uint32_t)mmc5603_buf[1] << 4) | ((mmc5603_buf[6] & 0xF0) >> 4); // [19:0]
-			rawY = ((uint32_t)mmc5603_buf[2] << 12) | ((uint32_t)mmc5603_buf[3] << 4) | ((mmc5603_buf[7] & 0xF0) >> 4); // [19:0]
-			rawZ = ((uint32_t)mmc5603_buf[4] << 12) | ((uint32_t)mmc5603_buf[5] << 4) | ((mmc5603_buf[8] & 0xF0) >> 4); // [19:0]
+	// Read 9 bytes of data from the sensor
+	if (HAL_I2C_Master_Receive(&hi2c2, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
+		// Handle reception error
+		return;
+	}
 
-			// Convert to Gauss
-			mag_x = rawX * 0.0625f / 1000.0f;
-			mag_y = rawY * 0.0625f / 1000.0f;
-			mag_z = rawZ * 0.0625f / 1000.0f;
-        }
-    }
+	// Extract X, Y, Z values from the buffer
+	raw_x = ((uint32_t)mmc5603_buf[0] << 12) | ((uint32_t)mmc5603_buf[1] << 4) | ((uint32_t)mmc5603_buf[6] >> 4);
+	raw_y = ((uint32_t)mmc5603_buf[2] << 12) | ((uint32_t)mmc5603_buf[3] << 4) | ((uint32_t)mmc5603_buf[7] >> 4);
+	raw_z = ((uint32_t)mmc5603_buf[4] << 12) | ((uint32_t)mmc5603_buf[5] << 4) | ((uint32_t)mmc5603_buf[8] >> 4);
+
+	// Fix center offsets
+
+	raw_x -= (1 << 19);
+	raw_y -= (1 << 19);
+	raw_z -= (1 << 19);
+
+	// Scale to Gauss
+	mag_x = (float)raw_x * 0.0000625;
+	mag_y = (float)raw_y * 0.0000625;
+	mag_z = (float)raw_z * 0.0000625;
+}
+
+float calculate_altitude(float pressure) {
+	return 44330.77 * (1 - powf(pressure / 101.326, 0.1902632)) + ALTITUDE_OFFSET;
 }
 
 void read_MPL3115A2(void)
 {
-    uint8_t data[5]; // Buffer to hold pressure and temperature data
+    uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, data, 5, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
     // Combine pressure bytes into a 20-bit integer
-    uint32_t p_raw = ((uint32_t)data[0] << 16) | ((uint32_t)data[1] << 8) | (data[2]);
+    uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
     p_raw >>= 4; // Pressure is stored in the upper 20 bits
 
     // Convert raw pressure to Pascals
     pressure = p_raw / 4.0 / 1000; // Pressure in KiloPascals
 
     // Combine temperature bytes into a 12-bit integer
-    int16_t t_raw = ((int16_t)data[3] << 8) | (data[4]);
+    int16_t t_raw = ((int16_t)mpl_data[3] << 8) | (mpl_data[4]);
     t_raw >>= 4; // Temperature is stored in the upper 12 bits
 
     // Convert raw temperature to degrees Celsius
     temperature = t_raw / 16.0; // Temperature in Celsius
+
+    altitude = calculate_altitude(pressure);
 }
 
 void read_MPU6050() {
@@ -324,24 +343,31 @@ void read_PA1010D(void)
 		pa_buf[pa1010d_i] = pa1010d_bytebuf;
 	}
 	parse_nmea(pa_buf);
-
-	return 1;
 }
 
 void init_MMC5603(void) {
-	uint8_t odr_value = 255;  // Example: Set ODR to 1000 Hz by writing 255
-	uint8_t control_reg0 = 0b01000001;  // Set Cmm_freq_en and Take_meas_M
-	uint8_t control_reg1 = 0b00000000;  // BW0=0, BW1=0 (6.6 ms)
+	uint8_t odr_value = 100;  // Example: Set ODR to 1000 Hz by writing 255
+	uint8_t control_reg0 = 0b10000000;  // Set Cmm_freq_en and Take_meas_M
+	uint8_t control_reg1 = 0b10000000;  // BW0=0, BW1=0 (6.6 ms)
 	uint8_t control_reg2 = 0b00010000;  // Set Cmm_en to enable continuous mode
-
-	// Set Output Data Rate
-	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
-
-	// Configure Control Register 0
-	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
 
 	// Configure Control Register 1
 	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
+	HAL_Delay(20);
+	uint8_t set_bit = 0b00001000;
+	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
+	HAL_Delay(1);
+	uint8_t reset_bit = 0b00010000;
+	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &reset_bit, 1, HAL_MAX_DELAY);
+	HAL_Delay(1);
+
+	// Set Output Data Rate
+	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
+	HAL_Delay(10);
+
+	// Configure Control Register 0
+	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
+	HAL_Delay(10);
 
 	// Configure Control Register 2
 	HAL_I2C_Mem_Write(&hi2c2, MMC5603_ADDRESS, 0x1D, I2C_MEMADD_SIZE_8BIT, &control_reg2, 1, HAL_MAX_DELAY);
@@ -358,8 +384,8 @@ void init_MPL3115A2(void)
 	if (who_am_i == 0xC4)
 	{
 		// WHO_AM_I is correct, now configure the sensor
-//		uint8_t data = 0xB9;
-		uint8_t data = 0x39;
+//		uint8_t data = 0xB9; // Altimeter mode
+		uint8_t data = 0x39; // Barometer mode
 		HAL_I2C_Mem_Write(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_CTRL_REG1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	}
 	else

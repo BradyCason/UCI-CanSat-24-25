@@ -1,29 +1,23 @@
-22:49:30 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
+23:39:31 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Zx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 ../Core/Src/main.c: In function 'read_PA1010D':
-../Core/Src/main.c:326:20: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
-  326 |         parse_nmea(pa_buf);
+../Core/Src/main.c:345:20: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  345 |         parse_nmea(pa_buf);
       |                    ^~~~~~
       |                    |
       |                    uint8_t * {aka unsigned char *}
-../Core/Src/main.c:195:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-  195 | bool parse_nmea(char *buf){
+../Core/Src/main.c:196:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  196 | bool parse_nmea(char *buf){
       |                 ~~~~~~^~~
-../Core/Src/main.c:328:16: warning: 'return' with a value, in function returning void [-Wreturn-type]
-  328 |         return 1;
-      |                ^
-../Core/Src/main.c:313:6: note: declared here
-  313 | void read_PA1010D(void)
-      |      ^~~~~~~~~~~~
 ../Core/Src/main.c: In function 'init_PA1010D':
-../Core/Src/main.c:406:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
-  406 |                         parse_nmea(pa_buf);
+../Core/Src/main.c:432:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  432 |                         parse_nmea(pa_buf);
       |                                    ^~~~~~
       |                                    |
       |                                    uint8_t * {aka unsigned char *}
-../Core/Src/main.c:195:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
-  195 | bool parse_nmea(char *buf){
+../Core/Src/main.c:196:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  196 | bool parse_nmea(char *buf){
       |                 ~~~~~~^~~
 arm-none-eabi-gcc -o "Nucleo_Sensor_Test.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Sensor_Test\STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Sensor_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Nucleo_Sensor_Test.elf
@@ -31,15 +25,15 @@ Finished building target: Nucleo_Sensor_Test.elf
 arm-none-eabi-size  Nucleo_Sensor_Test.elf 
 arm-none-eabi-objdump -h -S Nucleo_Sensor_Test.elf  > "Nucleo_Sensor_Test.list"
    text	   data	    bss	    dec	    hex	filename
-  36600	    552	   3904	  41056	   a060	Nucleo_Sensor_Test.elf
+  38908	    552	   3904	  43364	   a964	Nucleo_Sensor_Test.elf
 Finished building: default.size.stdout
  
 Finished building: Nucleo_Sensor_Test.list
  
-22:49:34 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
+23:39:36 **** Incremental Build of configuration Debug for project Nucleo_Sensor_Test ****
 make -j20 all 
 arm-none-eabi-size  Nucleo_Sensor_Test.elf 
    text	   data	    bss	    dec	    hex	filename
-  36600	    552	   3904	  41056	   a060	Nucleo_Sensor_Test.elf
+  38908	    552	   3904	  43364	   a964	Nucleo_Sensor_Test.elf
 Finished building: default.size.stdout
  
