@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="cont"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="cont"/>
-			<item value="12"/>
-			<item value="odr"/>
-			<item value="MPU_ADDRESS"/>
 			<item value="result"/>
-			<item value="tester"/>
-			<item value="nmea_sent"/>
-			<item value="atof"/>
+			<item value="MPL3115A2_CTRL_REG1"/>
+			<item value="MPL3115A2_OUT_P_MSB"/>
+			<item value="MPL3115A2_OUT_T_MSB"/>
+			<item value="calculate"/>
+			<item value="g"/>
+			<item value="P0"/>
+			<item value="mpl_data"/>
+			<item value="off_h"/>
+			<item value="ctrl_reg1"/>
+			<item value="26"/>
+			<item value="mpl"/>
 			<item value="pa_buf"/>
-			<item value="d_init"/>
-			<item value="_mode"/>
-			<item value="_moder"/>
-			<item value="init_pa"/>
-			<item value="init_s"/>
-			<item value="init_"/>
+			<item value="tester"/>
+			<item value="uint8_t mmc5603_buf[9];"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

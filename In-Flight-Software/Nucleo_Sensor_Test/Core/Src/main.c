@@ -62,6 +62,9 @@ typedef uint8_t bool;
 #define PA1010D_ADDRESS (0x10 << 1)
 #define PA_BFR_SIZE 255
 
+//INA219 (Voltage)
+#define INA219_ADDRESS (0x40 << 1)
+
 #define PI 3.141592
 
 #define ALTITUDE_OFFSET 0;
@@ -141,6 +144,18 @@ char parse_buf[255];
 char gps_lat_dir;
 char gps_long_dir;
 
+// INA219 DATA (VOLTAGE/CURRENT)
+HAL_StatusTypeDef ina_ret;
+uint8_t ina_buf[8];
+int16_t raw_shunt_voltage;
+int16_t raw_bus_voltage;
+int16_t raw_power;
+int16_t raw_current;
+float shunt_voltage;
+float bus_voltage;
+float power;
+float current;
+
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
 
@@ -217,6 +232,10 @@ bool parse_nmea(char *buf){
 	return true;
 }
 
+float calculate_altitude(float pressure) {
+	return 44330.77 * (1 - powf(pressure / 101.326, 0.1902632)) + ALTITUDE_OFFSET;
+}
+
 void read_MMC5603(void) {
     uint8_t mmc5603_buf[9];
     uint8_t first_reg = 0x00;
@@ -253,10 +272,6 @@ void read_MMC5603(void) {
 	mag_z = (float)raw_z * 0.0000625;
 }
 
-float calculate_altitude(float pressure) {
-	return 44330.77 * (1 - powf(pressure / 101.326, 0.1902632)) + ALTITUDE_OFFSET;
-}
-
 void read_MPL3115A2(void)
 {
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
@@ -281,7 +296,7 @@ void read_MPL3115A2(void)
     altitude = calculate_altitude(pressure);
 }
 
-void read_MPU6050() {
+void read_MPU6050(void) {
 	uint8_t imu_addr = 0x3B;
 	uint8_t gyro_addr = 0x43;
 	HAL_StatusTypeDef mpu_ret;
@@ -343,6 +358,33 @@ void read_PA1010D(void)
 		pa_buf[pa1010d_i] = pa1010d_bytebuf;
 	}
 	parse_nmea(pa_buf);
+}
+
+void read_INA219(void) {
+	/* INA219 (CURRENT/VOLTAGE) */
+	uint8_t bus_add = 0x02; // need to use separate registers for everything
+
+	ina_ret = HAL_I2C_IsDeviceReady(&hi2c2, INA219_ADDRESS, 3, 5);
+	if (ina_ret == HAL_OK) {
+		ina_ret = HAL_I2C_Master_Transmit(&hi2c2, INA219_ADDRESS, &bus_add, 1, 100);
+		if (ina_ret == HAL_OK) {
+			HAL_I2C_Master_Receive(&hi2c2, INA219_ADDRESS, ina_buf, 2, 10);
+
+			//raw_shunt_voltage = abs((int16_t)(ina_buf[0] << 8 | ina_buf[1]));
+			raw_bus_voltage = (int16_t)(ina_buf[0] << 8 | ina_buf [1]);
+			//raw_power = (int16_t)(ina_buf[4] << 8 | ina_buf [5]);
+			//raw_current = (int16_t)(ina_buf[6] << 8 | ina_buf [7]);
+
+			//shunt_voltage = raw_shunt_voltage*10.0;
+			bus_voltage = raw_bus_voltage/1600.0;
+			//power = raw_power*20/32768.0;
+			//current = raw_current/32768.0;
+
+			voltage = bus_voltage;
+		}
+
+	}
+
 }
 
 void init_MMC5603(void) {
@@ -435,12 +477,19 @@ void init_PA1010D(void)
 	}
 }
 
+void init_INA219(void)
+{
+	uint8_t ina_config[2] = {0b00000001, 0b00011101};
+	HAL_I2C_Mem_Write(&hi2c2, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+}
+
 void read_sensors(void)
 {
 	read_MPL3115A2(); // Temperature/ Pressure
 	read_MMC5603(); // Magnetic Field
 	read_MPU6050(); // Accel/ tilt
 	read_PA1010D(); // GPS
+	read_INA219(); // Voltage
 }
 
 void init_sensors()
@@ -449,6 +498,7 @@ void init_sensors()
 	init_MMC5603();
 	init_MPU6050();
 	init_PA1010D();
+	init_INA219();
 }
 
 

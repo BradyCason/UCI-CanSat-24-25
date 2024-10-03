@@ -1,6 +1,3 @@
-tester
-result
-state
 temperature
 pressure
 mag_x
@@ -19,6 +16,4 @@ gps_altitude
 gps_latitude
 gps_longitude
 gps_sats
-pa_buf
-nmea_sentence
-mmc5603_buf
+altitude
