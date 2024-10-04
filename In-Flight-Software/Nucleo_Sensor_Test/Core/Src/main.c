@@ -156,6 +156,8 @@ float bus_voltage;
 float power;
 float current;
 
+HAL_StatusTypeDef result;
+
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
 
@@ -494,6 +496,8 @@ void read_sensors(void)
 
 void init_sensors()
 {
+	result = HAL_I2C_IsDeviceReady(&hi2c2, MPU6050_ADDRESS, 3, 5);
+
 	init_MPL3115A2();
 	init_MMC5603();
 	init_MPU6050();
