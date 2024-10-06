@@ -128,7 +128,7 @@ int avi_length = 1800;            // how long a movie in seconds -- 1800 sec = 3
 int frame_interval = 0;          // record at full speed
 int speed_up_factor = 1;          // play at realtime
 int stream_delay = 500;           // minimum of 500 ms delay between frames
-int MagicNumber = 12;                // change this number to reset the eprom in your esp32 for file numbers
+int MagicNumber = 120;                // change this number to reset the eprom in your esp32 for file numbers
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -617,7 +617,14 @@ void read_config_file() {
     junk = config_file.readStringUntil('\n');
     cframesize = config_file.parseInt();
     junk = config_file.readStringUntil('\n');
-
+    cquality = config_file.parseInt();
+    junk = config_file.readStringUntil('\n');
+    cframesizeconfig = config_file.parseInt();
+    junk = config_file.readStringUntil('\n');
+    cqualityconfig = config_file.parseInt();
+    junk = config_file.readStringUntil('\n');
+    cbuffersconfig = config_file.parseInt();
+    junk = config_file.readStringUntil('\n');
     clength = config_file.parseInt();
     junk = config_file.readStringUntil('\n');
     cinterval = config_file.parseInt();
@@ -625,6 +632,8 @@ void read_config_file() {
     cspeedup = config_file.parseInt();
     junk = config_file.readStringUntil('\n');
     cstreamdelay = config_file.parseInt();
+    junk = config_file.readStringUntil('\n');
+    cinternet = config_file.parseInt();
     junk = config_file.readStringUntil('\n');
     czone = config_file.readStringUntil(' ');
     junk = config_file.readStringUntil('\n');

@@ -160,7 +160,7 @@ camera_fb_t * fb_next = NULL;
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "soc/soc.h"
-#include "soc/cpu.h"
+#include "esp_cpu.h"
 #include "soc/rtc_cntl_reg.h"
 
 static esp_err_t cam_err;
