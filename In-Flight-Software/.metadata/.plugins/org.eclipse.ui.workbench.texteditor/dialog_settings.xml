@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value=""/>
+		<item key="selection" value="TX_BFR"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="result"/>
-			<item value="MPL3115A2_CTRL_REG1"/>
-			<item value="MPL3115A2_OUT_P_MSB"/>
-			<item value="MPL3115A2_OUT_T_MSB"/>
-			<item value="calculate"/>
-			<item value="g"/>
-			<item value="P0"/>
-			<item value="mpl_data"/>
-			<item value="off_h"/>
-			<item value="ctrl_reg1"/>
-			<item value="26"/>
-			<item value="mpl"/>
-			<item value="pa_buf"/>
-			<item value="tester"/>
-			<item value="uint8_t mmc5603_buf[9];"/>
+			<item value="TX_bfr"/>
+			<item value="TX_buff"/>
+			<item value="snprintf"/>
+			<item value="printf"/>
+			<item value="cmd_echo"/>
+			<item value="hs_depl"/>
+			<item value="mac"/>
+			<item value="hal_uart_trans"/>
+			<item value="tx_count"/>
+			<item value="gs_mac"/>
+			<item value="prev"/>
+			<item value="transmitting"/>
+			<item value="read_tr"/>
+			<item value="pressure_str"/>
+			<item value="base"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

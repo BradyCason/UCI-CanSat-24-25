@@ -554,46 +554,57 @@ void init_commands(void)
 	snprintf(tel_off_command, sizeof(tel_off_command), "CMD,%s,CX,OFF", TEAM_ID);
 }
 
+uint8_t calculate_checksum(const char *data) {
+    uint32_t sum = 0;  // Use a larger type for summing
+    size_t len = strlen(data);  // Get the length of the string
+
+    // Iterate over each byte in the string and sum their values
+    for (size_t i = 0; i < len; i++) {
+        sum += (uint8_t)data[i];  // Cast char to uint8_t and add to sum
+    }
+
+    // Return the result modulo 256 (0x100)
+    return (uint8_t)(sum % 256);
+}
+
 void create_telemetry(uint8_t *ret, uint8_t part){
 	char tel_buf[TX_BFR_SIZE-18] = {0};	//Preload buffer
 
-	if (part == 0){
-		packet_count += 1;
-		/* Variables TEAM_ID, MISSION_TIME, PACKET_COUNT, MODE, STATE, ALTITUDE,
-		TEMPERATURE, PRESSURE, VOLTAGE, GYRO_R, GYRO_P, GYRO_Y, ACCEL_R,
-		ACCEL_P, ACCEL_Y, MAG_R, MAG_P, MAG_Y, AUTO_GYRO_ROTATION_RATE,
-		GPS_TIME, GPS_ALTITUDE, GPS_LATITUDE, GPS_LONGITUDE, GPS_SATS,
-		CMD_ECHO [,,OPTIONAL_DATA] */
-		snprintf(tel_buf, TX_BFR_SIZE,
-				"@1=%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-				TEAM_ID,
-				mission_time_hr, mission_time_min, mission_time_sec,
-				packet_count,
-				mode,
-				state,
-				altitude,
-				temperature,
-				pressure,
-				voltage,
-				gyro_x,
-				gyro_y,
-				gyro_z,
-				accel_x,
-				accel_y,
-				accel_z,
-				mag_x,
-				mag_y,
-				mag_z,
-				auto_gyro_rotation_rate,
-				gps_time_hr, gps_time_min, gps_time_sec,
-				gps_altitude,
-				gps_latitude,
-				gps_longitude,
-				gps_sats,
-				cmd_echo
-				);
-		tx_count = strlen(tel_buf);
-	}
+	packet_count += 1;
+	/* Variables TEAM_ID, MISSION_TIME, PACKET_COUNT, MODE, STATE, ALTITUDE,
+	TEMPERATURE, PRESSURE, VOLTAGE, GYRO_R, GYRO_P, GYRO_Y, ACCEL_R,
+	ACCEL_P, ACCEL_Y, MAG_R, MAG_P, MAG_Y, AUTO_GYRO_ROTATION_RATE,
+	GPS_TIME, GPS_ALTITUDE, GPS_LATITUDE, GPS_LONGITUDE, GPS_SATS,
+	CMD_ECHO [,,OPTIONAL_DATA] */
+	snprintf(tel_buf, TX_BFR_SIZE,
+			"@1=%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
+			TEAM_ID,
+			mission_time_hr, mission_time_min, mission_time_sec,
+			packet_count,
+			mode,
+			state,
+			altitude,
+			temperature,
+			pressure,
+			voltage,
+			gyro_x,
+			gyro_y,
+			gyro_z,
+			accel_x,
+			accel_y,
+			accel_z,
+			mag_x,
+			mag_y,
+			mag_z,
+			auto_gyro_rotation_rate,
+			gps_time_hr, gps_time_min, gps_time_sec,
+			gps_altitude,
+			gps_latitude,
+			gps_longitude,
+			gps_sats,
+			cmd_echo
+			);
+	tx_count = strlen(tel_buf);
 
 	memset(ret, '/0', sizeof(ret));
 	memcpy(ret, tel_buf, TX_BFR_SIZE-18);
@@ -605,40 +616,21 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 							uint16_t datanum)		//r
 {
 	uint16_t i,length; 	//the length of data for checksum
-	uint8_t check=0x00;
 
 	/*Write Packet Length to Packet*/
-	uint16_t packet_length=datanum+18;				// 18 = the number of packets that are not rf data
+	uint16_t packet_length=datanum+2;				// 1 byte for start delimiter and 1 for checksum
 	length=packet_length-4;							// length for checksum
 	T_packet[0]=0x7E;
-	T_packet[2]=(unsigned char)(length)&0x00ff;
-	T_packet[1]=(unsigned char)(length>>8)&0x00ff;
-	T_packet[3]=0x10;
-	T_packet[4]=0x00;		//0x01 for notification
-	T_packet[13]=0xFF;
-	T_packet[14]=0xFE;
-	T_packet[15]=0x00;
-	T_packet[16]=0x00;
-
-	/*Write Destination Address to Packet*/
-	for(i=0;i<8;i++)
-	{
-		T_packet[i+5]=dest_add[i];
-	}
 
   	/*Write RF Data to Packet*/
 	for(i=0;i<datanum;i++)
 	{
-		T_packet[i+17]=T_data[i];
+		T_packet[i+1]=T_data[i];
 	}
 
 	/*Calculate Checksum*/
-	for(i=0;i<length;i++)
-		{
-			check=(uint8_t)(check+T_packet[i+3]);
-		}
-	check=0xFF-check;
-	T_packet[packet_length-1]=check;
+
+	T_packet[packet_length-1]= calculate_checksum(T_data);
 	return packet_length;
 }
 
