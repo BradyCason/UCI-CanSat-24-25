@@ -76,6 +76,8 @@ typedef uint8_t bool;
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
+uint8_t GS_MAC_ADDR[8] = {0x00,0x13,0xA2,0x00,0x7A,0xD1,0x90,0x20};
+
 // XBee
 uint8_t rx_packet[RX_BFR_SIZE];
 uint8_t tx_data[TX_BFR_SIZE-18];
@@ -190,12 +192,10 @@ int descending_count = 0;
 // Other Variables
 int8_t altitude_offset = 0;
 int beacon_status = 0;
-int telemetry_status = 1;
+int telemetry_status = 0;
 bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
-
-uint8_t debug_packet[TX_BFR_SIZE];
 
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
@@ -612,12 +612,13 @@ void create_telemetry(uint8_t *ret, uint8_t part){
 
 uint16_t transmit_packet(	uint8_t *T_packet,		//w
 							uint8_t *T_data,		//r
+							uint8_t *dest_add,		//r
 							uint16_t datanum)		//r
 {
 	uint16_t i,length; 	//the length of data for checksum
 
 	/*Write Packet Length to Packet*/
-	uint16_t packet_length=datanum+3;				// 1 byte for start delimiter, 1 for checksum, 1 for \n
+	uint16_t packet_length=datanum+2;				// 1 byte for start delimiter and 1 for checksum
 	length=packet_length-4;							// length for checksum
 	T_packet[0]=0x7E;
 
@@ -628,13 +629,8 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	}
 
 	/*Calculate Checksum*/
-	T_packet[packet_length-2]= calculate_checksum(T_data);
-	T_packet[packet_length-1]= '\n';
-	for (i=0; i<packet_length; i++){
-		debug_packet[i] = T_packet[i];
-	}
-//	debug_packet = T_packet;
 
+	T_packet[packet_length-1]= calculate_checksum(T_data);
 	return packet_length;
 }
 
@@ -667,7 +663,7 @@ void read_transmit_telemetry (){
 
 
 		create_telemetry(tx_data, 0);
-		transmit_packet(tx_packet, tx_data, tx_count);
+		transmit_packet(tx_packet, tx_data, GS_MAC_ADDR, tx_count);
 		HAL_UART_Transmit(&huart2, tx_packet, sizeof(tx_packet), 100);
 
 		prev_time = gps_time_sec;

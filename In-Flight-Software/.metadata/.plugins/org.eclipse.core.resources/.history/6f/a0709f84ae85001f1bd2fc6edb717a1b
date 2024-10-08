@@ -617,7 +617,7 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	uint16_t i,length; 	//the length of data for checksum
 
 	/*Write Packet Length to Packet*/
-	uint16_t packet_length=datanum+3;				// 1 byte for start delimiter, 1 for checksum, 1 for \n
+	uint16_t packet_length=datanum+2;				// 1 byte for start delimiter and 1 for checksum
 	length=packet_length-4;							// length for checksum
 	T_packet[0]=0x7E;
 
@@ -628,12 +628,8 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	}
 
 	/*Calculate Checksum*/
-	T_packet[packet_length-2]= calculate_checksum(T_data);
-	T_packet[packet_length-1]= '\n';
-	for (i=0; i<packet_length; i++){
-		debug_packet[i] = T_packet[i];
-	}
-//	debug_packet = T_packet;
+	T_packet[packet_length-1]= calculate_checksum(T_data);
+	debug_packet = T_packet;
 
 	return packet_length;
 }

@@ -630,7 +630,7 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	/*Calculate Checksum*/
 	T_packet[packet_length-2]= calculate_checksum(T_data);
 	T_packet[packet_length-1]= '\n';
-	for (i=0; i<packet_length; i++){
+	for (i=0; i<packet_lenth; i++){
 		debug_packet[i] = T_packet[i];
 	}
 //	debug_packet = T_packet;
