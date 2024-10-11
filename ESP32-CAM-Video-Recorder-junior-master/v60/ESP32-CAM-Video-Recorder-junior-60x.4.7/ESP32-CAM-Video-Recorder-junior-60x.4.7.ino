@@ -128,7 +128,7 @@ int avi_length = 1800;            // how long a movie in seconds -- 1800 sec = 3
 int frame_interval = 0;          // record at full speed
 int speed_up_factor = 1;          // play at realtime
 int stream_delay = 500;           // minimum of 500 ms delay between frames
-int MagicNumber = 120;                // change this number to reset the eprom in your esp32 for file numbers
+int MagicNumber = 12;                // change this number to reset the eprom in your esp32 for file numbers
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
