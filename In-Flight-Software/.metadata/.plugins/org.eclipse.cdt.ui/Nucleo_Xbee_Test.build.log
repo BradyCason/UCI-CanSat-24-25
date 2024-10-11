@@ -1,0 +1,305 @@
+14:42:26 **** Build of configuration Debug for project Nucleo_Xbee_Test ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Zx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:41:19: error: 'RX_BFR_SIZE' undeclared here (not in a function)
+   41 | uint8_t rx_packet[RX_BFR_SIZE];
+      |                   ^~~~~~~~~~~
+../Core/Src/main.c:42:17: error: 'TX_BFR_SIZE' undeclared here (not in a function)
+   42 | uint8_t tx_data[TX_BFR_SIZE-18];
+      |                 ^~~~~~~~~~~
+../Core/Src/main.c:48:1: error: unknown type name 'bool'
+   48 | bool tx_ready;
+      | ^~~~
+../Core/Src/main.c:21:1: note: 'bool' is defined in header '<stdbool.h>'; did you forget to '#include <stdbool.h>'?
+   20 | #include "main.h"
+  +++ |+#include <stdbool.h>
+   21 | 
+../Core/Src/main.c: In function 'read_transmit_telemetry':
+../Core/Src/main.c:83:9: warning: implicit declaration of function 'read_sensors' [-Wimplicit-function-declaration]
+   83 |         read_sensors();
+      |         ^~~~~~~~~~~~
+../Core/Src/main.c:85:13: error: 'gps_time_sec' undeclared (first use in this function)
+   85 |         if (gps_time_sec != prev_time){
+      |             ^~~~~~~~~~~~
+../Core/Src/main.c:85:13: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:85:29: error: 'prev_time' undeclared (first use in this function)
+   85 |         if (gps_time_sec != prev_time){
+      |                             ^~~~~~~~~
+../Core/Src/main.c:87:17: error: 'transmitting' undeclared (first use in this function)
+   87 |                 transmitting = 1;
+      |                 ^~~~~~~~~~~~
+../Core/Src/main.c:88:17: error: 'mission_time_sec' undeclared (first use in this function)
+   88 |                 mission_time_sec++;
+      |                 ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:90:21: error: 'prev_alt' undeclared (first use in this function)
+   90 |                 if (prev_alt > altitude) {
+      |                     ^~~~~~~~
+../Core/Src/main.c:90:32: error: 'altitude' undeclared (first use in this function)
+   90 |                 if (prev_alt > altitude) {
+      |                                ^~~~~~~~
+../Core/Src/main.c:91:25: error: 'descending_count' undeclared (first use in this function)
+   91 |                         descending_count++;
+      |                         ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:100:25: error: 'mission_time_min' undeclared (first use in this function)
+  100 |                         mission_time_min += 1;
+      |                         ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:104:25: error: 'mission_time_hr' undeclared (first use in this function)
+  104 |                         mission_time_hr += 1;
+      |                         ^~~~~~~~~~~~~~~
+../Core/Src/main.c:111:17: warning: implicit declaration of function 'create_telemetry' [-Wimplicit-function-declaration]
+  111 |                 create_telemetry(tx_data, 0);
+      |                 ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:112:17: warning: implicit declaration of function 'transmit_packet' [-Wimplicit-function-declaration]
+  112 |                 transmit_packet(tx_packet, tx_data, GS_MAC_ADDR, tx_count);
+      |                 ^~~~~~~~~~~~~~~
+../Core/Src/main.c:112:53: error: 'GS_MAC_ADDR' undeclared (first use in this function); did you mean 'MAC_ADDR4'?
+  112 |                 transmit_packet(tx_packet, tx_data, GS_MAC_ADDR, tx_count);
+      |                                                     ^~~~~~~~~~~
+      |                                                     MAC_ADDR4
+../Core/Src/main.c:116:36: error: 'huart1' undeclared (first use in this function); did you mean 'huart3'?
+  116 |                 HAL_UART_Transmit(&huart1, tx_packet, sizeof(tx_packet), 100);
+      |                                    ^~~~~~
+      |                                    huart3
+../Core/Src/main.c:120:53: error: 'GS_MAC_ADDR2' undeclared (first use in this function); did you mean 'MAC_ADDR2'?
+  120 |                 transmit_packet(tx_packet, tx_data, GS_MAC_ADDR2, tx_count);
+      |                                                     ^~~~~~~~~~~~
+      |                                                     MAC_ADDR2
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:137:13: warning: implicit declaration of function 'strncmp' [-Wimplicit-function-declaration]
+  137 |         if (strncmp(rx_data, "CMD,2057,SIM,", strlen("CMD,2057,SIM,")) == 0) {
+      |             ^~~~~~~
+../Core/Src/main.c:21:1: note: include '<string.h>' or provide a declaration of 'strncmp'
+   20 | #include "main.h"
+  +++ |+#include <string.h>
+   21 | 
+../Core/Src/main.c:137:21: error: 'rx_data' undeclared (first use in this function); did you mean 'tx_data'?
+  137 |         if (strncmp(rx_data, "CMD,2057,SIM,", strlen("CMD,2057,SIM,")) == 0) {
+      |                     ^~~~~~~
+      |                     tx_data
+../Core/Src/main.c:137:47: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  137 |         if (strncmp(rx_data, "CMD,2057,SIM,", strlen("CMD,2057,SIM,")) == 0) {
+      |                                               ^~~~~~
+../Core/Src/main.c:137:47: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c:137:47: warning: incompatible implicit declaration of built-in function 'strlen' [-Wbuiltin-declaration-mismatch]
+../Core/Src/main.c:137:47: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c:141:25: warning: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+  141 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                         ^~~~~~
+../Core/Src/main.c:141:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:141:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+../Core/Src/main.c:141:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:141:32: error: 'cmd_echo' undeclared (first use in this function)
+  141 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                                ^~~~~~~~
+../Core/Src/main.c:142:25: warning: implicit declaration of function 'strncpy' [-Wimplicit-function-declaration]
+  142 |                         strncpy(cmd_echo, "SIMDISABLE", strlen("SIMDISABLE"));
+      |                         ^~~~~~~
+../Core/Src/main.c:142:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:142:25: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+../Core/Src/main.c:142:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:143:25: error: 'mode' undeclared (first use in this function)
+  143 |                         mode = 'F';
+      |                         ^~~~
+../Core/Src/main.c:144:25: error: 'sim_enabled' undeclared (first use in this function)
+  144 |                         sim_enabled = false;
+      |                         ^~~~~~~~~~~
+../Core/Src/main.c:144:39: error: 'false' undeclared (first use in this function)
+  144 |                         sim_enabled = false;
+      |                                       ^~~~~
+../Core/Src/main.c:144:39: note: 'false' is defined in header '<stdbool.h>'; did you forget to '#include <stdbool.h>'?
+../Core/Src/main.c:149:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  149 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                         ^~~~~~
+../Core/Src/main.c:149:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:150:25: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  150 |                         strncpy(cmd_echo, "SIMENABLE", strlen("SIMENABLE"));
+      |                         ^~~~~~~
+../Core/Src/main.c:150:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:151:39: error: 'true' undeclared (first use in this function)
+  151 |                         sim_enabled = true;
+      |                                       ^~~~
+../Core/Src/main.c:151:39: note: 'true' is defined in header '<stdbool.h>'; did you forget to '#include <stdbool.h>'?
+../Core/Src/main.c:157:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  157 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                         ^~~~~~
+../Core/Src/main.c:157:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:158:25: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  158 |                         strncpy(cmd_echo, "SIMACTIVATE", strlen("SIMACTIVATE"));
+      |                         ^~~~~~~
+../Core/Src/main.c:158:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:167:25: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  167 |                         strncpy(pressure_str, &rx_data[14], 5);
+      |                         ^~~~~~~
+../Core/Src/main.c:167:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:167:33: error: 'pressure_str' undeclared (first use in this function)
+  167 |                         strncpy(pressure_str, &rx_data[14], 5);
+      |                                 ^~~~~~~~~~~~
+../Core/Src/main.c:178:25: error: 'pressure' undeclared (first use in this function)
+  178 |                         pressure = atof(pressure_str)/1000;
+      |                         ^~~~~~~~
+../Core/Src/main.c:178:36: warning: implicit declaration of function 'atof' [-Wimplicit-function-declaration]
+  178 |                         pressure = atof(pressure_str)/1000;
+      |                                    ^~~~
+../Core/Src/main.c:179:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  179 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                         ^~~~~~
+../Core/Src/main.c:179:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:181:25: warning: implicit declaration of function 'strcat' [-Wimplicit-function-declaration]
+  181 |                         strcat(temp, pressure_str);
+      |                         ^~~~~~
+../Core/Src/main.c:181:25: note: include '<string.h>' or provide a declaration of 'strcat'
+../Core/Src/main.c:181:25: warning: incompatible implicit declaration of built-in function 'strcat' [-Wbuiltin-declaration-mismatch]
+../Core/Src/main.c:181:25: note: include '<string.h>' or provide a declaration of 'strcat'
+../Core/Src/main.c:171:29: warning: unused variable 'null_char_count' [-Wunused-variable]
+  171 |                         int null_char_count = 0;
+      |                             ^~~~~~~~~~~~~~~
+../Core/Src/main.c:191:25: error: 'mission_time_hr' undeclared (first use in this function)
+  191 |                         mission_time_hr = (int16_t)gps_time_hr;
+      |                         ^~~~~~~~~~~~~~~
+../Core/Src/main.c:191:52: error: 'gps_time_hr' undeclared (first use in this function)
+  191 |                         mission_time_hr = (int16_t)gps_time_hr;
+      |                                                    ^~~~~~~~~~~
+../Core/Src/main.c:192:25: error: 'mission_time_min' undeclared (first use in this function)
+  192 |                         mission_time_min = (int16_t)gps_time_min;
+      |                         ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:192:53: error: 'gps_time_min' undeclared (first use in this function)
+  192 |                         mission_time_min = (int16_t)gps_time_min;
+      |                                                     ^~~~~~~~~~~~
+../Core/Src/main.c:193:25: error: 'mission_time_sec' undeclared (first use in this function)
+  193 |                         mission_time_sec = (int16_t)gps_time_sec;
+      |                         ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:193:53: error: 'gps_time_sec' undeclared (first use in this function)
+  193 |                         mission_time_sec = (int16_t)gps_time_sec;
+      |                                                     ^~~~~~~~~~~~
+../Core/Src/main.c:194:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  194 |                         memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                         ^~~~~~
+../Core/Src/main.c:194:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:195:25: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  195 |                         strncpy(cmd_echo, "STGPS", strlen("STGPS"));
+      |                         ^~~~~~~
+../Core/Src/main.c:195:25: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:199:25: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  199 |                         memset(temp, 0, sizeof(temp));
+      |                         ^~~~~~
+../Core/Src/main.c:199:25: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:202:43: warning: implicit declaration of function 'atoi' [-Wimplicit-function-declaration]
+  202 |                         mission_time_hr = atoi(temp);
+      |                                           ^~~~
+../Core/Src/main.c:212:25: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  212 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~
+../Core/Src/main.c:21:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+   20 | #include "main.h"
+  +++ |+#include <stdio.h>
+   21 | 
+../Core/Src/main.c:212:25: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  212 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~
+../Core/Src/main.c:212:25: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Core/Src/main.c:220:17: error: 'base_altitude' undeclared (first use in this function)
+  220 |                 base_altitude = altitude;
+      |                 ^~~~~~~~~~~~~
+../Core/Src/main.c:220:33: error: 'altitude' undeclared (first use in this function)
+  220 |                 base_altitude = altitude;
+      |                                 ^~~~~~~~
+../Core/Src/main.c:221:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  221 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:221:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:222:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  222 |                 strncpy(cmd_echo, "CAL", strlen("CAL"));
+      |                 ^~~~~~~
+../Core/Src/main.c:222:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:223:29: error: 'state' undeclared (first use in this function)
+  223 |                 if (strncmp(state, "PRE-LAUNCH", strlen("PRE-LAUNCH")) == 0) {
+      |                             ^~~~~
+../Core/Src/main.c:232:17: error: 'beacon_status' undeclared (first use in this function)
+  232 |                 beacon_status = 1;
+      |                 ^~~~~~~~~~~~~
+../Core/Src/main.c:233:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  233 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:233:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:234:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  234 |                 strncpy(cmd_echo, "BCNON", strlen("BCNON"));
+      |                 ^~~~~~~
+../Core/Src/main.c:234:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:239:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  239 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:239:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:240:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  240 |                 strncpy(cmd_echo, "BCNOFF", strlen("BCNOFF"));
+      |                 ^~~~~~~
+../Core/Src/main.c:240:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:245:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  245 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:245:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:246:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  246 |                 strncpy(cmd_echo, "CXON", strlen("CXON"));
+      |                 ^~~~~~~
+../Core/Src/main.c:246:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:251:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  251 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:251:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:252:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  252 |                 strncpy(cmd_echo, "CXOFF", strlen("CXOFF"));
+      |                 ^~~~~~~
+../Core/Src/main.c:252:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:256:17: error: 'hs_deployed' undeclared (first use in this function)
+  256 |                 hs_deployed = 'P';
+      |                 ^~~~~~~~~~~
+../Core/Src/main.c:257:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  257 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:257:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:258:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  258 |                 strncpy(cmd_echo, "OVERRIDE1", strlen("OVERRIDE1"));
+      |                 ^~~~~~~
+../Core/Src/main.c:258:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c:262:17: error: 'pc_deployed' undeclared (first use in this function)
+  262 |                 pc_deployed = 'C';
+      |                 ^~~~~~~~~~~
+../Core/Src/main.c:263:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  263 |                 memset(cmd_echo, '\0', sizeof(cmd_echo));
+      |                 ^~~~~~
+../Core/Src/main.c:263:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:264:17: warning: incompatible implicit declaration of built-in function 'strncpy' [-Wbuiltin-declaration-mismatch]
+  264 |                 strncpy(cmd_echo, "OVERRIDE2", strlen("OVERRIDE2"));
+      |                 ^~~~~~~
+../Core/Src/main.c:264:17: note: include '<string.h>' or provide a declaration of 'strncpy'
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:273:24: error: 'rx_data' undeclared (first use in this function); did you mean 'tx_data'?
+  273 |                 while (rx_data[i+15] != 0) {
+      |                        ^~~~~~~
+      |                        tx_data
+../Core/Src/main.c:283:17: warning: incompatible implicit declaration of built-in function 'memset' [-Wbuiltin-declaration-mismatch]
+  283 |                 memset(rx_data, 0, sizeof(rx_data));
+      |                 ^~~~~~
+../Core/Src/main.c:283:17: note: include '<string.h>' or provide a declaration of 'memset'
+../Core/Src/main.c:285:54: error: 'huart1' undeclared (first use in this function); did you mean 'huart'?
+  285 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                      ^~~~~~
+      |                                                      huart
+../Core/Src/main.c: In function 'sendData':
+../Core/Src/main.c:293:48: warning: incompatible implicit declaration of built-in function 'strlen' [-Wbuiltin-declaration-mismatch]
+  293 |     HAL_UART_Transmit(&huart2, (uint8_t*)data, strlen(data), HAL_MAX_DELAY);
+      |                                                ^~~~~~
+../Core/Src/main.c:293:48: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:337:48: error: 'huart1' undeclared (first use in this function); did you mean 'huart3'?
+  337 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                ^~~~~~
+      |                                                huart3
+../Core/Src/main.c:337:56: error: 'rx_data' undeclared (first use in this function); did you mean 'tx_data'?
+  337 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        tx_data
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j20 all" terminated with exit code 2. Build might be incomplete.
+
+14:42:28 Build Failed. 40 errors, 42 warnings. (took 2s.240ms)
+

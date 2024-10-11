@@ -31,11 +31,11 @@ buzzer_on = False
 
 # xbee communication parameters
 BAUDRATE = 115200
-COM_PORT = 6
+COM_PORT = 5
 
 MAC_ADDR = ""
 
-SER_DEBUG = True       # Set as True whenever testing without XBee connected
+SER_DEBUG = False       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
     ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
 
@@ -256,11 +256,14 @@ def parse_xbee(data):
 
 def read_xbee():
     while True:     # Keep running as long as the serial connection is open
+        print(ser.inWaiting())
         if ser.inWaiting() > 0:
+            print("test")
             start_byte = ser.read(1)
 
             if start_byte == START_DELIMITER:
                 frame = ser.read_until(b"\n").decode().strip()
+                print(frame)
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, checksum):
                     parse_xbee(data.split(","))

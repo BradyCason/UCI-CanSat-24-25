@@ -3,8 +3,10 @@
 	<section name="WorkbenchPreferenceDialog">
 		<item key="DIALOG_X_ORIGIN" value="632"/>
 		<item key="DIALOG_Y_ORIGIN" value="189"/>
-		<item key="DIALOG_WIDTH" value="935"/>
+		<item key="DIALOG_WIDTH" value="888"/>
 		<item key="DIALOG_HEIGHT" value="930"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+	</section>
+	<section name="ImportExportAction">
 	</section>
 </section>

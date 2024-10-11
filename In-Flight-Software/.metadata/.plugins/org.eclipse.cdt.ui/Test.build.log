@@ -1,0 +1,17 @@
+14:01:41 **** Incremental Build of configuration Release for project Test ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -DUSE_HAL_DRIVER -DSTM32F412Zx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -Os -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "Test.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Test\STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Test.elf
+ 
+arm-none-eabi-size  Test.elf 
+arm-none-eabi-objdump -h -S Test.elf  > "Test.list"
+   text	   data	    bss	    dec	    hex	filename
+  11088	     12	   1748	  12848	   3230	Test.elf
+Finished building: default.size.stdout
+ 
+Finished building: Test.list
+ 
+
+14:01:42 Build Finished. 0 errors, 0 warnings. (took 989ms)
+

@@ -1,0 +1,10 @@
+21:32:20 **** Incremental Build of configuration Debug for project Debugger_Test ****
+make -j20 all 
+arm-none-eabi-size  Debugger_Test.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10168	    104	   1912	  12184	   2f98	Debugger_Test.elf
+Finished building: default.size.stdout
+ 
+
+21:32:20 Build Finished. 0 errors, 0 warnings. (took 309ms)
+
