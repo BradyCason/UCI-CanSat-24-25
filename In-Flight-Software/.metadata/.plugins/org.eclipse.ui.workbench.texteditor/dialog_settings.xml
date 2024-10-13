@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="TX_BFR"/>
+		<item key="selection" value="altitude_of"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="TX_bfr"/>
-			<item value="TX_buff"/>
-			<item value="snprintf"/>
-			<item value="printf"/>
-			<item value="cmd_echo"/>
-			<item value="hs_depl"/>
+			<item value="altitude_of"/>
+			<item value="debug_pa"/>
+			<item value="hal_trans"/>
+			<item value="transmit_p"/>
+			<item value="transm"/>
+			<item value="debug_packet"/>
+			<item value="telemetry_status"/>
+			<item value="tx_packet"/>
+			<item value="mac_add"/>
+			<item value="mac_"/>
 			<item value="mac"/>
-			<item value="hal_uart_trans"/>
-			<item value="tx_count"/>
-			<item value="gs_mac"/>
-			<item value="prev"/>
-			<item value="transmitting"/>
-			<item value="read_tr"/>
-			<item value="pressure_str"/>
-			<item value="base"/>
+			<item value="hal_uart"/>
+			<item value="create_tele"/>
+			<item value="transmit_packet"/>
+			<item value="t_packet"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

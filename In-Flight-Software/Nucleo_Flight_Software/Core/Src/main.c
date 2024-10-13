@@ -196,7 +196,7 @@ char rx_data[255];
 HAL_StatusTypeDef uart_received;
 
 uint8_t debug_packet[TX_BFR_SIZE];
-
+HAL_StatusTypeDef result;
 
 //Set up Interrupt handler to invoke data transmit from xbee to the board.
 void USART2_IRQHandler(void) {
@@ -512,7 +512,7 @@ void init_PA1010D(void)
 	//Wait for stabilization
 	for(int j=0; j<10; j++){
 		for(int i=0; i<255; i++){
-			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 10);
+			result = HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 10);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -640,7 +640,6 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	for (i=0; i<packet_length; i++){
 		debug_packet[i] = T_packet[i];
 	}
-//	debug_packet = T_packet;
 
 	return packet_length;
 }
@@ -828,8 +827,46 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 
 	memset(rx_data, 0, sizeof(rx_data));
 
+	// Call function for next packet
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
+}
+
+void I2C_BusReset(void) {
+    // Configure SCL (PF1) and SDA (PF0) as GPIO outputs
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // Enable the GPIOF clock (assuming I2C1 uses PF0 and PF1)
+    __HAL_RCC_GPIOF_CLK_ENABLE();
+
+    // Configure SCL (PF1) and SDA (PF0) as open-drain outputs
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+    // Manually toggle SCL (PF1) to clear the bus
+    for (int i = 0; i < 10; i++) {
+        HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_SET);   // Set SCL high
+        HAL_Delay(1);                                         // Small delay
+        HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_RESET); // Set SCL low
+        HAL_Delay(1);                                         // Small delay
+    }
+
+    // Check if SDA (PF0) is still low (held by a device)
+    if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0) == GPIO_PIN_RESET) {
+        // Handle error: SDA line is stuck low
+        // You can handle this situation or attempt more aggressive resets.
+    }
+
+    // Reinitialize the I2C pins as alternate function (for I2C peripheral)
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;  // Make sure to use the correct AF for your I2C peripheral
+    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 }
 
 /* USER CODE END 0 */
@@ -851,6 +888,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
+  I2C_BusReset();
 
   /* USER CODE END Init */
 
