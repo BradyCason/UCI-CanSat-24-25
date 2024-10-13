@@ -18,6 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -26,18 +28,22 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef uint8_t bool;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define RX_BFR_SIZE 50
+#define TX_BFR_SIZE 255
 
+#define TEAM_ID 2057
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
 // XBee
+uint8_t packet_count = 0;
 uint8_t rx_packet[RX_BFR_SIZE];
 uint8_t tx_data[TX_BFR_SIZE-18];
 uint8_t tx_data2[TX_BFR_SIZE-18];
@@ -47,6 +53,11 @@ uint8_t tx_count;
 uint8_t tx_count2;
 bool tx_ready;
 uint8_t tx_part;
+int8_t mission_time_hr;
+int8_t mission_time_min;
+int8_t mission_time_sec;
+uint8_t rx_data[255];
+HAL_StatusTypeDef uart_received;
 
 /* USER CODE END PM */
 
@@ -75,227 +86,65 @@ static void MX_I2C2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-int telemetry_status = 1;
-HAL_StatusTypeDef uart_received;
-
-void read_transmit_telemetry (){
-	read_sensors();
-
-	if (gps_time_sec != prev_time){
-
-		transmitting = 1;
-		mission_time_sec++;
-
-		if (prev_alt > altitude) {
-			descending_count++;
-		}
-		else {
-			descending_count = 0;
-		}
-
-
-		if ( mission_time_sec >= 60 ){
-			mission_time_sec -= 60;
-			mission_time_min += 1;
-		}
-		if ( mission_time_min >= 60 ){
-			mission_time_min -= 60;
-			mission_time_hr += 1;
-		}
-		if ( mission_time_hr >= 24 ){
-			mission_time_hr -= 24;
-		}
-
-
-		create_telemetry(tx_data, 0);
-		transmit_packet(tx_packet, tx_data, GS_MAC_ADDR, tx_count);
-		create_telemetry(tx_data2, 1);
-		transmit_packet(tx_packet2, tx_data2, GS_MAC_ADDR, tx_count2);
-
-		HAL_UART_Transmit(&huart1, tx_packet, sizeof(tx_packet), 100);
-		HAL_Delay(50);
-		HAL_UART_Transmit(&huart1, tx_packet2, sizeof(tx_packet2), 100);
-
-		transmit_packet(tx_packet, tx_data, GS_MAC_ADDR2, tx_count);
-		transmit_packet(tx_packet2, tx_data2, GS_MAC_ADDR2, tx_count2);
-		HAL_Delay(50);
-		HAL_UART_Transmit(&huart1, tx_packet, sizeof(tx_packet), 100);
-		HAL_Delay(50);
-		HAL_UART_Transmit(&huart1, tx_packet2, sizeof(tx_packet2), 100);
-
-		prev_time = gps_time_sec;
-		prev_alt = altitude;
-
-		transmitting = 0;
-
-	}
+void USART2_IRQHandler(void) {
+    HAL_UART_IRQHandler(&huart2); // Call the HAL interrupt handler
 }
 
-void handle_command() {
-	// SIM command
-	if (strncmp(rx_data, "CMD,2057,SIM,", strlen("CMD,2057,SIM,")) == 0) {
-
-		// disable
-		if (rx_data[13] == 'D'){
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			strncpy(cmd_echo, "SIMDISABLE", strlen("SIMDISABLE"));
-			mode = 'F';
-			sim_enabled = false;
-		}
-
-		// enable
-		if (rx_data[13] == 'E'){
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			strncpy(cmd_echo, "SIMENABLE", strlen("SIMENABLE"));
-			sim_enabled = true;
-		}
-
-		// activate
-		if (rx_data[13] == 'A' && sim_enabled == true){
-			mode = 'S';
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			strncpy(cmd_echo, "SIMACTIVATE", strlen("SIMACTIVATE"));
-		}
-
-	}
-
-	// SIMP command
-	else if (strncmp(rx_data, "CMD,2057,SIMP,", strlen("CMD,2057,SIMP,")) == 0) {
-		if (mode == 'S') {
-
-			strncpy(pressure_str, &rx_data[14], 5);
-
-			//memset(pressure_str, '\0', sizeof(pressure_str));
-			int i = 0;
-			int null_char_count = 0;
-			while (pressure_str[8-i] == '\0') {
-				i++;
-			}
-
-			//pressure_str[8-i] = "\0";
-
-			pressure = atof(pressure_str)/1000;
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			char temp[12] = "SIMP";
-			strcat(temp, pressure_str);
-			strncpy(cmd_echo, temp, strlen(temp));
-			memset(pressure_str, '\0', sizeof(pressure_str));
-		}
-		sim_enabled = false;
-	}
-
-	// set time command
-	else if (strncmp(rx_data, "CMD,2057,ST,", strlen("CMD,2057,ST,")) == 0) {
-		if (rx_data[12]=='G') {
-			mission_time_hr = (int16_t)gps_time_hr;
-			mission_time_min = (int16_t)gps_time_min;
-			mission_time_sec = (int16_t)gps_time_sec;
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			strncpy(cmd_echo, "STGPS", strlen("STGPS"));
-		}
-		else {
-			char temp[3];
-			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[12];
-			temp[1] = rx_data[13];
-			mission_time_hr = atoi(temp);
-			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[15];
-			temp[1] = rx_data[16];
-			mission_time_min = atoi(temp);
-			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[18];
-			temp[1] = rx_data[19];
-			mission_time_sec = atoi(temp);
-			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
 
 
-		}
+void create_telemetry(uint8_t *ret, uint8_t part){
+	char tel_buf[TX_BFR_SIZE-18] = {0};	//Preload buffer
 
-	}
+	snprintf(tel_buf, TX_BFR_SIZE, "Hello Xbee!\0");
 
-	else if (strncmp(rx_data, "CMD,2057,CAL", strlen("CMD,2057,CAL")) == 0) {
-		base_altitude = altitude;
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "CAL", strlen("CAL"));
-		if (strncmp(state, "PRE-LAUNCH", strlen("PRE-LAUNCH")) == 0) {
-			memset(state, 0, sizeof(state));
-			strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
-		}
-
-		sim_enabled = false;
-	}
-
-	else if (strncmp(rx_data, "CMD,2057,BCN,ON", strlen("CMD,2057,BCN,ON")) == 0) {
-		beacon_status = 1;
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "BCNON", strlen("BCNON"));
-		sim_enabled = false;
-	}
-	else if (strncmp(rx_data, "CMD,2057,BCN,OFF", strlen("CMD,2057,BCN,OFF")) == 0) {
-		beacon_status = 0;
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "BCNOFF", strlen("BCNOFF"));
-		sim_enabled = false;
-	}
-	else if (strncmp(rx_data, "CMD,2057,CX,ON", strlen("CMD,2057,CX,ON")) == 0) {
-		telemetry_status = 1;
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "CXON", strlen("CXON"));
-		sim_enabled = false;
-	}
-	else if (strncmp(rx_data, "CMD,2057,CX,OFF", strlen("CMD,2057,CX,OFF")) == 0) {
-		telemetry_status = 0;
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "CXOFF", strlen("CXOFF"));
-		sim_enabled = false;
-	}
-	else if (strncmp(rx_data, "CMD,2057,OVERRIDE,1", strlen("CMD,2057,OVERRIDE,1")) == 0) {
-		hs_deployed = 'P';
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "OVERRIDE1", strlen("OVERRIDE1"));
-		sim_enabled = false;
-	}
-	else if (strncmp(rx_data, "CMD,2057,OVERRIDE,2", strlen("CMD,2057,OVERRIDE,2")) == 0) {
-		pc_deployed = 'C';
-		memset(cmd_echo, '\0', sizeof(cmd_echo));
-		strncpy(cmd_echo, "OVERRIDE2", strlen("OVERRIDE2"));
-		sim_enabled = false;
-	}
-
-
-}
-
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
-	int i = 0;
-		while (rx_data[i+15] != 0) {
-			rx_data[i] = rx_data[i+15];
-			i++;
-		}
-		rx_data[i-1] = 0;
-		for (; i < 255; i++) {
-			rx_data[i] = 0;
-		}
-
-		handle_command();
-		memset(rx_data, 0, sizeof(rx_data));
-
-	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
-
+	memset(ret, 0, sizeof(ret));
+	memcpy(ret, tel_buf, TX_BFR_SIZE-18);
 }
 
 char rxBuffer[100];
+
+
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+//	int i = 0;
+//		while (rx_data[i+15] != 0) {
+//			rx_data[i] = rx_data[i+15];
+//			i++;
+//		}
+//		rx_data[i-1] = 0;
+//		for (; i < 255; i++) {
+//			rx_data[i] = 0;
+//		}
+//
+//
+
+//
+//	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rxBuffer, RX_BFR_SIZE);
+
+    HAL_UART_Transmit(&huart2, rx_data, Size, 100);
+
+    // Optionally, you can print it (if using printf with UART)
+    printf("Received data: %s\r\n", rxBuffer);
+
+//	memset(rxBuffer, 1, sizeof(rxBuffer));
+
+    // Re-initialize the UART to receive more data after the previous one
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
+
+
+}
+
+
 HAL_StatusTypeDef result;
 
-void sendData(const char *data) {
-    HAL_UART_Transmit(&huart2, (uint8_t*)data, strlen(data), HAL_MAX_DELAY);
+void sendData() {
+	create_telemetry(tx_data, 0);
+	HAL_UART_Transmit(&huart2, tx_data, sizeof(tx_data), 100);
 }
 
-void receiveData(char *buffer, uint16_t size) {
-	result = HAL_UART_Receive(&huart2, (uint8_t*)buffer, size, HAL_MAX_DELAY);
-}
+//void receiveData(char *buffer, uint16_t size) {
+//	result = HAL_UART_Receive(&huart2, (uint8_t*)buffer, size, HAL_MAX_DELAY);
+//}
 
 /* USER CODE END 0 */
 
@@ -334,7 +183,11 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+	memset(rx_data, 0, sizeof(rx_data));
+
+//	uart_received = HAL_UART_Receive(&huart2, rxBuffer, RX_BFR_SIZE, HAL_MAX_DELAY);
+
+  uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
   /* USER CODE END 2 */
 
@@ -342,15 +195,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  sendData("Hello, XBee!\r\n");
-	  HAL_Delay(1000); // Delay between sends
+	// Test receiving data with HAL_UART_Receive in blocking mode
 
-	  receiveData(rxBuffer, sizeof(rxBuffer) - 1);
-	  rxBuffer[sizeof(rxBuffer) - 1] = '\0';
 
-	  if (telemetry_status == 1) {
-	  		  read_transmit_telemetry();
-	  	  }
+//	if (uart_received == HAL_OK) {
+//		// If data is received successfully, process the received data
+//		// For example, you can print it or send it back
+//		// You can replace this part with how you want to handle the data
+//
+//		// Transmit the received data back (echo)
+//		HAL_UART_Transmit(&huart2, rxBuffer, RX_BFR_SIZE, 100);
+//
+//		// Optional: Print the received data (if using printf with UART)
+//		printf("Received data: %s\r\n", rxBuffer);
+//
+//		// Clear the buffer for the next reception
+//		memset(rxBuffer, 0, RX_BFR_SIZE);
+//	} else {
+//		// Handle error case
+//		printf("Error receiving data\r\n");
+//	}
+
+	// Add some delay between loops if needed
+	HAL_Delay(100);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -447,7 +315,8 @@ static void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-
+	HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */

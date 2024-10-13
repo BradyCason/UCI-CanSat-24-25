@@ -60,8 +60,8 @@ all: main-build
 main-build: Nucleo_Xbee_Test.elf secondary-outputs
 
 # Tool invocations
-Nucleo_Xbee_Test.elf Nucleo_Xbee_Test.map: $(OBJS) $(USER_OBJS) C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Xbee_Test\STM32F412ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Nucleo_Xbee_Test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Xbee_Test\STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Xbee_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Nucleo_Xbee_Test.elf Nucleo_Xbee_Test.map: $(OBJS) $(USER_OBJS) /Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Xbee_Test/STM32F412ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Nucleo_Xbee_Test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Xbee_Test/STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Xbee_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
