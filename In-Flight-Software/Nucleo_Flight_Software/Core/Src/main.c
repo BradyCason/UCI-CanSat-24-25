@@ -197,6 +197,13 @@ HAL_StatusTypeDef uart_received;
 
 uint8_t debug_packet[TX_BFR_SIZE];
 
+
+//Set up Interrupt handler to invoke data transmit from xbee to the board.
+void USART2_IRQHandler(void) {
+    HAL_UART_IRQHandler(&huart2);
+}
+
+
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
 
@@ -806,17 +813,19 @@ void handle_command() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
-	int i = 0;
-	while (rx_data[i+15] != 0) {
-		rx_data[i] = rx_data[i+15];
-		i++;
-	}
-	rx_data[i-1] = 0;
-	for (; i < 255; i++) {
-		rx_data[i] = 0;
-	}
+//	int i = 0;
+//	while (rx_data[i+15] != 0) {
+//		rx_data[i] = rx_data[i+15];
+//		i++;
+//	}
+//	rx_data[i-1] = 0;
+//	for (; i < 255; i++) {
+//		rx_data[i] = 0;
+//	}
 
-	handle_command();
+//	handle_command();
+	memcpy(rx_packet, rx_data, RX_BFR_SIZE);
+
 	memset(rx_data, 0, sizeof(rx_data));
 
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
@@ -984,7 +993,8 @@ static void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-
+	HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
