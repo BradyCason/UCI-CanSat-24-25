@@ -60,8 +60,8 @@ all: main-build
 main-build: Nucleo_Flight_Software.elf secondary-outputs
 
 # Tool invocations
-Nucleo_Flight_Software.elf Nucleo_Flight_Software.map: $(OBJS) $(USER_OBJS) C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Flight_Software\STM32F412ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Nucleo_Flight_Software.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Flight_Software\STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Nucleo_Flight_Software.elf Nucleo_Flight_Software.map: $(OBJS) $(USER_OBJS) /Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Flight_Software/STM32F412ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Nucleo_Flight_Software.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Flight_Software/STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

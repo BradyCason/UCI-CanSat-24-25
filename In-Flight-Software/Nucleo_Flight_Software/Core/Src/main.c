@@ -668,7 +668,7 @@ void read_transmit_telemetry (){
 
 		create_telemetry(tx_data, 0);
 		transmit_packet(tx_packet, tx_data, tx_count);
-		HAL_UART_Transmit(&huart2, tx_packet, sizeof(tx_packet), 100);
+		HAL_UART_Transmit(&huart2, tx_data, sizeof(tx_packet), 100);
 
 		prev_time = gps_time_sec;
 		prev_alt = altitude;
@@ -871,7 +871,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  read_sensors();
+//	  read_sensors();
 	  // Control Telemetry
 	  if (telemetry_status == 1) {
 		  read_transmit_telemetry();
