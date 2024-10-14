@@ -1,10 +1,10 @@
-14:17:30 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
+22:13:45 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
 make -j20 all 
 arm-none-eabi-size  Nucleo_Flight_Software.elf 
    text	   data	    bss	    dec	    hex	filename
-  50804	    640	   5216	  56660	   dd54	Nucleo_Flight_Software.elf
+  50868	    640	   5424	  56932	   de64	Nucleo_Flight_Software.elf
 Finished building: default.size.stdout
  
 
-14:17:30 Build Finished. 0 errors, 0 warnings. (took 428ms)
+22:13:46 Build Finished. 0 errors, 0 warnings. (took 431ms)
 

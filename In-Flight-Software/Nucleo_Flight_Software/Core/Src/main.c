@@ -67,7 +67,7 @@ typedef uint8_t bool;
 
 #define PI 3.141592
 
-#define RX_BFR_SIZE 50
+#define RX_BFR_SIZE 255
 #define TX_BFR_SIZE 255
 #define TEAM_ID "2057"
 
@@ -101,8 +101,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
-static void MX_I2C2_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -470,7 +470,7 @@ void init_MPL3115A2(void)
 {
 	// Check the WHO_AM_I register to verify sensor is connected
 	uint8_t who_am_i = 0;
-	HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
 	if (who_am_i == 0xC4)
 	{
 		// WHO_AM_I is correct, now configure the sensor
@@ -512,7 +512,7 @@ void init_PA1010D(void)
 	//Wait for stabilization
 	for(int j=0; j<10; j++){
 		for(int i=0; i<255; i++){
-			result = HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 10);
+			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 10);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -542,6 +542,11 @@ void read_sensors(void)
 
 void init_sensors(void)
 {
+//	result = HAL_I2C_GetState(&hi2c2);
+//	if (HAL_I2C_GetState(&hi2c2) == HAL_I2C_STATE_BUSY) {
+////		result = HAL_BUSY;
+//	    I2C_BusReset();  // Call your I2C bus reset function only if the bus is busy
+//	}
 	init_MPL3115A2();
 	init_MMC5603();
 	init_MPU6050();
@@ -584,7 +589,7 @@ void create_telemetry(uint8_t *ret, uint8_t part){
 	GPS_TIME, GPS_ALTITUDE, GPS_LATITUDE, GPS_LONGITUDE, GPS_SATS,
 	CMD_ECHO [,,OPTIONAL_DATA] */
 	snprintf(tel_buf, TX_BFR_SIZE,
-			"@1=%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
+			"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
 			TEAM_ID,
 			mission_time_hr, mission_time_min, mission_time_sec,
 			packet_count,
@@ -889,7 +894,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-  I2C_BusReset();
 
   /* USER CODE END Init */
 
@@ -904,11 +908,13 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
-  MX_I2C2_Init();
   MX_USART2_UART_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
+
+  I2C_BusReset();
 
   init_sensors();
   init_commands();

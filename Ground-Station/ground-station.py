@@ -256,12 +256,11 @@ def parse_xbee(data):
 
 def read_xbee():
     while True:     # Keep running as long as the serial connection is open
-        print(ser.inWaiting())
         if ser.inWaiting() > 0:
-            print("test")
             start_byte = ser.read(1)
 
-            if start_byte == START_DELIMITER:
+            if start_byte.decode('utf-8') == START_DELIMITER:
+                print("test")
                 frame = ser.read_until(b"\n").decode().strip()
                 print(frame)
                 data, checksum = frame.rsplit(",", 1)
