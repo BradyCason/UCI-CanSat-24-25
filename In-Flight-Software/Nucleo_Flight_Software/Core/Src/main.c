@@ -147,7 +147,8 @@ char cmd_echo[64] = "N/A";
 
 // PA1010D DATA
 uint8_t PA1010D_RATE[] = "$PMTK220,500*2B\r\n";
-uint8_t PA1010D_SAT[] = "$PMTK313,1*2E\r\n";
+//uint8_t PA1010D_SAT[] = "$PMTK313,1*2E\r\n";
+uint8_t PA1010D_SAT[] = "$PMTK353,1,0,0,0,0*2A\r\n";
 uint8_t PA1010D_INIT[] = "$PMTK225,0*2B\r\n";
 uint8_t PA1010D_CFG[] = "$PMTK353,1,0,0,0,0*2A\r\n";
 uint8_t PA1010D_MODE[] = "$PMTK314,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n";
@@ -189,14 +190,22 @@ int descending_count = 0;
 
 // Other Variables
 int8_t altitude_offset = 0;
+float mag_x_offset = 0;
+float mag_y_offset = 0;
+float mag_z_offset = 0;
 int beacon_status = 0;
 int telemetry_status = 1;
 bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
 
-uint8_t debug_packet[TX_BFR_SIZE];
 HAL_StatusTypeDef result;
+float mag_x_min = 0;
+float mag_y_min = 0;
+float mag_z_min = 0;
+float mag_x_max = 0;
+float mag_y_max = 0;
+float mag_z_max = 0;
 
 //Set up Interrupt handler to invoke data transmit from xbee to the board.
 void USART2_IRQHandler(void) {
@@ -325,7 +334,7 @@ void read_MPL3115A2(void)
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+    result = HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
     // Combine pressure bytes into a 20-bit integer
     uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
@@ -398,14 +407,16 @@ void read_PA1010D(void)
 	uint8_t pa1010d_bytebuf;
 
 	/* PA1010D (GPS) */
-	for(pa1010d_i=0; pa1010d_i<255; pa1010d_i++){
-		pa_ret = HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 100);
-		if (pa1010d_bytebuf == '$'){
-			break;
+	if (HAL_I2C_IsDeviceReady(&hi2c2, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
+		for(pa1010d_i=0; pa1010d_i<255; pa1010d_i++){
+			result = HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
+			if (pa1010d_bytebuf == '$'){
+				break;
+			}
+			pa_buf[pa1010d_i] = pa1010d_bytebuf;
 		}
-		pa_buf[pa1010d_i] = pa1010d_bytebuf;
+		parse_nmea(pa_buf);
 	}
-	parse_nmea(pa_buf);
 }
 
 void read_INA219(void) {
@@ -470,7 +481,7 @@ void init_MPL3115A2(void)
 {
 	// Check the WHO_AM_I register to verify sensor is connected
 	uint8_t who_am_i = 0;
-	result = HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
 	if (who_am_i == 0xC4)
 	{
 		// WHO_AM_I is correct, now configure the sensor
@@ -507,12 +518,13 @@ void init_PA1010D(void)
 	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
 	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
 //	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
-	pa_init_ret[4] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
+//	pa_init_ret[4] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
 
+//	HAL_Delay(10000);
 	//Wait for stabilization
 	for(int j=0; j<10; j++){
 		for(int i=0; i<255; i++){
-			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, 10);
+			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -528,7 +540,7 @@ void init_PA1010D(void)
 void init_INA219(void)
 {
 	uint8_t ina_config[2] = {0b00000001, 0b00011101};
-	HAL_I2C_Mem_Write(&hi2c2, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+	result = HAL_I2C_Mem_Write(&hi2c2, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
@@ -547,6 +559,7 @@ void init_sensors(void)
 ////		result = HAL_BUSY;
 //	    I2C_BusReset();  // Call your I2C bus reset function only if the bus is busy
 //	}
+
 	init_MPL3115A2();
 	init_MMC5603();
 	init_MPU6050();
@@ -567,20 +580,48 @@ void init_commands(void)
 }
 
 uint8_t calculate_checksum(const char *data) {
-    uint32_t sum = 0;  // Use a larger type for summing
-    size_t len = strlen(data);  // Get the length of the string
+//    uint32_t sum = 0;  // Use a larger type for summing
+//    size_t len = strlen(data);  // Get the length of the string
+//
+//    // Iterate over each byte in the string and sum their values
+//    for (size_t i = 0; i < len; i++) {
+//        sum += (uint8_t)data[i];  // Cast char to uint8_t and add to sum
+//    }
+//
+//    // Return the result modulo 256 (0x100)
+//    return (uint8_t)(sum % 256);
 
-    // Iterate over each byte in the string and sum their values
-    for (size_t i = 0; i < len; i++) {
-        sum += (uint8_t)data[i];  // Cast char to uint8_t and add to sum
-    }
+	uint8_t checksum = 0;
+	while (*data) {
+		checksum += *data++;
+	}
+	return checksum % 256;
+}
 
-    // Return the result modulo 256 (0x100)
-    return (uint8_t)(sum % 256);
+void send_packet(){
+
+	char packet[512];  // Buffer for packet
+	char data[480];    // Buffer for data without checksum
+
+	packet_count += 1;
+
+	snprintf(data, sizeof(data),
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%02d:%02d:%02d,%.6f,%.6f,%.6f,%u,%s",
+		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
+		 mode, state, altitude, temperature, pressure, voltage,
+		 gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, mag_x, mag_y, mag_z,
+		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
+		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo);
+
+	uint8_t checksum = calculate_checksum(data);
+	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
+
+	// Send the packet using HAL_UART_Transmit
+	HAL_UART_Transmit(&huart2, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
 }
 
 void create_telemetry(uint8_t *ret, uint8_t part){
-	char tel_buf[TX_BFR_SIZE-18] = {0};	//Preload buffer
+	char tel_buf[TX_BFR_SIZE-3] = {0};	//Preload buffer
 
 	packet_count += 1;
 	/* Variables TEAM_ID, MISSION_TIME, PACKET_COUNT, MODE, STATE, ALTITUDE,
@@ -588,6 +629,7 @@ void create_telemetry(uint8_t *ret, uint8_t part){
 	ACCEL_P, ACCEL_Y, MAG_R, MAG_P, MAG_Y, AUTO_GYRO_ROTATION_RATE,
 	GPS_TIME, GPS_ALTITUDE, GPS_LATITUDE, GPS_LONGITUDE, GPS_SATS,
 	CMD_ECHO [,,OPTIONAL_DATA] */
+	set_cmd_echo("Test");
 	snprintf(tel_buf, TX_BFR_SIZE,
 			"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
 			TEAM_ID,
@@ -619,7 +661,7 @@ void create_telemetry(uint8_t *ret, uint8_t part){
 	tx_count = strlen(tel_buf);
 
 	memset(ret, '/0', sizeof(ret));
-	memcpy(ret, tel_buf, TX_BFR_SIZE-18);
+	memcpy(ret, tel_buf, TX_BFR_SIZE-3);
 }
 
 uint16_t transmit_packet(	uint8_t *T_packet,		//w
@@ -640,11 +682,8 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 	}
 
 	/*Calculate Checksum*/
-	T_packet[packet_length-2]= calculate_checksum(T_data);
+//	T_packet[packet_length-2]= calculate_checksum(T_data);
 	T_packet[packet_length-1]= '\n';
-	for (i=0; i<packet_length; i++){
-		debug_packet[i] = T_packet[i];
-	}
 
 	return packet_length;
 }
@@ -652,39 +691,34 @@ uint16_t transmit_packet(	uint8_t *T_packet,		//w
 void read_transmit_telemetry (){
 	read_sensors();
 
-	if (gps_time_sec != prev_time){
-
-		//
-		if (prev_alt > altitude) {
-			descending_count++;
-		}
-		else {
-			descending_count = 0;
-		}
-
-		// Handle Mission Time
-		mission_time_sec++;
-		if ( mission_time_sec >= 60 ){
-			mission_time_sec -= 60;
-			mission_time_min += 1;
-		}
-		if ( mission_time_min >= 60 ){
-			mission_time_min -= 60;
-			mission_time_hr += 1;
-		}
-		if ( mission_time_hr >= 24 ){
-			mission_time_hr -= 24;
-		}
-
-
-		create_telemetry(tx_data, 0);
-		transmit_packet(tx_packet, tx_data, tx_count);
-		HAL_UART_Transmit(&huart2, tx_data, sizeof(tx_packet), 100);
-
-		prev_time = gps_time_sec;
-		prev_alt = altitude;
-
+	if (prev_alt > altitude) {
+		descending_count++;
 	}
+	else {
+		descending_count = 0;
+	}
+
+	// Handle Mission Time
+	mission_time_sec++;
+	if ( mission_time_sec >= 60 ){
+		mission_time_sec -= 60;
+		mission_time_min += 1;
+	}
+	if ( mission_time_min >= 60 ){
+		mission_time_min -= 60;
+		mission_time_hr += 1;
+	}
+	if ( mission_time_hr >= 24 ){
+		mission_time_hr -= 24;
+	}
+
+	prev_time = gps_time_sec;
+	prev_alt = altitude;
+
+//	create_telemetry(tx_data, 0);
+//	transmit_packet(tx_packet, tx_data, tx_count);
+//	HAL_UART_Transmit(&huart2, tx_packet, sizeof(tx_packet), 100);
+	send_packet();
 }
 
 void set_cmd_echo(const char *cmd)
@@ -874,6 +908,27 @@ void I2C_BusReset(void) {
     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 }
 
+void calibrate_mmc(){
+	read_MMC5603();
+	if (mag_x < mag_x_min){
+		mag_x_min = mag_x;
+	}
+	if (mag_x > mag_x_max){
+		mag_x_max = mag_x;
+	}
+	if (mag_y < mag_y_min){
+		mag_y_min = mag_y;
+	}
+	if (mag_y > mag_y_max){
+		mag_y_max = mag_y;
+	}
+	if (mag_z < mag_z_min){
+		mag_z_min = mag_z;
+	}
+	if (mag_z > mag_z_max){
+		mag_z_max = mag_z;
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -912,12 +967,12 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
-
-  I2C_BusReset();
+  result = HAL_I2C_IsDeviceReady(&hi2c2, PA1010D_ADDRESS, 3, 5);
 
   init_sensors();
   init_commands();
+
+  uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
   /* USER CODE END 2 */
 

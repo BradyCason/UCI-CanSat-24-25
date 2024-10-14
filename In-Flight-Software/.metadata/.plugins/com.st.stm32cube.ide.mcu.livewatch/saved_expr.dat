@@ -18,4 +18,3 @@ gps_longitude
 gps_sats
 altitude
 result
-debug_packet

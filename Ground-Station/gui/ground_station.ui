@@ -199,7 +199,7 @@ QPushButton:hover {
                   <string notr="true"/>
                  </property>
                  <property name="text">
-                  <string>Mission Time: N/A</string>
+                  <string>Mission Time:</string>
                  </property>
                 </widget>
                </item>
@@ -217,7 +217,7 @@ QPushButton:hover {
                   <string notr="true">border: none;</string>
                  </property>
                  <property name="text">
-                  <string>Packet Count: N/A</string>
+                  <string>Packet Count:</string>
                  </property>
                 </widget>
                </item>
@@ -235,7 +235,7 @@ QPushButton:hover {
                   <string notr="true">border: none;</string>
                  </property>
                  <property name="text">
-                  <string>Mode: N/A</string>
+                  <string>Mode:</string>
                  </property>
                 </widget>
                </item>
@@ -253,7 +253,7 @@ QPushButton:hover {
                   <string notr="true">border: none;</string>
                  </property>
                  <property name="text">
-                  <string>State: N/A</string>
+                  <string>State:</string>
                  </property>
                 </widget>
                </item>
@@ -271,7 +271,7 @@ QPushButton:hover {
                   <string notr="true">border: none;</string>
                  </property>
                  <property name="text">
-                  <string>PC Deployed: N/A</string>
+                  <string>PC Deployed:</string>
                  </property>
                 </widget>
                </item>
@@ -289,7 +289,7 @@ QPushButton:hover {
                   <string notr="true">border: none;</string>
                  </property>
                  <property name="text">
-                  <string>CMD Echo: N/A</string>
+                  <string>CMD Echo:</string>
                  </property>
                 </widget>
                </item>

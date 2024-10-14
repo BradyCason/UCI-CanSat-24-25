@@ -25,7 +25,7 @@ readable_time = time.strftime("telemetry_%Y-%m-%d_%H-%M-%S", local_time)
 sim = False
 running = True
 sim_enable = False
-telemetry_on = False
+telemetry_on = True
 csv_indexer = 0
 buzzer_on = False
 
@@ -44,7 +44,7 @@ if (not SER_DEBUG):
 # need to write all commands to csv files by last filled values
 telemetry = {}
 
-START_DELIMITER = 0x7E
+START_DELIMITER = b"~"
 
 class GroundStationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -238,7 +238,7 @@ def verify_checksum(data, checksum):
     return checksum == calc_checksum(data)
 
 def parse_xbee(data):
-    global sim
+    global sim, telemetry, w
 
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
@@ -248,6 +248,9 @@ def parse_xbee(data):
     else:
         sim = False
 
+    # Output to Ground Station
+    w.update()
+
     # Add data to csv file
     file = str(readable_time) + '.csv'
     with open(file, 'a', newline='') as f_object:
@@ -255,17 +258,41 @@ def parse_xbee(data):
         writer_object.writerow(telemetry.values())
 
 def read_xbee():
+    buffer = ""
     while True:     # Keep running as long as the serial connection is open
         if ser.inWaiting() > 0:
-            start_byte = ser.read(1)
+            buffer += ser.read(ser.inWaiting()).decode()
 
-            if start_byte.decode('utf-8') == START_DELIMITER:
-                print("test")
-                frame = ser.read_until(b"\n").decode().strip()
-                print(frame)
-                data, checksum = frame.rsplit(",", 1)
-                if verify_checksum(data, checksum):
-                    parse_xbee(data.split(","))
+            start_idx = buffer.find(START_DELIMITER.decode())
+            end_idx = buffer.find("\n")
+            if start_idx == -1 or end_idx == -1:
+                # Wait for a full packet
+                continue
+
+            frame = buffer[start_idx + 1:end_idx].strip()
+            buffer = buffer[end_idx + 1:]
+
+            data, checksum = frame.rsplit(",", 1)
+            if verify_checksum(data, float(checksum)):
+                parse_xbee(data.split(","))
+            else:
+                print("Failed to read frame:", frame)
+
+            # start_byte = ser.read(1)
+            # if start_byte != START_DELIMITER:
+            #     print(start_byte.decode())
+
+            # if start_byte == START_DELIMITER:
+            #     time.sleep(0.1)
+            #     frame = ser.read_until(b"\n").decode().strip()
+            #     try:
+            #         data, checksum = frame.rsplit(",", 1)
+            #         if verify_checksum(data, float(checksum)):
+            #             parse_xbee(data.split(","))
+            #         else:
+            #             print("Failed to read frame:", frame)
+            #     except:
+            #         print("Failed to read frame:", frame)
 
 def write_xbee(cmd):
     # Frame Format: ~<data>,<checksum>
@@ -313,6 +340,7 @@ def main():
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)
+    global w
     w = GroundStationWindow()
 
     if (not SER_DEBUG):
