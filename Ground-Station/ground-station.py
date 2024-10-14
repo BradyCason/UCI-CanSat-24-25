@@ -44,7 +44,7 @@ if (not SER_DEBUG):
 # need to write all commands to csv files by last filled values
 telemetry = {}
 
-START_DELIMITER = b"~"
+START_DELIMITER = "~"
 
 class GroundStationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -263,7 +263,7 @@ def read_xbee():
         if ser.inWaiting() > 0:
             buffer += ser.read(ser.inWaiting()).decode()
 
-            start_idx = buffer.find(START_DELIMITER.decode())
+            start_idx = buffer.find(START_DELIMITER)
             end_idx = buffer.find("\n")
             if start_idx == -1 or end_idx == -1:
                 # Wait for a full packet
@@ -312,7 +312,7 @@ def write_xbee(cmd):
 
     # Create Packet
     checksum = calc_checksum(cmd)
-    frame = f"{chr(START_DELIMITER)}{cmd},{checksum:02X}"
+    frame = f"{START_DELIMITER}{cmd},{checksum:02X}"
 
     # Send to XBee
     if (not SER_DEBUG):

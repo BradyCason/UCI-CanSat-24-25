@@ -1,4 +1,4 @@
-14:38:45 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
+16:25:02 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Zx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 ../Core/Src/main.c: In function 'read_PA1010D':
@@ -19,95 +19,44 @@ arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -D
 ../Core/Src/main.c:268:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
   268 | bool parse_nmea(char *buf){
       |                 ~~~~~~^~~
-../Core/Src/main.c: In function 'create_telemetry':
-../Core/Src/main.c:632:9: warning: implicit declaration of function 'set_cmd_echo' [-Wimplicit-function-declaration]
-  632 |         set_cmd_echo("Test");
-      |         ^~~~~~~~~~~~
-../Core/Src/main.c:634:114: warning: format '%d' expects argument of type 'int', but argument 23 has type 'double' [-Wformat=]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                                                                                                                 ~^
-      |                                                                                                                  |
-      |                                                                                                                  int
-      |                                                                                                                 %f
-......
-  652 |                         mag_z,
-      |                         ~~~~~                                                                                     
-      |                         |
-      |                         double
-../Core/Src/main.c:634:119: warning: format '%d' expects argument of type 'int', but argument 24 has type 'double' [-Wformat=]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                                                                                                                    ~~~^
-      |                                                                                                                       |
-      |                                                                                                                       int
-      |                                                                                                                    %02f
-......
-  653 |                         auto_gyro_rotation_rate,
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~                                                                        
-      |                         |
-      |                         double
-../Core/Src/main.c:634:134: warning: format '%f' expects argument of type 'double', but argument 27 has type 'int' [-Wformat=]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                                                                                                                                   ~~~^
-      |                                                                                                                                      |
-      |                                                                                                                                      double
-      |                                                                                                                                   %.1d
-......
-  654 |                         gps_time_hr, gps_time_min, gps_time_sec,
-      |                                                    ~~~~~~~~~~~~                                                                       
-      |                                                    |
-      |                                                    int
-../Core/Src/main.c:634:147: warning: format '%d' expects argument of type 'int', but argument 30 has type 'double' [-Wformat=]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                                                                                                                                                  ~^
-      |                                                                                                                                                   |
-      |                                                                                                                                                   int
-      |                                                                                                                                                  %f
-......
-  657 |                         gps_longitude,
-      |                         ~~~~~~~~~~~~~                                                                                                              
-      |                         |
-      |                         double
-../Core/Src/main.c:634:150: warning: format '%s' expects argument of type 'char *', but argument 31 has type 'int' [-Wformat=]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                                                                                                                                                     ~^
-      |                                                                                                                                                      |
-      |                                                                                                                                                      char *
-      |                                                                                                                                                     %d
-......
-  658 |                         gps_sats,
-      |                         ~~~~~~~~                                                                                                                      
-      |                         |
-      |                         int
-../Core/Src/main.c:634:25: warning: too many arguments for format [-Wformat-extra-args]
-  634 |                         "%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:663:21: warning: multi-character character constant [-Wmultichar]
-  663 |         memset(ret, '/0', sizeof(ret));
-      |                     ^~~~
-../Core/Src/main.c:663:33: warning: argument to 'sizeof' in 'memset' call is the same expression as the destination; did you mean to provide an explicit length? [-Wsizeof-pointer-memaccess]
-  663 |         memset(ret, '/0', sizeof(ret));
-      |                                 ^
-../Core/Src/main.c: In function 'transmit_packet':
-../Core/Src/main.c:671:20: warning: variable 'length' set but not used [-Wunused-but-set-variable]
-  671 |         uint16_t i,length;      //the length of data for checksum
-      |                    ^~~~~~
-../Core/Src/main.c: At top level:
-../Core/Src/main.c:724:6: warning: conflicting types for 'set_cmd_echo'; have 'void(const char *)'
-  724 | void set_cmd_echo(const char *cmd)
-      |      ^~~~~~~~~~~~
-../Core/Src/main.c:632:9: note: previous implicit declaration of 'set_cmd_echo' with type 'void(const char *)'
-  632 |         set_cmd_echo("Test");
-      |         ^~~~~~~~~~~~
 ../Core/Src/main.c: In function 'handle_command':
-../Core/Src/main.c:803:63: warning: conversion lacks type at end of format [-Wformat=]
-  803 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
+../Core/Src/main.c:724:63: warning: conversion lacks type at end of format [-Wformat=]
+  724 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
       |                                                               ^
-../Core/Src/main.c:803:48: warning: too many arguments for format [-Wformat-extra-args]
-  803 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
+../Core/Src/main.c:724:48: warning: too many arguments for format [-Wformat-extra-args]
+  724 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
       |                                                ^~~~~~~~~~~~~~~~~
 ../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
-../Core/Src/main.c:870:62: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
-  870 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
+../Core/Src/main.c:781:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+  781 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:789:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+  789 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:791:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+  791 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:582:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  582 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:795:48: warning: pointer targets in passing argument 1 of 'handle_command' differ in signedness [-Wpointer-sign]
+  795 |                                 handle_command(&rx_packet[1]);
+      |                                                ^~~~~~~~~~~~~
+      |                                                |
+      |                                                uint8_t * {aka unsigned char *}
+../Core/Src/main.c:651:33: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  651 | void handle_command(const char *cmd) {
+      |                     ~~~~~~~~~~~~^~~
+../Core/Src/main.c:807:62: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+  807 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
       |                                                              ^~~~~~~
       |                                                              |
       |                                                              char *
@@ -119,8 +68,8 @@ In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
   757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
       |                                                                          ~~~~~~~~~^~~~~
 ../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:975:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
-  975 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
+../Core/Src/main.c:928:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+  928 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
       |                                                        ^~~~~~~
       |                                                        |
       |                                                        char *
@@ -128,11 +77,11 @@ In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
   757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
       |                                                                          ~~~~~~~~~^~~~~
 ../Core/Src/main.c: In function 'handle_command':
-../Core/Src/main.c:816:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
-  816 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+../Core/Src/main.c:737:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+  737 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:803:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
-  803 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
+../Core/Src/main.c:724:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+  724 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
       |                                                            ^
 arm-none-eabi-gcc -o "Nucleo_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\Nucleo_Flight_Software\STM32F412ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: Nucleo_Flight_Software.elf
@@ -140,15 +89,15 @@ Finished building target: Nucleo_Flight_Software.elf
 arm-none-eabi-size  Nucleo_Flight_Software.elf 
 arm-none-eabi-objdump -h -S Nucleo_Flight_Software.elf  > "Nucleo_Flight_Software.list"
    text	   data	    bss	    dec	    hex	filename
-  50500	    596	   4676	  55772	   d9dc	Nucleo_Flight_Software.elf
+  51564	    648	   4680	  56892	   de3c	Nucleo_Flight_Software.elf
 Finished building: default.size.stdout
  
 Finished building: Nucleo_Flight_Software.list
  
-14:38:49 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
+16:25:13 **** Incremental Build of configuration Debug for project Nucleo_Flight_Software ****
 make -j20 all 
 arm-none-eabi-size  Nucleo_Flight_Software.elf 
    text	   data	    bss	    dec	    hex	filename
-  50500	    596	   4676	  55772	   d9dc	Nucleo_Flight_Software.elf
+  51564	    648	   4680	  56892	   de3c	Nucleo_Flight_Software.elf
 Finished building: default.size.stdout
  

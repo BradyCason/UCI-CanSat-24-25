@@ -189,7 +189,7 @@ float prev_alt = 0;
 int descending_count = 0;
 
 // Other Variables
-int8_t altitude_offset = 0;
+float altitude_offset = 0;
 float mag_x_offset = 0;
 float mag_y_offset = 0;
 float mag_z_offset = 0;
@@ -334,7 +334,7 @@ void read_MPL3115A2(void)
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    result = HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c2, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
     // Combine pressure bytes into a 20-bit integer
     uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
@@ -409,7 +409,7 @@ void read_PA1010D(void)
 	/* PA1010D (GPS) */
 	if (HAL_I2C_IsDeviceReady(&hi2c2, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
 		for(pa1010d_i=0; pa1010d_i<255; pa1010d_i++){
-			result = HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
+			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -518,7 +518,7 @@ void init_PA1010D(void)
 	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
 	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
 //	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
-//	pa_init_ret[4] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
+	pa_init_ret[4] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
 
 //	HAL_Delay(10000);
 	//Wait for stabilization
@@ -540,7 +540,7 @@ void init_PA1010D(void)
 void init_INA219(void)
 {
 	uint8_t ina_config[2] = {0b00000001, 0b00011101};
-	result = HAL_I2C_Mem_Write(&hi2c2, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+	HAL_I2C_Mem_Write(&hi2c2, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
@@ -572,7 +572,7 @@ void init_commands(void)
 	snprintf(sim_command, sizeof(sim_command), "CMD,%s,SIM,", TEAM_ID);
 	snprintf(simp_command, sizeof(simp_command), "CMD,%s,SIMP,", TEAM_ID);
 	snprintf(set_time_command, sizeof(set_time_command), "CMD,%s,ST,", TEAM_ID);
-	snprintf(cal_alt_command, sizeof(cal_alt_command), "CMD,%s,CAL,", TEAM_ID);
+	snprintf(cal_alt_command, sizeof(cal_alt_command), "CMD,%s,CAL", TEAM_ID);
 	snprintf(bcn_on_command, sizeof(bcn_on_command), "CMD,%s,BCN,ON", TEAM_ID);
 	snprintf(bcn_off_command, sizeof(bcn_off_command), "CMD,%s,BCN,OFF", TEAM_ID);
 	snprintf(tel_on_command, sizeof(tel_on_command), "CMD,%s,CX,ON", TEAM_ID);\
@@ -580,17 +580,6 @@ void init_commands(void)
 }
 
 uint8_t calculate_checksum(const char *data) {
-//    uint32_t sum = 0;  // Use a larger type for summing
-//    size_t len = strlen(data);  // Get the length of the string
-//
-//    // Iterate over each byte in the string and sum their values
-//    for (size_t i = 0; i < len; i++) {
-//        sum += (uint8_t)data[i];  // Cast char to uint8_t and add to sum
-//    }
-//
-//    // Return the result modulo 256 (0x100)
-//    return (uint8_t)(sum % 256);
-
 	uint8_t checksum = 0;
 	while (*data) {
 		checksum += *data++;
@@ -618,74 +607,6 @@ void send_packet(){
 
 	// Send the packet using HAL_UART_Transmit
 	HAL_UART_Transmit(&huart2, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
-}
-
-void create_telemetry(uint8_t *ret, uint8_t part){
-	char tel_buf[TX_BFR_SIZE-3] = {0};	//Preload buffer
-
-	packet_count += 1;
-	/* Variables TEAM_ID, MISSION_TIME, PACKET_COUNT, MODE, STATE, ALTITUDE,
-	TEMPERATURE, PRESSURE, VOLTAGE, GYRO_R, GYRO_P, GYRO_Y, ACCEL_R,
-	ACCEL_P, ACCEL_Y, MAG_R, MAG_P, MAG_Y, AUTO_GYRO_ROTATION_RATE,
-	GPS_TIME, GPS_ALTITUDE, GPS_LATITUDE, GPS_LONGITUDE, GPS_SATS,
-	CMD_ECHO [,,OPTIONAL_DATA] */
-	set_cmd_echo("Test");
-	snprintf(tel_buf, TX_BFR_SIZE,
-			"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%d,%02d:%02d:%02d,%.1f,%.4f,%.4f,%d,%s",
-			TEAM_ID,
-			mission_time_hr, mission_time_min, mission_time_sec,
-			packet_count,
-			mode,
-			state,
-			altitude,
-			temperature,
-			pressure,
-			voltage,
-			gyro_x,
-			gyro_y,
-			gyro_z,
-			accel_x,
-			accel_y,
-			accel_z,
-			mag_x,
-			mag_y,
-			mag_z,
-			auto_gyro_rotation_rate,
-			gps_time_hr, gps_time_min, gps_time_sec,
-			gps_altitude,
-			gps_latitude,
-			gps_longitude,
-			gps_sats,
-			cmd_echo
-			);
-	tx_count = strlen(tel_buf);
-
-	memset(ret, '/0', sizeof(ret));
-	memcpy(ret, tel_buf, TX_BFR_SIZE-3);
-}
-
-uint16_t transmit_packet(	uint8_t *T_packet,		//w
-							uint8_t *T_data,		//r
-							uint16_t datanum)		//r
-{
-	uint16_t i,length; 	//the length of data for checksum
-
-	/*Write Packet Length to Packet*/
-	uint16_t packet_length=datanum+3;				// 1 byte for start delimiter, 1 for checksum, 1 for \n
-	length=packet_length-4;							// length for checksum
-	T_packet[0]=0x7E;
-
-  	/*Write RF Data to Packet*/
-	for(i=0;i<datanum;i++)
-	{
-		T_packet[i+1]=T_data[i];
-	}
-
-	/*Calculate Checksum*/
-//	T_packet[packet_length-2]= calculate_checksum(T_data);
-	T_packet[packet_length-1]= '\n';
-
-	return packet_length;
 }
 
 void read_transmit_telemetry (){
@@ -727,26 +648,26 @@ void set_cmd_echo(const char *cmd)
 	strncpy(cmd_echo, cmd, strlen(cmd));
 }
 
-void handle_command() {
+void handle_command(const char *cmd) {
 
 	// SIM command
-	if (strncmp(rx_data, sim_command, strlen(sim_command)) == 0) {
+	if (strncmp(cmd, sim_command, strlen(sim_command)) == 0) {
 
 		// disable
-		if (rx_data[13] == 'D'){
+		if (cmd[13] == 'D'){
 			set_cmd_echo("SIMDISABLE");
 			mode = 'F';
 			sim_enabled = false;
 		}
 
 		// enable
-		if (rx_data[13] == 'E'){
+		if (cmd[13] == 'E'){
 			set_cmd_echo("SIMENABLE");
 			sim_enabled = true;
 		}
 
 		// activate
-		if (rx_data[13] == 'A' && sim_enabled == true){
+		if (cmd[13] == 'A' && sim_enabled == true){
 			mode = 'S';
 			set_cmd_echo("SIMACTIVATE");
 		}
@@ -754,7 +675,7 @@ void handle_command() {
 	}
 
 	// SIMP command
-	else if (strncmp(rx_data, simp_command, strlen(simp_command)) == 0) {
+	else if (strncmp(cmd, simp_command, strlen(simp_command)) == 0) {
 		if (mode == 'S') {
 			char pressure_str[16];
 
@@ -778,8 +699,8 @@ void handle_command() {
 	}
 
 	// set time command
-	else if (strncmp(rx_data, set_time_command, strlen(set_time_command)) == 0) {
-		if (rx_data[12]=='G') {
+	else if (strncmp(cmd, set_time_command, strlen(set_time_command)) == 0) {
+		if (cmd[12]=='G') {
 			mission_time_hr = (int16_t)gps_time_hr;
 			mission_time_min = (int16_t)gps_time_min;
 			mission_time_sec = (int16_t)gps_time_sec;
@@ -788,16 +709,16 @@ void handle_command() {
 		else {
 			char temp[3];
 			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[12];
-			temp[1] = rx_data[13];
+			temp[0] = cmd[12];
+			temp[1] = cmd[13];
 			mission_time_hr = atoi(temp);
 			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[15];
-			temp[1] = rx_data[16];
+			temp[0] = cmd[15];
+			temp[1] = cmd[16];
 			mission_time_min = atoi(temp);
 			memset(temp, 0, sizeof(temp));
-			temp[0] = rx_data[18];
-			temp[1] = rx_data[19];
+			temp[0] = cmd[18];
+			temp[1] = cmd[19];
 			mission_time_sec = atoi(temp);
 			memset(cmd_echo, '\0', sizeof(cmd_echo));
 			snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
@@ -808,8 +729,8 @@ void handle_command() {
 	}
 
 	// Calibrate Altitude
-	else if (strncmp(rx_data, "CMD,2057,CAL", strlen("CMD,2057,CAL")) == 0) {
-		altitude_offset = altitude;
+	else if (strncmp(cmd, cal_alt_command, strlen(cal_alt_command)) == 0) {
+		altitude_offset -= altitude;
 		set_cmd_echo("CAL");
 		if (strncmp(state, "PRE-LAUNCH", strlen("PRE-LAUNCH")) == 0) {
 			memset(state, 0, sizeof(state));
@@ -820,28 +741,28 @@ void handle_command() {
 	}
 
 	// Beacon On
-	else if (strncmp(rx_data, bcn_on_command, strlen(bcn_on_command)) == 0) {
+	else if (strncmp(cmd, bcn_on_command, strlen(bcn_on_command)) == 0) {
 		beacon_status = 1;
 		set_cmd_echo("BCNON");
 		sim_enabled = false;
 	}
 
 	// Beacon Off
-	else if (strncmp(rx_data, bcn_off_command, strlen(bcn_off_command)) == 0) {
+	else if (strncmp(cmd, bcn_off_command, strlen(bcn_off_command)) == 0) {
 		beacon_status = 0;
 		set_cmd_echo("BCNOFF");
 		sim_enabled = false;
 	}
 
 	// Telemetry On
-	else if (strncmp(rx_data, tel_on_command, strlen(tel_on_command)) == 0) {
+	else if (strncmp(cmd, tel_on_command, strlen(tel_on_command)) == 0) {
 		telemetry_status = 1;
 		set_cmd_echo("CXON");
 		sim_enabled = false;
 	}
 
 	// Telemetry Off
-	else if (strncmp(rx_data, tel_off_command, strlen(tel_off_command)) == 0) {
+	else if (strncmp(cmd, tel_off_command, strlen(tel_off_command)) == 0) {
 		telemetry_status = 0;
 		set_cmd_echo("CXOFF");
 		sim_enabled = false;
@@ -851,20 +772,36 @@ void handle_command() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
-//	int i = 0;
-//	while (rx_data[i+15] != 0) {
-//		rx_data[i] = rx_data[i+15];
-//		i++;
-//	}
-//	rx_data[i-1] = 0;
-//	for (; i < 255; i++) {
-//		rx_data[i] = 0;
-//	}
-
-//	handle_command();
 	memcpy(rx_packet, rx_data, RX_BFR_SIZE);
 
 	memset(rx_data, 0, sizeof(rx_data));
+
+	if (rx_packet[0] == '~') {
+		// Calculate where the comma and checksum should be
+		char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+
+		// Ensure the expected comma is at the right position
+		if (*comma_pos == ',') {
+			// Null-terminate the data part (exclude comma and checksum)
+			*comma_pos = '\0';
+
+			// Extract and convert the received checksum (2 characters after the comma)
+			uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+			// Calculate checksum of the data part (after '~' and before comma)
+			uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+			// Compare calculated checksum with the received one
+			if (calculated_checksum == received_checksum) {
+				// Checksum is valid, process the command
+				handle_command(&rx_packet[1]);
+			} else {
+				// Checksum mismatch, handle error
+				result = HAL_ERROR;
+			}
+		} else {
+			// Handle case where there's no comma at the expected position
+			result = HAL_ERROR;
+		}
+	}
 
 	// Call function for next packet
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
@@ -897,6 +834,20 @@ void I2C_BusReset(void) {
     if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0) == GPIO_PIN_RESET) {
         // Handle error: SDA line is stuck low
         // You can handle this situation or attempt more aggressive resets.
+    	// Try toggling SDA to release it
+		for (int i = 0; i < 10; i++) {
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_SET);  // Set SDA high
+			HAL_Delay(5);
+			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET); // Set SDA low
+			HAL_Delay(5);
+		}
+
+		// Check again if SDA is still low
+		if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0) == GPIO_PIN_RESET) {
+			// Handle error: SDA line is stuck low
+			result = HAL_ERROR;
+			return;
+		}
     }
 
     // Reinitialize the I2C pins as alternate function (for I2C peripheral)
@@ -967,7 +918,9 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  result = HAL_I2C_IsDeviceReady(&hi2c2, PA1010D_ADDRESS, 3, 5);
+//  I2C_BusReset();
+
+//  result = HAL_I2C_IsDeviceReady(&hi2c2, MMC5603_ADDRESS, 3, 5);
 
   init_sensors();
   init_commands();
