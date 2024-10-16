@@ -6,6 +6,8 @@ import threading
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import pyqtgraph as pg
 from csv import writer, reader
+from datetime import datetime
+import pytz
 
 TEAM_ID = "2057"
 
@@ -81,11 +83,20 @@ class GroundStationWindow(QtWidgets.QMainWindow):
                     label = self.simulation_container.findChild(QtWidgets.QLabel, field)
             self.telemetry_labels[field] = label
 
+        # Set First Color of Telemetry Toggle button
+        if telemetry_on:
+            self.telemetry_toggle_button.setText("Telemetry Toggle: On")
+            self.make_button_green(self.telemetry_toggle_button)
+        else:
+            self.telemetry_toggle_button.setText("Telemetry Toggle: Off")
+            self.make_button_red(self.telemetry_toggle_button)
+
     def connect_buttons(self):
         self.sim_enable_button.clicked.connect(lambda: self.handle_simulation("ENABLE"))
         self.sim_activate_button.clicked.connect(lambda: self.handle_simulation("ACTIVATE"))
         self.sim_disable_button.clicked.connect(lambda: self.handle_simulation("DISABLE"))
-        self.set_time_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
+        self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
+        self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
         # self.override_state_1_button.clicked.connect(None)
         # self.override_state_2_button.clicked.connect(None)
@@ -94,7 +105,8 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.show_graphs_button.clicked.connect(self.graph_window.show)
 
         # Connect non-sim buttons to update sim button colors
-        self.set_time_button.clicked.connect(self.non_sim_button_clicked)
+        self.set_time_gps_button.clicked.connect(self.non_sim_button_clicked)
+        self.set_time_utc_button.clicked.connect(self.non_sim_button_clicked)
         self.calibrate_alt_button.clicked.connect(self.non_sim_button_clicked)
         self.override_state_1_button.clicked.connect(self.non_sim_button_clicked)
         self.override_state_2_button.clicked.connect(self.non_sim_button_clicked)
@@ -252,7 +264,7 @@ def parse_xbee(data):
     w.update()
 
     # Add data to csv file
-    file = str(readable_time) + '.csv'
+    file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + '.csv')
     with open(file, 'a', newline='') as f_object:
         writer_object = writer(f_object)
         writer_object.writerow(telemetry.values())
@@ -272,11 +284,17 @@ def read_xbee():
             frame = buffer[start_idx + 1:end_idx].strip()
             buffer = buffer[end_idx + 1:]
 
-            data, checksum = frame.rsplit(",", 1)
-            if verify_checksum(data, float(checksum)):
-                parse_xbee(data.split(","))
-            else:
-                print("Failed to read frame:", frame)
+            try:
+                data, checksum = frame.rsplit(",", 1)
+                if verify_checksum(data, float(checksum)):
+                    if len(data.split(",")) == 25:
+                        parse_xbee(data.split(","))
+                    else:
+                        print("Incorrect number of fields in frame: ", frame)
+                else:
+                    print("Failed to read frame:", frame)
+            except:
+                print("Error reading frame: ", frame)
 
             # start_byte = ser.read(1)
             # if start_byte != START_DELIMITER:
@@ -337,6 +355,11 @@ def send_simp_data():
 
 
 def main():
+    # Create new csv file with header
+    file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + '.csv')
+    with open(file, 'w', newline='') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(TELEMETRY_FIELDS)
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)

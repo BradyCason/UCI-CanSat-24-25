@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /* USER CODE END Includes */
 
@@ -70,6 +71,10 @@ typedef uint8_t bool;
 #define RX_BFR_SIZE 255
 #define TX_BFR_SIZE 255
 #define TEAM_ID "2057"
+
+#define I2C_SCL_PIN GPIO_PIN_0
+#define I2C_SDA_PIN GPIO_PIN_1
+#define I2C_PORT GPIOF
 
 /* USER CODE END PD */
 
@@ -146,7 +151,7 @@ uint8_t gps_sats;
 char cmd_echo[64] = "N/A";
 
 // PA1010D DATA
-uint8_t PA1010D_RATE[] = "$PMTK220,500*2B\r\n";
+uint8_t PA1010D_RATE[] = "$PMTK220,1000*1F\r\n";
 //uint8_t PA1010D_SAT[] = "$PMTK313,1*2E\r\n";
 uint8_t PA1010D_SAT[] = "$PMTK353,1,0,0,0,0*2A\r\n";
 uint8_t PA1010D_INIT[] = "$PMTK225,0*2B\r\n";
@@ -189,10 +194,11 @@ float prev_alt = 0;
 int descending_count = 0;
 
 // Other Variables
+float direction = 0;
 float altitude_offset = 0;
-float mag_x_offset = 0;
-float mag_y_offset = 0;
-float mag_z_offset = 0;
+float mag_x_offset = 0.1773125085;
+float mag_y_offset = 0.2233437445;
+float mag_z_offset = -1.321749987;
 int beacon_status = 0;
 int telemetry_status = 1;
 bool sim_enabled = false;
@@ -204,8 +210,8 @@ float mag_x_min = 0;
 float mag_y_min = 0;
 float mag_z_min = 0;
 float mag_x_max = 0;
-float mag_y_max = 0;
-float mag_z_max = 0;
+float mag_y_max = -1;
+float mag_z_max = -1;
 
 //Set up Interrupt handler to invoke data transmit from xbee to the board.
 void USART2_IRQHandler(void) {
@@ -304,7 +310,7 @@ void read_MMC5603(void) {
 		return;
 	}
 
-	HAL_Delay(10);
+//	HAL_Delay(10);
 
 	// Read 9 bytes of data from the sensor
 	if (HAL_I2C_Master_Receive(&hi2c2, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
@@ -324,9 +330,14 @@ void read_MMC5603(void) {
 	raw_z -= (1 << 19);
 
 	// Scale to Gauss
-	mag_x = (float)raw_x * 0.0000625;
-	mag_y = (float)raw_y * 0.0000625;
-	mag_z = (float)raw_z * 0.0000625;
+	mag_x = (float)raw_x * 0.0000625 - mag_x_offset;
+	mag_y = (float)raw_y * 0.0000625 - mag_y_offset;
+	mag_z = (float)raw_z * 0.0000625 - mag_z_offset;
+
+	direction = atan2(mag_y, mag_x) * 180 / PI;
+	if (direction < 0){
+		direction += 360;
+	}
 }
 
 void read_MPL3115A2(void)
@@ -514,11 +525,11 @@ void init_PA1010D(void)
 {
 	uint8_t pa1010d_bytebuf;
 
-//	pa_init_ret[0] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
-	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
-	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
+	HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
+	HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
+//	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
+//	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
 //	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
-	pa_init_ret[4] = HAL_I2C_Master_Transmit(&hi2c2, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
 
 //	HAL_Delay(10000);
 	//Wait for stabilization
@@ -545,26 +556,20 @@ void init_INA219(void)
 
 void read_sensors(void)
 {
+	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
 	read_MMC5603(); // Magnetic Field
-	read_MPU6050(); // Accel/ tilt
 	read_PA1010D(); // GPS
-	read_INA219(); // Voltage
+//	read_INA219(); // Voltage
 }
 
 void init_sensors(void)
 {
-//	result = HAL_I2C_GetState(&hi2c2);
-//	if (HAL_I2C_GetState(&hi2c2) == HAL_I2C_STATE_BUSY) {
-////		result = HAL_BUSY;
-//	    I2C_BusReset();  // Call your I2C bus reset function only if the bus is busy
-//	}
-
+	init_MPU6050(); // Must be first
 	init_MPL3115A2();
 	init_MMC5603();
-	init_MPU6050();
 	init_PA1010D();
-	init_INA219();
+//	init_INA219();
 }
 
 void init_commands(void)
@@ -595,7 +600,7 @@ void send_packet(){
 	packet_count += 1;
 
 	snprintf(data, sizeof(data),
-		"%s,%02d:%02d:%02d,%d,%c,%s,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%02d:%02d:%02d,%.6f,%.6f,%.6f,%u,%s",
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%02d:%02d:%02d,%.4f,%.4f,%.4f,%u,%s",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
 		 gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, mag_x, mag_y, mag_z,
@@ -609,9 +614,17 @@ void send_packet(){
 	HAL_UART_Transmit(&huart2, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
 }
 
-void read_transmit_telemetry (){
-	read_sensors();
+void handle_state(){
 
+}
+
+void read_transmit_telemetry (){
+	if (mode == 'F') {
+		read_sensors();
+	}
+
+	// Handle State
+//	handle_state();
 	if (prev_alt > altitude) {
 		descending_count++;
 	}
@@ -619,26 +632,9 @@ void read_transmit_telemetry (){
 		descending_count = 0;
 	}
 
-	// Handle Mission Time
-	mission_time_sec++;
-	if ( mission_time_sec >= 60 ){
-		mission_time_sec -= 60;
-		mission_time_min += 1;
-	}
-	if ( mission_time_min >= 60 ){
-		mission_time_min -= 60;
-		mission_time_hr += 1;
-	}
-	if ( mission_time_hr >= 24 ){
-		mission_time_hr -= 24;
-	}
-
 	prev_time = gps_time_sec;
 	prev_alt = altitude;
 
-//	create_telemetry(tx_data, 0);
-//	transmit_packet(tx_packet, tx_data, tx_count);
-//	HAL_UART_Transmit(&huart2, tx_packet, sizeof(tx_packet), 100);
 	send_packet();
 }
 
@@ -676,20 +672,23 @@ void handle_command(const char *cmd) {
 
 	// SIMP command
 	else if (strncmp(cmd, simp_command, strlen(simp_command)) == 0) {
+		if (result == HAL_OK){
+			result = HAL_BUSY;
+		}
+		else{
+			result = HAL_OK;
+		}
 		if (mode == 'S') {
-			char pressure_str[16];
+			char pressure_str[7];
 
-			strncpy(pressure_str, &rx_data[14], 5);
+			strncpy(pressure_str, &cmd[14], 6);
+			pressure_str[6] = '\0';
 
-			//memset(pressure_str, '\0', sizeof(pressure_str));
-			int i = 0;
-			while (pressure_str[8-i] == '\0') {
-				i++;
-			}
-
-			//pressure_str[8-i] = "\0";
-
+			// Read sensors, then update the pressure and altitude
+			read_sensors();
 			pressure = atof(pressure_str)/1000;
+			altitude = calculate_altitude(pressure);
+
 			char temp[12] = "SIMP";
 			strcat(temp, pressure_str);
 			set_cmd_echo(temp);
@@ -793,70 +792,13 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 			if (calculated_checksum == received_checksum) {
 				// Checksum is valid, process the command
 				handle_command(&rx_packet[1]);
-			} else {
-				// Checksum mismatch, handle error
-				result = HAL_ERROR;
 			}
-		} else {
-			// Handle case where there's no comma at the expected position
-			result = HAL_ERROR;
 		}
 	}
 
 	// Call function for next packet
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
-}
-
-void I2C_BusReset(void) {
-    // Configure SCL (PF1) and SDA (PF0) as GPIO outputs
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    // Enable the GPIOF clock (assuming I2C1 uses PF0 and PF1)
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-
-    // Configure SCL (PF1) and SDA (PF0) as open-drain outputs
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-    // Manually toggle SCL (PF1) to clear the bus
-    for (int i = 0; i < 10; i++) {
-        HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_SET);   // Set SCL high
-        HAL_Delay(1);                                         // Small delay
-        HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_RESET); // Set SCL low
-        HAL_Delay(1);                                         // Small delay
-    }
-
-    // Check if SDA (PF0) is still low (held by a device)
-    if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0) == GPIO_PIN_RESET) {
-        // Handle error: SDA line is stuck low
-        // You can handle this situation or attempt more aggressive resets.
-    	// Try toggling SDA to release it
-		for (int i = 0; i < 10; i++) {
-			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_SET);  // Set SDA high
-			HAL_Delay(5);
-			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET); // Set SDA low
-			HAL_Delay(5);
-		}
-
-		// Check again if SDA is still low
-		if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_0) == GPIO_PIN_RESET) {
-			// Handle error: SDA line is stuck low
-			result = HAL_ERROR;
-			return;
-		}
-    }
-
-    // Reinitialize the I2C pins as alternate function (for I2C peripheral)
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;  // Make sure to use the correct AF for your I2C peripheral
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 }
 
 void calibrate_mmc(){
@@ -879,6 +821,10 @@ void calibrate_mmc(){
 	if (mag_z > mag_z_max){
 		mag_z_max = mag_z;
 	}
+
+	mag_x_offset = (mag_x_min + mag_x_max) / 2;
+	mag_y_offset = (mag_y_min + mag_y_max) / 2;
+	mag_z_offset = (mag_z_min + mag_z_max) / 2;
 }
 /* USER CODE END 0 */
 
@@ -918,9 +864,7 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-//  I2C_BusReset();
-
-//  result = HAL_I2C_IsDeviceReady(&hi2c2, MMC5603_ADDRESS, 3, 5);
+//  result = HAL_I2C_IsDeviceReady(&hi2c2, MPU6050_ADDRESS, 3, 5);
 
   init_sensors();
   init_commands();
@@ -933,22 +877,35 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  read_sensors();
-	  // Control Telemetry
-	  if (telemetry_status == 1) {
-		  read_transmit_telemetry();
-	  }
+	// Handle Mission Time
+	mission_time_sec++;
+	if ( mission_time_sec >= 60 ){
+		mission_time_sec -= 60;
+		mission_time_min += 1;
+	}
+	if ( mission_time_min >= 60 ){
+		mission_time_min -= 60;
+		mission_time_hr += 1;
+	}
+	if ( mission_time_hr >= 24 ){
+		mission_time_hr -= 24;
+	}
 
-	  // Control Beacon
-	  if (beacon_status == 1) {
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-	  }
+	// Control Telemetry
+	if (telemetry_status == 1){
+		read_transmit_telemetry();
+	}
 
-	  else {
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	  }
+	// Control Beacon
+	if (beacon_status == 1) {
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	}
 
-	  HAL_Delay(1000);
+	else {
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	}
+
+	HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 

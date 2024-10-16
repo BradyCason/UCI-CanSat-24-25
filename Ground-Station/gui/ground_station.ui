@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>996</width>
-    <height>731</height>
+    <width>973</width>
+    <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1151,9 +1151,9 @@ QPushButton:hover {
        <widget class="QWidget" name="control_container" native="true">
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="control_panel" stretch="1,0,1,0,1,0,1,0,1,0,1,0,1">
+          <layout class="QVBoxLayout" name="control_panel" stretch="1,0,1,0,1,0,1,0,1,0,1,0,1,0,1">
            <item>
-            <widget class="QPushButton" name="set_time_button">
+            <widget class="QPushButton" name="set_time_gps_button">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1172,7 +1172,7 @@ QPushButton:hover {
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>Set Time</string>
+              <string>Set Time: GPS</string>
              </property>
             </widget>
            </item>
@@ -1183,6 +1183,41 @@ QPushButton:hover {
              </property>
              <property name="sizeType">
               <enum>QSizePolicy::Minimum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>5</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="set_time_utc_button">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <family>Sans Serif Collection</family>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Set Time: UTC</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1425,7 +1460,7 @@ QPushButton:hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>996</width>
+     <width>973</width>
      <height>26</height>
     </rect>
    </property>
