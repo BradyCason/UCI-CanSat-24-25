@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="altitude_of"/>
+		<item key="selection" value="BusRes"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="altitude_of"/>
-			<item value="debug_pa"/>
-			<item value="hal_trans"/>
-			<item value="transmit_p"/>
-			<item value="transm"/>
-			<item value="debug_packet"/>
-			<item value="telemetry_status"/>
-			<item value="tx_packet"/>
-			<item value="mac_add"/>
-			<item value="mac_"/>
-			<item value="mac"/>
-			<item value="hal_uart"/>
-			<item value="create_tele"/>
-			<item value="transmit_packet"/>
-			<item value="t_packet"/>
+			<item value="busres"/>
+			<item value="pf0_stat"/>
+			<item value="resetbus"/>
+			<item value="init_sens"/>
+			<item value="68"/>
+			<item value="pf0_"/>
+			<item value="pf0"/>
+			<item value="pressure_st"/>
+			<item value="error_"/>
+			<item value="error"/>
+			<item value="define"/>
+			<item value="i2c2_int"/>
+			<item value="read_sens"/>
+			<item value="Delay(1"/>
+			<item value="read_mmc"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

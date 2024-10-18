@@ -70,7 +70,7 @@ typedef uint8_t bool;
 
 #define RX_BFR_SIZE 255
 #define TX_BFR_SIZE 255
-#define TEAM_ID "2057"
+#define TEAM_ID "3141"
 
 #define I2C_SCL_PIN GPIO_PIN_0
 #define I2C_SDA_PIN GPIO_PIN_1

@@ -9,7 +9,7 @@ from csv import writer, reader
 from datetime import datetime
 import pytz
 
-TEAM_ID = "2057"
+TEAM_ID = "3141"
 
 TELEMETRY_FIELDS = ["TEAM_ID", "MISSION_TIME", "PACKET_COUNT", "MODE", "STATE", "ALTITUDE",
                     "TEMPERATURE", "PRESSURE", "VOLTAGE", "GYRO_R", "GYRO_P", "GYRO_Y", "ACCEL_R",
