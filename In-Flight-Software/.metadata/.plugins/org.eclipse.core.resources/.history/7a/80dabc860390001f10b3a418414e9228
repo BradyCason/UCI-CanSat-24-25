@@ -222,6 +222,7 @@ bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
 volatile uint32_t ms_elapsed = 0;
+uint8_t started = 0;
 bool started = 0;
 bool calibrating_compass = 0;
 

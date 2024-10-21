@@ -28,6 +28,7 @@ sim = False
 running = True
 sim_enable = False
 telemetry_on = True
+calibrate_comp_on = False
 csv_indexer = 0
 buzzer_on = False
 
@@ -100,6 +101,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
         # self.override_state_1_button.clicked.connect(None)
         # self.override_state_2_button.clicked.connect(None)
+        self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
         self.buzzer_toggle_button.clicked.connect(self.toggle_buzzer)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
@@ -172,6 +174,19 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         global sim_enable
         sim_enable = False
         self.update_sim_button_colors()
+
+    def calibrate_comp_toggle(self):
+        global calibrate_comp_on
+        calibrate_comp_on = not calibrate_comp_on
+
+        if calibrate_comp_on:
+            write_xbee("CMD,"+ TEAM_ID + ",CC,ON")
+            self.calibrate_comp_button.setText("Stop Calibrating Compass")
+            self.make_button_green(self.calibrate_comp_button)
+        else:
+            write_xbee("CMD,"+ TEAM_ID + ",CC,OFF")
+            self.calibrate_comp_button.setText("Calibrate Compass")
+            self.make_button_blue(self.calibrate_comp_button)
 
     def toggle_telemetry(self):
         global telemetry_on

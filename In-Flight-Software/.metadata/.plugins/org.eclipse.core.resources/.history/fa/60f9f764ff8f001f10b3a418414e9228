@@ -195,8 +195,6 @@ char bcn_on_command[16];
 char bcn_off_command[17];
 char tel_on_command[15];
 char tel_off_command[16];
-char cal_comp_on_command[15];
-char cal_comp_off_command[16];
 
 // State Variables
 float prev_alt = 0;
@@ -222,6 +220,7 @@ bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
 volatile uint32_t ms_elapsed = 0;
+uint8_t started = 0;
 bool started = 0;
 bool calibrating_compass = 0;
 
@@ -639,8 +638,6 @@ void init_commands(void)
 	snprintf(bcn_off_command, sizeof(bcn_off_command), "CMD,%s,BCN,OFF", TEAM_ID);
 	snprintf(tel_on_command, sizeof(tel_on_command), "CMD,%s,CX,ON", TEAM_ID);\
 	snprintf(tel_off_command, sizeof(tel_off_command), "CMD,%s,CX,OFF", TEAM_ID);
-	snprintf(cal_comp_on_command, sizeof(cal_comp_on_command), "CMD,%s,CC,ON", TEAM_ID);
-	snprintf(cal_comp_off_command, sizeof(cal_comp_off_command), "CMD,%s,CC,OFF", TEAM_ID);
 }
 
 uint8_t calculate_checksum(const char *data) {
@@ -857,24 +854,11 @@ void handle_command(const char *cmd) {
 
 	// Calibrate compass On
 	else if (strncmp(cmd, cal_comp_on_command, strlen(cal_comp_on_command)) == 0) {
-		mag_x_min = mag_x;
-		mag_x_max = mag_x;
-		mag_y_min = mag_y;
-		mag_y_max = mag_y;
-		mag_z_min = mag_z;
-		mag_z_max = mag_z;
+		started = 0;
 		calibrating_compass = 1;
-		set_cmd_echo("CCON");
+		set_cmd_echo("CC");
 		sim_enabled = false;
 	}
-
-	// Calibrate compass Off
-	else if (strncmp(cmd, cal_comp_off_command, strlen(cal_comp_off_command)) == 0) {
-			store_flash_data();
-			calibrating_compass = 0;
-			set_cmd_echo("CCOFF");
-			sim_enabled = false;
-		}
 
 }
 
