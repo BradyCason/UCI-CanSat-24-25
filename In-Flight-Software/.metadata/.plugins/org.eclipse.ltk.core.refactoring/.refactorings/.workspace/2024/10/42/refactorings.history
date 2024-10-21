@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Nucleo_Flight_Software/Core/Src/FLASH_SECTOR_F4&apos;" deleteContents="false" description="Delete resource &apos;Nucleo_Flight_Software/Core/Src/FLASH_SECTOR_F4&apos;" element1="/Nucleo_Flight_Software/Core/Src/FLASH_SECTOR_F4" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1729287698192"/>
+</session>

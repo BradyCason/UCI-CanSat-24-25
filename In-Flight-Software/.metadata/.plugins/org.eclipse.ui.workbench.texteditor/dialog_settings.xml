@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="BusRes"/>
+		<item key="selection" value="memory"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="memory"/>
+			<item value="flash"/>
+			<item value="init_sens"/>
+			<item value="mag_x_off"/>
+			<item value="0.07"/>
+			<item value="result ="/>
+			<item value="calibrate_"/>
+			<item value="calibrate"/>
+			<item value="direction"/>
+			<item value="heading"/>
 			<item value="busres"/>
 			<item value="pf0_stat"/>
 			<item value="resetbus"/>
-			<item value="init_sens"/>
 			<item value="68"/>
 			<item value="pf0_"/>
-			<item value="pf0"/>
-			<item value="pressure_st"/>
-			<item value="error_"/>
-			<item value="error"/>
-			<item value="define"/>
-			<item value="i2c2_int"/>
-			<item value="read_sens"/>
-			<item value="Delay(1"/>
-			<item value="read_mmc"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

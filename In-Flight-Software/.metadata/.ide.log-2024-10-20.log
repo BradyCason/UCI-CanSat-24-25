@@ -1,0 +1,31 @@
+2024-10-20 22:32:43,897 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:32:43,949 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:32:43,949 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:32:51,676 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:32:51,774 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:33:28,144 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:33:28,256 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:40:27,673 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:40:27,817 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:43:26,755 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:43:49,297 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:43:52,273 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:43:52,366 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:48:27,166 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:48:27,382 [INFO] WebApp:186 - Connection restablished
+2024-10-20 22:48:41,347 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:41,348 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:41,348 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:41,485 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:41,485 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:41,486 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2024-10-20 22:48:47,658 [INFO] WebApp:189 - Connection lost
+2024-10-20 22:48:47,760 [INFO] WebApp:186 - Connection restablished
+2024-10-20 23:24:13,177 [INFO] WebApp:189 - Connection lost
+2024-10-20 23:24:13,300 [INFO] WebApp:186 - Connection restablished
+2024-10-20 23:28:18,142 [INFO] WebApp:189 - Connection lost
+2024-10-20 23:28:18,234 [INFO] WebApp:186 - Connection restablished
+2024-10-20 23:33:22,151 [INFO] WebApp:189 - Connection lost
+2024-10-20 23:33:22,265 [INFO] WebApp:186 - Connection restablished
+2024-10-20 23:34:11,648 [INFO] WebApp:189 - Connection lost
+2024-10-20 23:34:11,765 [INFO] WebApp:186 - Connection restablished

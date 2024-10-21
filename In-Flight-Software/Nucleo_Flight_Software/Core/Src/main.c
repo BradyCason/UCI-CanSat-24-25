@@ -66,6 +66,13 @@ typedef uint8_t bool;
 //INA219 (Voltage)
 #define INA219_ADDRESS (0x40 << 1)
 
+// Flash Memory
+#define SECTOR 11
+#define FLASH_ALTITUDE_OFFSET_ADDRESS 0x080E0000
+#define FLASH_MAG_X_OFFSET_ADDRESS 0x080E0004
+#define FLASH_MAG_Y_OFFSET_ADDRESS 0x080E0008
+#define FLASH_MAG_Z_OFFSET_ADDRESS 0x080E000C
+
 #define PI 3.141592
 
 #define RX_BFR_SIZE 255
@@ -128,7 +135,7 @@ int8_t mission_time_min;
 int8_t mission_time_sec;
 int16_t packet_count = 0;
 char mode = 'F';
-char state[16] = "PRE-LAUNCH";
+char state[14] = "LAUNCH_PAD";
 float altitude;
 float temperature;
 float pressure;
@@ -191,33 +198,78 @@ char tel_off_command[16];
 
 // State Variables
 float prev_alt = 0;
-int descending_count = 0;
 
 // Other Variables
 float direction = 0;
-float altitude_offset = 0;
-float mag_x_offset = 0.1773125085;
-float mag_y_offset = 0.2233437445;
-float mag_z_offset = -1.321749987;
-int beacon_status = 0;
-int telemetry_status = 1;
-bool sim_enabled = false;
-char rx_data[255];
-HAL_StatusTypeDef uart_received;
-
-HAL_StatusTypeDef result;
+float altitude_offset = 2;
+float mag_x_offset = 0.173406959;
+float mag_y_offset = 0.0170800537;
+//float mag_z_offset = -0.435796857;
+float mag_z_offset;
 float mag_x_min = 0;
 float mag_y_min = 0;
 float mag_z_min = 0;
 float mag_x_max = 0;
 float mag_y_max = -1;
 float mag_z_max = -1;
+int beacon_status = 0;
+int telemetry_status = 1;
+bool sim_enabled = false;
+char rx_data[255];
+HAL_StatusTypeDef uart_received;
+volatile uint32_t ms_elapsed = 0;
+uint8_t started = 0;
+
+HAL_StatusTypeDef result;
 
 //Set up Interrupt handler to invoke data transmit from xbee to the board.
 void USART2_IRQHandler(void) {
     HAL_UART_IRQHandler(&huart2);
 }
 
+void store_flash_data(){
+	// Store altitude offset, magnetic offsets, mission time
+	HAL_FLASH_Unlock();
+
+	FLASH_Erase_Sector(SECTOR, FLASH_VOLTAGE_RANGE_2);
+//	HAL_Delay(100);
+
+	uint32_t altitude_offset_bits, mag_x_offset_bits, mag_y_offset_bits, mag_z_offset_bits;
+
+	// Copy the float data into the 32-bit unsigned integer variables
+	memcpy(&altitude_offset_bits, &altitude_offset, sizeof(altitude_offset));
+	memcpy(&mag_x_offset_bits, &mag_x_offset, sizeof(mag_x_offset));
+	memcpy(&mag_y_offset_bits, &mag_y_offset, sizeof(mag_y_offset));
+	memcpy(&mag_z_offset_bits, &mag_z_offset, sizeof(mag_z_offset));
+
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_ALTITUDE_OFFSET_ADDRESS, altitude_offset_bits);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_X_OFFSET_ADDRESS, mag_x_offset_bits);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Y_OFFSET_ADDRESS, mag_y_offset_bits);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Z_OFFSET_ADDRESS, mag_z_offset_bits);
+	HAL_Delay(100);
+
+	HAL_FLASH_Lock();
+}
+
+void load_flash_data(){
+	HAL_FLASH_Unlock();
+
+//	altitude_offset = * (__IO uint32_t*) FLASH_ALTITUDE_OFFSET_ADDRESS;
+//	mag_x_offset = * (__IO uint32_t*) FLASH_MAG_X_OFFSET_ADDRESS;
+//	mag_y_offset = * (__IO uint32_t*) FLASH_MAG_Y_OFFSET_ADDRESS;
+//	mag_z_offset = * (__IO uint32_t*) FLASH_MAG_Z_OFFSET_ADDRESS;
+
+//	altitude_offset = * (float*) FLASH_ALTITUDE_OFFSET_ADDRESS;
+//	mag_x_offset = *(float*)FLASH_MAG_X_OFFSET_ADDRESS;
+//	mag_y_offset = * (float*) FLASH_MAG_Y_OFFSET_ADDRESS;
+//	mag_z_offset = * (float*) FLASH_MAG_Z_OFFSET_ADDRESS;
+	memcpy(&altitude_offset, (float*)FLASH_ALTITUDE_OFFSET_ADDRESS, sizeof(float));
+	memcpy(&mag_x_offset, (float*)FLASH_MAG_X_OFFSET_ADDRESS, sizeof(float));
+	memcpy(&mag_y_offset, (float*)FLASH_MAG_Y_OFFSET_ADDRESS, sizeof(float));
+	memcpy(&mag_z_offset, (float*)FLASH_MAG_Z_OFFSET_ADDRESS, sizeof(float));
+
+	HAL_FLASH_Lock();
+}
 
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
@@ -600,7 +652,7 @@ void send_packet(){
 	packet_count += 1;
 
 	snprintf(data, sizeof(data),
-		"%s,%02d:%02d:%02d,%d,%c,%s,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%02d:%02d:%02d,%.4f,%.4f,%.4f,%u,%s",
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
 		 gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, mag_x, mag_y, mag_z,
@@ -615,25 +667,59 @@ void send_packet(){
 }
 
 void handle_state(){
+	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
+	uint8_t current_movement;
 
+	// Determine ascending, descending, or stationary
+	if (altitude < prev_alt + 0.5 && altitude > prev_alt - 0.5){
+		current_movement = 0;
+	}
+	else if (altitude < prev_alt) {
+		current_movement = -1;
+	}
+	else {
+		current_movement = 1;
+	}
+
+	// Probe Release if limit switch
+	if (0 == 1){
+		memset(state, 0, sizeof(state));
+		strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+		// Deploy Auto Gyro
+	}
+
+	// Ascent if ascending and probe not released
+	else if (current_movement == 1){
+		memset(state, 0, sizeof(state));
+		strncpy(state, "ASCENDING", strlen("ASCENDING"));
+	}
+
+	// Apogee if current state is ascent and now stationary or descending
+	else if ((strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 || strncmp(state, "PROBE_RELEASE", strlen("PROBE_RELEASE")) == 0) && current_movement != 1){
+		memset(state, 0, sizeof(state));
+		strncpy(state, "APOGEE", strlen("APOGEE"));
+	}
+
+	// Descent if not apogee and descending
+	else if (current_movement == -1){
+		memset(state, 0, sizeof(state));
+		strncpy(state, "DESCENDING", strlen("DESCENDING"));
+	}
+
+	// Landed if not moving
+	else{
+		memset(state, 0, sizeof(state));
+		strncpy(state, "LANDED", strlen("LANDED"));
+		// Activate audio beacon and stop telemetry transmission
+	}
+
+	prev_alt = altitude;
 }
 
 void read_transmit_telemetry (){
 	if (mode == 'F') {
 		read_sensors();
 	}
-
-	// Handle State
-//	handle_state();
-	if (prev_alt > altitude) {
-		descending_count++;
-	}
-	else {
-		descending_count = 0;
-	}
-
-	prev_time = gps_time_sec;
-	prev_alt = altitude;
 
 	send_packet();
 }
@@ -672,12 +758,6 @@ void handle_command(const char *cmd) {
 
 	// SIMP command
 	else if (strncmp(cmd, simp_command, strlen(simp_command)) == 0) {
-		if (result == HAL_OK){
-			result = HAL_BUSY;
-		}
-		else{
-			result = HAL_OK;
-		}
 		if (mode == 'S') {
 			char pressure_str[7];
 
@@ -730,6 +810,7 @@ void handle_command(const char *cmd) {
 	// Calibrate Altitude
 	else if (strncmp(cmd, cal_alt_command, strlen(cal_alt_command)) == 0) {
 		altitude_offset -= altitude;
+		store_flash_data();
 		set_cmd_echo("CAL");
 		if (strncmp(state, "PRE-LAUNCH", strlen("PRE-LAUNCH")) == 0) {
 			memset(state, 0, sizeof(state));
@@ -826,6 +907,49 @@ void calibrate_mmc(){
 	mag_y_offset = (mag_y_min + mag_y_max) / 2;
 	mag_z_offset = (mag_z_min + mag_z_max) / 2;
 }
+
+void ms_interrupt(void){
+	if (started == 1){
+		ms_elapsed++;
+	}
+
+	if (ms_elapsed >= 1000){
+		ms_elapsed -= 1000;
+
+		// Occurs every second
+		// Handle Mission Time
+		mission_time_sec++;
+		if ( mission_time_sec >= 60 ){
+			mission_time_sec -= 60;
+			mission_time_min += 1;
+		}
+		if ( mission_time_min >= 60 ){
+			mission_time_min -= 60;
+			mission_time_hr += 1;
+		}
+		if ( mission_time_hr >= 24 ){
+			mission_time_hr -= 24;
+		}
+
+		handle_state();
+
+		// Control Telemetry
+		if (telemetry_status == 1){
+			read_transmit_telemetry();
+		}
+
+		// Control Beacon
+		if (beacon_status == 1) {
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+		}
+
+		else {
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+		}
+
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -864,12 +988,17 @@ int main(void)
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-//  result = HAL_I2C_IsDeviceReady(&hi2c2, MPU6050_ADDRESS, 3, 5);
+//  store_flash_data();
+//  load_flash_data();
+
+  result = HAL_I2C_IsDeviceReady(&hi2c2, MPU6050_ADDRESS, 3, 5);
 
   init_sensors();
   init_commands();
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
+
+  started = 1;
 
   /* USER CODE END 2 */
 
@@ -877,35 +1006,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	// Handle Mission Time
-	mission_time_sec++;
-	if ( mission_time_sec >= 60 ){
-		mission_time_sec -= 60;
-		mission_time_min += 1;
-	}
-	if ( mission_time_min >= 60 ){
-		mission_time_min -= 60;
-		mission_time_hr += 1;
-	}
-	if ( mission_time_hr >= 24 ){
-		mission_time_hr -= 24;
-	}
-
-	// Control Telemetry
-	if (telemetry_status == 1){
-		read_transmit_telemetry();
-	}
-
-	// Control Beacon
-	if (beacon_status == 1) {
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-	}
-
-	else {
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	}
-
-	HAL_Delay(1000);
+	  // Uncomment the following code to calibrate the magnetometer
+//	  ms_elapsed++;
+//	  calibrate_mmc();
+//	  if (ms_elapsed >= 1000){
+//		  ms_elapsed -= 1000;
+//		  store_flash_data();
+//	  }
 
     /* USER CODE END WHILE */
 

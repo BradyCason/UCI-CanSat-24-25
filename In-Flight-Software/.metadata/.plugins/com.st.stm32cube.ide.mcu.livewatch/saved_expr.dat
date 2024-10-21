@@ -18,11 +18,15 @@ gps_longitude
 gps_sats
 altitude
 result
+direction
+telemetry_status
+mag_x_offset
+mag_y_offset
+mag_z_offset
 mag_x_min
 mag_x_max
 mag_y_min
 mag_y_max
 mag_z_min
 mag_z_max
-direction
-telemetry_status
+read_data
