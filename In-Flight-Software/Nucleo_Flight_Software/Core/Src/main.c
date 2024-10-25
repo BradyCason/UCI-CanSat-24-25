@@ -72,6 +72,7 @@ typedef uint8_t bool;
 #define FLASH_MAG_X_OFFSET_ADDRESS 0x080E0004
 #define FLASH_MAG_Y_OFFSET_ADDRESS 0x080E0008
 #define FLASH_MAG_Z_OFFSET_ADDRESS 0x080E000C
+#define FLASH_TIME_DIF_ADDRESS 0x080E0010
 
 #define PI 3.141592
 
@@ -93,6 +94,8 @@ uint8_t rx_packet[RX_BFR_SIZE];
 uint8_t tx_data[TX_BFR_SIZE-18];
 uint8_t tx_packet[TX_BFR_SIZE];
 uint8_t tx_count;
+volatile bool command_ready = false;
+char command_buffer[RX_BFR_SIZE-1];
 
 /* USER CODE END PM */
 
@@ -173,6 +176,7 @@ uint8_t i2cret[128];
 char parse_buf[255];
 char gps_lat_dir;
 char gps_long_dir;
+uint32_t time_dif;
 
 // INA219 DATA (VOLTAGE/CURRENT)
 HAL_StatusTypeDef ina_ret;
@@ -203,7 +207,7 @@ float prev_alt = 0;
 
 // Other Variables
 float direction = 0;
-float altitude_offset = 2;
+float altitude_offset = 0;
 //float mag_x_offset = 0.173406959;
 //float mag_y_offset = 0.0170800537;
 //float mag_z_offset = -0.435796857;
@@ -232,6 +236,24 @@ void USART2_IRQHandler(void) {
     HAL_UART_IRQHandler(&huart2);
 }
 
+uint32_t time_seconds(uint8_t hr, uint8_t min, uint8_t sec){
+	return 3600 * hr + 60 * min + sec;
+}
+
+int32_t get_time_dif(){
+	return time_seconds(mission_time_hr, mission_time_min, mission_time_sec) - time_seconds(gps_time_hr, gps_time_min, gps_time_sec);
+}
+
+void get_mission_time(){
+	int32_t mission_time = (time_seconds(gps_time_hr, gps_time_min, gps_time_sec) + time_dif) % 86400;
+	if (mission_time < 0) mission_time += 86400;
+	mission_time_sec = mission_time % 60;
+	mission_time -= mission_time_sec;
+	mission_time_min = (mission_time % 3600) / 60;
+	mission_time -= mission_time_min;
+	mission_time_hr = mission_time / 3600;
+}
+
 void store_flash_data(){
 	// Store altitude offset, magnetic offsets, mission time
 	HAL_FLASH_Unlock();
@@ -251,6 +273,7 @@ void store_flash_data(){
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_X_OFFSET_ADDRESS, mag_x_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Y_OFFSET_ADDRESS, mag_y_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Z_OFFSET_ADDRESS, mag_z_offset_bits);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_TIME_DIF_ADDRESS, get_time_dif());
 	HAL_Delay(100);
 
 	HAL_FLASH_Lock();
@@ -272,6 +295,7 @@ void load_flash_data(){
 	memcpy(&mag_x_offset, (float*)FLASH_MAG_X_OFFSET_ADDRESS, sizeof(float));
 	memcpy(&mag_y_offset, (float*)FLASH_MAG_Y_OFFSET_ADDRESS, sizeof(float));
 	memcpy(&mag_z_offset, (float*)FLASH_MAG_Z_OFFSET_ADDRESS, sizeof(float));
+	memcpy(&time_dif, (int32_t*)FLASH_TIME_DIF_ADDRESS, sizeof(int32_t));
 
 	HAL_FLASH_Lock();
 }
@@ -568,6 +592,7 @@ void init_MPU6050(void)
 	uint8_t mpu_config = 0x00;
 	uint8_t mpu_set_sample_rate = 0x07;
 	uint8_t mpu_set_fs_range = 0x00;
+	uint8_t clockSource = 0x01;
 
 	// wake up sensor
 	HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
@@ -576,6 +601,7 @@ void init_MPU6050(void)
 	HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
 	HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x1B, 1, &mpu_set_fs_range, 1, 1000);
 	HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x1c, 1, &mpu_set_fs_range, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x6B, I2C_MEMADD_SIZE_8BIT, &clockSource, 1, HAL_MAX_DELAY);
 }
 
 void init_PA1010D(void)
@@ -620,13 +646,26 @@ void read_sensors(void)
 //	read_INA219(); // Voltage
 }
 
+void reset_MPU6050(void) {
+    uint8_t reset_command = 0x80;  // Set the reset bit in PWR_MGMT_1
+    HAL_I2C_Mem_Write(&hi2c2, MPU6050_ADDRESS, 0x6B, 1, &reset_command, 1, HAL_MAX_DELAY);
+    HAL_Delay(100); // Wait for reset to complete
+}
+
 void init_sensors(void)
 {
+	if (HAL_I2C_GetState(&hi2c2) != HAL_I2C_STATE_READY) {
+		reset_MPU6050();
+	}
+
 	init_MPU6050(); // Must be first
 	init_MPL3115A2();
 	init_MMC5603();
 	init_PA1010D();
 //	init_INA219();
+
+	read_PA1010D();
+	get_mission_time();
 }
 
 void init_commands(void)
@@ -675,10 +714,10 @@ void send_packet(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	uint8_t current_movement;
+	int8_t current_movement;
 
 	// Determine ascending, descending, or stationary
-	if (altitude < prev_alt + 0.5 && altitude > prev_alt - 0.5){
+	if (altitude < (prev_alt + 0.5) && altitude > (prev_alt - 0.5)){
 		current_movement = 0;
 	}
 	else if (altitude < prev_alt) {
@@ -713,11 +752,16 @@ void handle_state(){
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
 	}
 
-	// Landed if not moving
-	else{
+	// Landed if not moving and was previously descending or landed
+	else if (current_movement == 0 && (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 || strncmp(state, "LANDED", strlen("LANDED")) == 0)){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "LANDED", strlen("LANDED"));
 		// Activate audio beacon and stop telemetry transmission
+	}
+
+	else{
+		memset(state, 0, sizeof(state));
+		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
 	}
 
 	prev_alt = altitude;
@@ -807,10 +851,9 @@ void handle_command(const char *cmd) {
 			temp[1] = cmd[19];
 			mission_time_sec = atoi(temp);
 			memset(cmd_echo, '\0', sizeof(cmd_echo));
-			snprintf(cmd_echo, 11, "ST%02d:%02d:%02", mission_time_hr, mission_time_min, mission_time_sec);
-
-
+			snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
 		}
+		store_flash_data();
 
 	}
 
@@ -870,11 +913,11 @@ void handle_command(const char *cmd) {
 
 	// Calibrate compass Off
 	else if (strncmp(cmd, cal_comp_off_command, strlen(cal_comp_off_command)) == 0) {
-			store_flash_data();
-			calibrating_compass = 0;
-			set_cmd_echo("CCOFF");
-			sim_enabled = false;
-		}
+		calibrating_compass = 0;
+		store_flash_data();
+		set_cmd_echo("CCOFF");
+		sim_enabled = false;
+	}
 
 }
 
@@ -897,9 +940,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 			// Calculate checksum of the data part (after '~' and before comma)
 			uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
 			// Compare calculated checksum with the received one
-			if (calculated_checksum == received_checksum) {
+			if (calculated_checksum == received_checksum && command_ready == false) {
 				// Checksum is valid, process the command
-				handle_command(&rx_packet[1]);
+				strcpy(command_buffer, &rx_packet[1]);
+				command_ready = true;
 			}
 		}
 	}
@@ -933,56 +977,6 @@ void calibrate_mmc(){
 	mag_x_offset = (mag_x_min + mag_x_max) / 2;
 	mag_y_offset = (mag_y_min + mag_y_max) / 2;
 	mag_z_offset = (mag_z_min + mag_z_max) / 2;
-}
-
-void ms_interrupt(void){
-
-	// If in compass calibration mode
-	if (calibrating_compass == 1){
-		calibrate_mmc();
-		return;
-	}
-
-	// Only read data after everything is initialized
-	if (started == 1){
-		ms_elapsed++;
-	}
-
-	if (ms_elapsed >= 1000){
-		ms_elapsed -= 1000;
-
-		// Occurs every second
-		// Handle Mission Time
-		mission_time_sec++;
-		if ( mission_time_sec >= 60 ){
-			mission_time_sec -= 60;
-			mission_time_min += 1;
-		}
-		if ( mission_time_min >= 60 ){
-			mission_time_min -= 60;
-			mission_time_hr += 1;
-		}
-		if ( mission_time_hr >= 24 ){
-			mission_time_hr -= 24;
-		}
-
-		handle_state();
-
-		// Control Telemetry
-		if (telemetry_status == 1){
-			read_transmit_telemetry();
-		}
-
-		// Control Beacon
-		if (beacon_status == 1) {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-		}
-
-		else {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-		}
-
-	}
 }
 
 /* USER CODE END 0 */
@@ -1041,6 +1035,50 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (command_ready){
+		  handle_command(command_buffer);
+		  command_ready = false;
+	  }
+
+	  if (calibrating_compass == 1){
+		  calibrate_mmc();
+	  }
+
+	  if (HAL_I2C_GetState(&hi2c2) != HAL_I2C_STATE_READY) {
+	      init_sensors();
+	  }
+
+	  // Handle Mission Time
+	  mission_time_sec++;
+	  if ( mission_time_sec >= 60 ){
+		  mission_time_sec -= 60;
+		  mission_time_min += 1;
+	  }
+	  if ( mission_time_min >= 60 ){
+		  mission_time_min -= 60;
+		  mission_time_hr += 1;
+	  }
+	  if ( mission_time_hr >= 24 ){
+		  mission_time_hr -= 24;
+	  }
+
+	  handle_state();
+
+	  // Control Telemetry
+	  if (telemetry_status == 1){
+		  read_transmit_telemetry();
+	  }
+
+	  // Control Beacon
+	  if (beacon_status == 1) {
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	  }
+
+	  else {
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+	  }
+
+	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 

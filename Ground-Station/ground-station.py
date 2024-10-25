@@ -30,13 +30,10 @@ sim_enable = False
 telemetry_on = True
 calibrate_comp_on = False
 csv_indexer = 0
-buzzer_on = False
 
 # xbee communication parameters
 BAUDRATE = 115200
 COM_PORT = 5
-
-MAC_ADDR = ""
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
@@ -69,6 +66,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
     def setup_UI(self):
         logo_pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(__file__), "gui", "logo.png")).scaled(self.logo.size(), aspectRatioMode=True)
         self.logo.setPixmap(logo_pixmap)
+        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(__file__), "gui", "logo.png")))
         self.title.setText("CanSat Ground Station - TEAM " + TEAM_ID)
 
         # graph window, linked to button on rightmost panel
@@ -99,19 +97,16 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
-        # self.override_state_1_button.clicked.connect(None)
-        # self.override_state_2_button.clicked.connect(None)
+        # self.deploy_auto_gyro_button.clicked.connect(None)
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
-        self.buzzer_toggle_button.clicked.connect(self.toggle_buzzer)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
 
         # Connect non-sim buttons to update sim button colors
         self.set_time_gps_button.clicked.connect(self.non_sim_button_clicked)
         self.set_time_utc_button.clicked.connect(self.non_sim_button_clicked)
         self.calibrate_alt_button.clicked.connect(self.non_sim_button_clicked)
-        self.override_state_1_button.clicked.connect(self.non_sim_button_clicked)
-        self.override_state_2_button.clicked.connect(self.non_sim_button_clicked)
+        self.deploy_auto_gyro_button.clicked.connect(self.non_sim_button_clicked)
         self.telemetry_toggle_button.clicked.connect(self.non_sim_button_clicked)
 
     def update(self):
@@ -153,6 +148,11 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             csv_indexer = 0
         
         self.update_sim_button_colors()
+
+        if cmd == "ACTIVATE":
+            # Wait 1 second to let the Payload receive the command
+            # before sending simp data
+            time.sleep(1)
 
     def update_sim_button_colors(self):
         global sim, sim_enable
@@ -201,19 +201,6 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.telemetry_toggle_button.setText("Telemetry Toggle: Off")
             self.make_button_red(self.telemetry_toggle_button)
 
-    def toggle_buzzer(self):
-        global buzzer_on
-        buzzer_on = not buzzer_on
-
-        if buzzer_on:
-            write_xbee("CMD,"+ TEAM_ID + ",BCN,ON")
-            self.buzzer_toggle_button.setText("Buzzer Toggle: On")
-            self.make_button_green(self.buzzer_toggle_button)
-        else:
-            write_xbee("CMD,"+ TEAM_ID + ",BCN,OFF")
-            self.buzzer_toggle_button.setText("Buzzer Toggle: Off")
-            self.make_button_red(self.buzzer_toggle_button)
-
 
 class GraphWindow(pg.GraphicsLayoutWidget):
     def __init__(self):
@@ -222,6 +209,8 @@ class GraphWindow(pg.GraphicsLayoutWidget):
         self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
         self.setStyleSheet("background-color: white; border:4px solid rgb(0, 0, 0);")
+        self.setWindowTitle("UCI CanSat Live Telemetry")
+        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(__file__), "gui", "logo.png")))
 
         # set up arrays for data that will be graphed
         self.graph_data = {}
@@ -270,10 +259,10 @@ def parse_xbee(data):
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
 
-    if data[3] == "S":
-        sim = True
-    else:
-        sim = False
+    # if data[3] == "S":
+    #     sim = True
+    # else:
+    #     sim = False
 
     # Output to Ground Station
     w.update()

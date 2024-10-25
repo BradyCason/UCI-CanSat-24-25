@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="memory"/>
+		<item key="selection" value="handle_state"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="memory"/>
-			<item value="flash"/>
-			<item value="init_sens"/>
-			<item value="mag_x_off"/>
-			<item value="0.07"/>
-			<item value="result ="/>
-			<item value="calibrate_"/>
-			<item value="calibrate"/>
-			<item value="direction"/>
-			<item value="heading"/>
-			<item value="busres"/>
-			<item value="pf0_stat"/>
-			<item value="resetbus"/>
-			<item value="68"/>
-			<item value="pf0_"/>
+			<item value="handle_state"/>
+			<item value="prev_alt"/>
+			<item value="command_ready"/>
+			<item value="handle_command"/>
+			<item value="launch_pad"/>
+			<item value="sim_enabled"/>
+			<item value="activate"/>
+			<item value="read_mpu"/>
+			<item value="set time"/>
+			<item value="handle_comm"/>
+			<item value="hi2c2."/>
+			<item value="hi2c."/>
+			<item value="hi2c.init"/>
+			<item value="hali2c"/>
+			<item value="init_sen"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>
@@ -32,8 +32,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1392"/>
-		<item key="DIALOG_Y_ORIGIN" value="264"/>
+		<item key="DIALOG_X_ORIGIN" value="1343"/>
+		<item key="DIALOG_Y_ORIGIN" value="376"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
