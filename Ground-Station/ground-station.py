@@ -238,6 +238,8 @@ class GraphWindow(pg.GraphicsLayoutWidget):
                 if telemetry[field] != "N/A":
                     try:
                         self.graph_data[field].append(float(telemetry[field]))
+                        if len(self.graph_data[field]) > 50:
+                            self.graph_data[field].pop()
                     except:
                         pass
                     self.graphs[field].curve.setData(self.graph_data[field])

@@ -74,6 +74,16 @@ typedef uint8_t bool;
 #define FLASH_MAG_Z_OFFSET_ADDRESS 0x080E000C
 #define FLASH_TIME_DIF_ADDRESS 0x080E0010
 
+// Stepper Motor
+#define IN1_PIN GPIO_PIN_11
+#define IN1_PORT GPIOB
+#define IN2_PIN GPIO_PIN_10
+#define IN2_PORT GPIOB
+#define IN3_PIN GPIO_PIN_11
+#define IN3_PORT GPIOD
+#define IN4_PIN GPIO_PIN_15
+#define IN4_PORT GPIOB
+
 #define PI 3.141592
 
 #define RX_BFR_SIZE 255
@@ -225,9 +235,18 @@ int telemetry_status = 1;
 bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
-volatile uint32_t ms_elapsed = 0;
-bool started = 0;
 bool calibrating_compass = 0;
+
+uint8_t steps[8][4] = {
+    {1, 0, 0, 0},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 1},
+    {0, 0, 0, 1},
+    {1, 0, 0, 1}
+};
 
 HAL_StatusTypeDef result;
 
@@ -236,6 +255,31 @@ void USART2_IRQHandler(void) {
     HAL_UART_IRQHandler(&huart2);
 }
 
+// Stepper Motor Functions ---------------------------------------------------------------------------
+void Stepper_SetStep(uint8_t stepIndex) {
+    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[stepIndex][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[stepIndex][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[stepIndex][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[stepIndex][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+// Rotate the motor a specified number of steps
+void Stepper_Rotate(int stepsCount, int delayMs) {
+    int stepIndex = 0;
+    int direction = (stepsCount > 0) ? 1 : -1;
+    stepsCount = abs(stepsCount);
+
+    for (int i = 0; i < stepsCount; i++) {
+        Stepper_SetStep(stepIndex);
+        HAL_Delay(delayMs);
+
+        stepIndex += direction;
+        if (stepIndex >= 8) stepIndex = 0;
+        else if (stepIndex < 0) stepIndex = 7;
+    }
+}
+
+// Flash Data Functions ---------------------------------------------------------------------------------
 uint32_t time_seconds(uint8_t hr, uint8_t min, uint8_t sec){
 	return 3600 * hr + 60 * min + sec;
 }
@@ -1027,7 +1071,7 @@ int main(void)
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
-  started = 1;
+  Stepper_Rotate(2048, 5);
 
   /* USER CODE END 2 */
 
@@ -1079,6 +1123,11 @@ int main(void)
 	  }
 
 	  HAL_Delay(1000);
+
+	  for (int i = 0; i < 8; i++) {
+	      Stepper_SetStep(i);   // Set step
+	      HAL_Delay(1000);       // Increase delay to make movement visible
+	  }
 
     /* USER CODE END WHILE */
 
@@ -1291,7 +1340,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LD1_Pin|GPIO_PIN_10|GPIO_PIN_11|LD3_Pin
+                          |GPIO_PIN_15|LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
@@ -1302,12 +1355,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
+  /*Configure GPIO pins : LD1_Pin PB10 PB11 LD3_Pin
+                           PB15 LD2_Pin */
+  GPIO_InitStruct.Pin = LD1_Pin|GPIO_PIN_10|GPIO_PIN_11|LD3_Pin
+                          |GPIO_PIN_15|LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PD11 */
+  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
   GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
