@@ -35,7 +35,7 @@ csv_indexer = 0
 BAUDRATE = 115200
 COM_PORT = 5
 
-SER_DEBUG = False       # Set as True whenever testing without XBee connected
+SER_DEBUG = True       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
     ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
 
