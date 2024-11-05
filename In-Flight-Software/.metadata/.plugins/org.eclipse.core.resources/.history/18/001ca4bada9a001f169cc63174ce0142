@@ -66,6 +66,10 @@ typedef uint8_t bool;
 //INA219 (Voltage)
 #define INA219_ADDRESS (0x40 << 1)
 
+// LM393 (Auto Gyro Speed)
+#define PULSES_PER_ROTATION 1
+#define AUTO_GYRO_TIME_INTERVAL_MS 1000
+
 // Flash Memory
 #define SECTOR 11
 #define FLASH_ALTITUDE_OFFSET_ADDRESS 0x080E0000
@@ -73,6 +77,16 @@ typedef uint8_t bool;
 #define FLASH_MAG_Y_OFFSET_ADDRESS 0x080E0008
 #define FLASH_MAG_Z_OFFSET_ADDRESS 0x080E000C
 #define FLASH_TIME_DIF_ADDRESS 0x080E0010
+
+// Stepper Motor
+#define IN1_PIN GPIO_PIN_11
+#define IN1_PORT GPIOB
+#define IN2_PIN GPIO_PIN_10
+#define IN2_PORT GPIOB
+#define IN3_PIN GPIO_PIN_11
+#define IN3_PORT GPIOD
+#define IN4_PIN GPIO_PIN_15
+#define IN4_PORT GPIOB
 
 #define PI 3.141592
 
@@ -102,6 +116,8 @@ char command_buffer[RX_BFR_SIZE-1];
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c2;
 
+TIM_HandleTypeDef htim2;
+
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
@@ -118,6 +134,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -190,6 +207,9 @@ float bus_voltage;
 float power;
 float current;
 
+// LM393 (Auto Gyro Rotation Rate)
+volatile uint32_t pulse_count = 0;
+
 // Commands
 char sim_command[14];
 char simp_command[15];
@@ -225,9 +245,18 @@ int telemetry_status = 1;
 bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
-volatile uint32_t ms_elapsed = 0;
-bool started = 0;
 bool calibrating_compass = 0;
+
+uint8_t steps[8][4] = {
+    {1, 0, 0, 0},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 1},
+    {0, 0, 0, 1},
+    {1, 0, 0, 1}
+};
 
 HAL_StatusTypeDef result;
 
@@ -236,6 +265,53 @@ void USART2_IRQHandler(void) {
     HAL_UART_IRQHandler(&huart2);
 }
 
+// Stepper Motor Functions ---------------------------------------------------------------------------
+void Stepper_SetStep(uint8_t stepIndex) {
+    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[stepIndex][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[stepIndex][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[stepIndex][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[stepIndex][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+// Rotate the motor a specified number of steps
+void Stepper_Rotate(int stepsCount, int delayMs) {
+    int stepIndex = 0;
+    int direction = (stepsCount > 0) ? 1 : -1;
+    stepsCount = abs(stepsCount);
+
+    for (int i = 0; i < stepsCount; i++) {
+        Stepper_SetStep(stepIndex);
+        HAL_Delay(delayMs);
+
+        stepIndex += direction;
+        if (stepIndex >= 8) stepIndex = 0;
+        else if (stepIndex < 0) stepIndex = 7;
+    }
+}
+
+// Servo Motor Functions -------------------------------------------------------------------------------
+void Servo_SetAngle(uint8_t angle) {
+    // Ensure angle is within 0-180 range
+    if (angle > 180) angle = 180;
+
+    // Map the angle to the PWM pulse width
+    // 1 ms pulse width for 0° and 2 ms for 180° (assuming 50 Hz PWM frequency)
+    uint16_t pulse_width = 500 + (angle * 1000 / 180);  // Pulse width in microseconds
+
+    // Convert pulse width to timer count based on timer frequency
+    uint32_t timer_freq = HAL_RCC_GetPCLK1Freq() * 2;     // Assuming APB1 prescaler 2 for TIM2
+    uint32_t period = (timer_freq / 50) - 1;              // 50 Hz frequency for 20 ms period
+    uint16_t compare_value = ((pulse_width * period) / 20000);
+
+    // Set the PWM duty cycle for the specified angle
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, compare_value);
+}
+
+void Servo_Init() {
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);  // Start PWM signal on TIM2 Channel 1
+}
+
+// Flash Data Functions ---------------------------------------------------------------------------------
 uint32_t time_seconds(uint8_t hr, uint8_t min, uint8_t sec){
 	return 3600 * hr + 60 * min + sec;
 }
@@ -714,7 +790,7 @@ void send_packet(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	uint8_t current_movement;
+	int8_t current_movement;
 
 	// Determine ascending, descending, or stationary
 	if (altitude < (prev_alt + 0.5) && altitude > (prev_alt - 0.5)){
@@ -1015,6 +1091,7 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_USART2_UART_Init();
   MX_I2C2_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
 //  store_flash_data();
@@ -1024,10 +1101,11 @@ int main(void)
 
   init_sensors();
   init_commands();
+  Servo_Init();
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
-  started = 1;
+  Stepper_Rotate(2048, 5);
 
   /* USER CODE END 2 */
 
@@ -1079,6 +1157,11 @@ int main(void)
 	  }
 
 	  HAL_Delay(1000);
+
+	  for (int i = 0; i < 8; i++) {
+	      Stepper_SetStep(i);   // Set step
+	      HAL_Delay(1000);       // Increase delay to make movement visible
+	  }
 
     /* USER CODE END WHILE */
 
@@ -1164,6 +1247,65 @@ static void MX_I2C2_Init(void)
   /* USER CODE BEGIN I2C2_Init 2 */
 
   /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 4294967295;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
 
 }
 
@@ -1285,13 +1427,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LD1_Pin|GPIO_PIN_10|GPIO_PIN_11|LD3_Pin
+                          |GPIO_PIN_15|LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
@@ -1302,12 +1448,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
+  /*Configure GPIO pins : LD1_Pin PB10 PB11 LD3_Pin
+                           PB15 LD2_Pin */
+  GPIO_InitStruct.Pin = LD1_Pin|GPIO_PIN_10|GPIO_PIN_11|LD3_Pin
+                          |GPIO_PIN_15|LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PD11 */
+  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
   GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;

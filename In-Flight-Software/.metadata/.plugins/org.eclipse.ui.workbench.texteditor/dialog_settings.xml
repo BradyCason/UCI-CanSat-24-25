@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="TIM_CHANNEL_1"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="HAL_GPIO_EXTI_IRQHandler"/>
+			<item value="EXTI1_IRQHandler"/>
+			<item value="pulses_per"/>
+			<item value="TIME_INTERVAL_MS"/>
+			<item value="HAL_TIM_PeriodElapsedCallback"/>
+			<item value="HAL_GPIO_EXTI_Callback"/>
 			<item value="TIM_CHANNEL_1"/>
 			<item value="14"/>
 			<item value="setstep"/>
@@ -17,12 +23,6 @@
 			<item value="stepper_setstep"/>
 			<item value="main("/>
 			<item value="gpio_pin_5"/>
-			<item value="main)"/>
-			<item value="ms_ela"/>
-			<item value="started"/>
-			<item value="STEP_PIN_4"/>
-			<item value="GPIO_PIN_5"/>
-			<item value="gpioc"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>
@@ -32,7 +32,7 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1622"/>
+		<item key="DIALOG_X_ORIGIN" value="1515"/>
 		<item key="DIALOG_Y_ORIGIN" value="396"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
