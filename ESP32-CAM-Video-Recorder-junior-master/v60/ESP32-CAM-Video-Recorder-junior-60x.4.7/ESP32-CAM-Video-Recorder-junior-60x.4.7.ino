@@ -114,7 +114,7 @@ int IncludeInternet = 0;      // 0 for no internet, 1 for time only, 2  WiFiMan,
 const char* ssid = "jzjzjz";
 
 // https://sites.google.com/a/usapiens.com/opnode/time-zones  -- find your timezone here
-String TIMEZONE = "GMT0BST,M3.5.0/01,M10.5.0/02";
+String TIMEZONE = "PST8PDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
 //String TIMEZONE = "MST7MDT,M3.2.0/2:00:00,M11.1.0/2:00:00";
 #define Lots_of_Stats 1
 #define blinking 0
@@ -155,7 +155,7 @@ long last_frame_time;
 
 
 // https://github.com/espressif/esp32-camera/issues/182
-#define fbs 8 // was 64 -- how many kb of static ram for psram -> sram buffer for sd write
+#define fbs 64 // was 64 -- how many kb of static ram for psram -> sram buffer for sd write
 uint8_t framebuffer_static[fbs * 1024 + 20];
 
 // CAMERA_MODEL_AI_THINKER
@@ -2488,9 +2488,9 @@ void setup() {
       start_Stream_82_server();
     }
   */
-  framebuffer = (uint8_t*)ps_malloc(512 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
-  framebuffer2 = (uint8_t*)ps_malloc(512 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
-  framebuffer3 = (uint8_t*)ps_malloc(512 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
+  framebuffer = (uint8_t*)ps_malloc(1024 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
+  framebuffer2 = (uint8_t*)ps_malloc(1024 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
+  framebuffer3 = (uint8_t*)ps_malloc(1024 * 1024); // buffer to store a jpg in motion // needs to be larger for big frames from ov5640
 
   Serial.println("Creating the_camera_loop_task");
 
