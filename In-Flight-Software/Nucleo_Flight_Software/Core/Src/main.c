@@ -89,6 +89,7 @@ typedef uint8_t bool;
 #define IN4_PORT GPIOB
 
 #define PI 3.141592
+#define STEPS_PER_DEGREE 11.3777777778
 
 #define RX_BFR_SIZE 255
 #define TX_BFR_SIZE 255
@@ -228,7 +229,11 @@ char cal_comp_off_command[16];
 float prev_alt = 0;
 
 // Other Variables
+float direction_correction = 0;
+int steps_needed = 0;
 float direction = 0;
+float direction_offset = 0;
+float north_direction_offset = 0;
 float altitude_offset = 0;
 //float mag_x_offset = 0.173406959;
 //float mag_y_offset = 0.0170800537;
@@ -314,6 +319,19 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
         if (stepIndex >= 8) stepIndex = 0;
         else if (stepIndex < 0) stepIndex = 7;
     }
+}
+
+// Rotate the motor to correct its direction to all way to the North
+void Stepper_Correction(int direction, int delayMs){
+	direction_correction = direction - direction_offset;
+	if (direction_correction > 5 || direction_correction < -5){
+		steps_needed = -(int)(direction_correction * STEPS_PER_DEGREE);
+		Stepper_Rotate(steps_needed, delayMs);
+		direction_offset = direction;
+	}
+	else{
+		steps_needed = 0;
+	}
 }
 
 // Servo Motor Functions -------------------------------------------------------------------------------
@@ -1133,7 +1151,12 @@ int main(void)
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
-  Stepper_Rotate(2048, 5);
+  Stepper_Rotate(4096, 0);
+
+  // Set North Direction Offset
+  read_MMC5603();
+  north_direction_offset = direction;
+  direction_offset = direction;
 
   /* USER CODE END 2 */
 
@@ -1175,6 +1198,9 @@ int main(void)
 		  read_transmit_telemetry();
 	  }
 
+	  // Correction of Camera Angle
+	  Stepper_Correction(direction, 0);
+
 	  // Control Beacon
 	  if (beacon_status == 1) {
 		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -1186,10 +1212,10 @@ int main(void)
 
 	  HAL_Delay(1000);
 
-	  for (int i = 0; i < 8; i++) {
-	      Stepper_SetStep(i);   // Set step
-	      HAL_Delay(1000);       // Increase delay to make movement visible
-	  }
+//	  for (int i = 0; i < 8; i++) {
+//	      Stepper_SetStep(i);   // Set step
+//	      HAL_Delay(1000);       // Increase delay to make movement visible
+//	  }
 
     /* USER CODE END WHILE */
 
