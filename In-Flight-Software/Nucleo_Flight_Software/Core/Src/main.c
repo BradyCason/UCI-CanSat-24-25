@@ -235,6 +235,7 @@ float direction = 0;
 float direction_offset = 0;
 float north_direction_offset = 0;
 float altitude_offset = 0;
+float tolerate_direction = 0;
 //float mag_x_offset = 0.173406959;
 //float mag_y_offset = 0.0170800537;
 //float mag_z_offset = -0.435796857;
@@ -325,6 +326,15 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
 void Stepper_Correction(int direction, int delayMs){
 	direction_correction = direction - direction_offset;
 	if (direction_correction > 5 || direction_correction < -5){
+		tolerate_direction = tolerate_direction + direction_correction;
+		if(tolerate_direction > 15){
+			direction_correction = direction_correction - 15;
+			tolerate_direction = tolerate_direction - 15;
+		}
+		else if(tolerate_direction < -15){
+			direction_correction = direction_correction + 15;
+			tolerate_direction = tolerate_direction + 15;
+		}
 		steps_needed = -(int)(direction_correction * STEPS_PER_DEGREE);
 		Stepper_Rotate(steps_needed, delayMs);
 		direction_offset = direction;
@@ -1153,10 +1163,10 @@ int main(void)
 
   Stepper_Rotate(4096, 0);
 
-  // Set North Direction Offset
+  // Set North Direction Offset (It should be done when before the payload is launched)
   read_MMC5603();
   north_direction_offset = direction;
-  direction_offset = direction;
+  direction_offset = direction; // Remove this line later, this should be first done when the camera needs to start to maintain north
 
   /* USER CODE END 2 */
 
