@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value=""/>
+		<item key="selection" value="Stepper_Rotate"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="HAL_GPIO_EXTI_IRQHandler"/>
-			<item value="EXTI1_IRQHandler"/>
-			<item value="pulses_per"/>
-			<item value="TIME_INTERVAL_MS"/>
-			<item value="HAL_TIM_PeriodElapsedCallback"/>
-			<item value="HAL_GPIO_EXTI_Callback"/>
-			<item value="TIM_CHANNEL_1"/>
-			<item value="14"/>
-			<item value="setstep"/>
-			<item value="step"/>
-			<item value="step\"/>
-			<item value="Stepper_SetStep"/>
-			<item value="stepper_setstep"/>
-			<item value="main("/>
-			<item value="gpio_pin_5"/>
+			<item value="Stepper_Rotate"/>
+			<item value="stepIn"/>
+			<item value="Stepper_R\otate"/>
+			<item value="SysTick_Handler"/>
+			<item value="main"/>
+			<item value="stepper_correction"/>
+			<item value="direction_offset"/>
+			<item value="beacon"/>
+			<item value="beacon_"/>
+			<item value="4096"/>
+			<item value="#include &lt;math.h&gt;"/>
+			<item value="direction"/>
+			<item value="direction_"/>
+			<item value="reset_mpu"/>
+			<item value="cal_alt_command"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>
