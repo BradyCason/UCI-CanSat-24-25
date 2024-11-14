@@ -52,6 +52,8 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+extern volatile uint32_t msCounter;
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -188,7 +190,7 @@ void SysTick_Handler(void)
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
-//  ms_interrupt();
+  msCounter++;
 
   /* USER CODE END SysTick_IRQn 1 */
 }

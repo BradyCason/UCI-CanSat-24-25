@@ -37,7 +37,8 @@ COM_PORT = 5
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
-    ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
+    # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
+    ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
 
 # telemetry
 # strings as keys and values as values, only last stored
@@ -97,6 +98,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
+        self.set_camera_north_button.clicked.connect(lambda: write_xbee("CMD" + TEAM_ID + ",SCN"))
         # self.deploy_auto_gyro_button.clicked.connect(None)
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
@@ -104,6 +106,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
 
         # Connect non-sim buttons to update sim button colors
         self.set_time_gps_button.clicked.connect(self.non_sim_button_clicked)
+        self.set_camera_north_button.clicked.connect(self.non_sim_button_clicked)
         self.set_time_utc_button.clicked.connect(self.non_sim_button_clicked)
         self.calibrate_alt_button.clicked.connect(self.non_sim_button_clicked)
         self.deploy_auto_gyro_button.clicked.connect(self.non_sim_button_clicked)

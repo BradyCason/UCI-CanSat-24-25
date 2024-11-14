@@ -87,6 +87,12 @@ typedef uint8_t bool;
 #define IN3_PORT GPIOD
 #define IN4_PIN GPIO_PIN_15
 #define IN4_PORT GPIOB
+#define STEPS_PER_REV 4096
+
+// Servo
+#define SERVO_MIN_PULSE_WIDTH 600   // 0° (0.5 ms)
+#define SERVO_MAX_PULSE_WIDTH 2400  // 180° (2.5 ms)
+#define SERVO_FREQUENCY 50
 
 #define PI 3.141592
 #define STEPS_PER_DEGREE 11.3777777778
@@ -213,11 +219,22 @@ float current;
 // LM393 (Auto Gyro Rotation Rate)
 volatile uint32_t pulse_count = 0;
 
+// Stepper Variables
+//float direction_correction = 0;
+//int steps_needed = 0;
+double direction = 0;
+double direction_offset = 0;
+//float north_direction_offset = 0;
+//float tolerate_direction = 0;
+double stepper_direction = 0;
+int stepIndex = 1;
+
 // Commands
 char sim_command[14];
 char simp_command[15];
 char set_time_command[13];
 char cal_alt_command[14];
+char set_camera_north_command[14];
 char bcn_on_command[16];
 char bcn_off_command[17];
 char tel_on_command[15];
@@ -229,13 +246,6 @@ char cal_comp_off_command[16];
 float prev_alt = 0;
 
 // Other Variables
-float direction_correction = 0;
-int steps_needed = 0;
-float direction = 0;
-float direction_offset = 0;
-float north_direction_offset = 0;
-float altitude_offset = 0;
-float tolerate_direction = 0;
 //float mag_x_offset = 0.173406959;
 //float mag_y_offset = 0.0170800537;
 //float mag_z_offset = -0.435796857;
@@ -248,12 +258,14 @@ float mag_z_min = 0;
 float mag_x_max = 0;
 float mag_y_max = -1;
 float mag_z_max = -1;
-int beacon_status = 0;
+float altitude_offset = 0;
 int telemetry_status = 1;
 bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
 bool calibrating_compass = 0;
+
+volatile uint32_t msCounter = 0;
 
 uint8_t steps[8][4] = {
     {1, 0, 0, 0},
@@ -299,16 +311,15 @@ void calculate_speed(void)
 }
 
 // Stepper Motor Functions ---------------------------------------------------------------------------
-void Stepper_SetStep(uint8_t stepIndex) {
-    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[stepIndex][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[stepIndex][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[stepIndex][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[stepIndex][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+void Stepper_SetStep(uint8_t i) {
+    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[i][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[i][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[i][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[i][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 // Rotate the motor a specified number of steps
 void Stepper_Rotate(int stepsCount, int delayMs) {
-    int stepIndex = 0;
     int direction = (stepsCount > 0) ? 1 : -1;
     stepsCount = abs(stepsCount);
 
@@ -323,47 +334,38 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
 }
 
 // Rotate the motor to correct its direction to all way to the North
-void Stepper_Correction(int direction, int delayMs){
-	direction_correction = direction - direction_offset;
-	if (direction_correction > 5 || direction_correction < -5){
-		tolerate_direction = tolerate_direction + direction_correction;
-		if(tolerate_direction > 15){
-			direction_correction = direction_correction - 15;
-			tolerate_direction = tolerate_direction - 15;
-		}
-		else if(tolerate_direction < -15){
-			direction_correction = direction_correction + 15;
-			tolerate_direction = tolerate_direction + 15;
-		}
-		steps_needed = -(int)(direction_correction * STEPS_PER_DEGREE);
-		Stepper_Rotate(steps_needed, delayMs);
-		direction_offset = direction;
-	}
-	else{
-		steps_needed = 0;
-	}
+void Stepper_Correction(){
+	read_MMC5603();
+	float dir_change = -(direction - direction_offset - stepper_direction);
+	if (dir_change > 180) dir_change -= 360;
+	else if (dir_change < -180) dir_change += 360;
+	int num_steps = round(dir_change * STEPS_PER_REV / 360);
+	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
+//	stepper_direction = stepper_direction % 360;
+	Stepper_Rotate(num_steps, 0);
 }
 
 // Servo Motor Functions -------------------------------------------------------------------------------
-void Servo_SetAngle(uint8_t angle) {
-    // Ensure angle is within 0-180 range
-    if (angle > 180) angle = 180;
+void Set_Servo_Angle(uint8_t angle) {
+    // Limit the angle between 0° and 180°
+    if (angle > 180) {
+        angle = 180;
+    }
 
-    // Map the angle to the PWM pulse width
-    // 1 ms pulse width for 0° and 2 ms for 180° (assuming 50 Hz PWM frequency)
-    uint16_t pulse_width = 500 + (angle * 1000 / 180);  // Pulse width in microseconds
+    // Map the angle to the pulse width
+    uint32_t pulse_width = SERVO_MIN_PULSE_WIDTH +
+                           ((SERVO_MAX_PULSE_WIDTH - SERVO_MIN_PULSE_WIDTH) * angle) / 180;
 
-    // Convert pulse width to timer count based on timer frequency
-    uint32_t timer_freq = HAL_RCC_GetPCLK1Freq() * 2;     // Assuming APB1 prescaler 2 for TIM2
-    uint32_t period = (timer_freq / 50) - 1;              // 50 Hz frequency for 20 ms period
-    uint16_t compare_value = ((pulse_width * period) / 20000);
+    // Calculate the duty cycle for the given pulse width
+    uint32_t tim_period = htim2.Init.Period + 1;   // Get the timer period
+    uint32_t pulse = (tim_period * pulse_width) / (1000000 / SERVO_FREQUENCY);
 
-    // Set the PWM duty cycle for the specified angle
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, compare_value);
+    // Set the pulse width to TIM2 Channel 3
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, pulse);
 }
 
 void Servo_Init() {
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);  // Start PWM signal on TIM2 Channel 1
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 1
 }
 
 // Flash Data Functions ---------------------------------------------------------------------------------
@@ -431,6 +433,7 @@ void load_flash_data(){
 	HAL_FLASH_Lock();
 }
 
+// Sensor Read Functions -----------------------------------------------------------------------------
 uint8_t set_gps(char* buf, uint8_t order){
 	char tmp[2];
 
@@ -669,6 +672,33 @@ void read_INA219(void) {
 
 }
 
+void calibrate_mmc(){
+	read_MMC5603();
+	if (mag_x < mag_x_min){
+		mag_x_min = mag_x;
+	}
+	if (mag_x > mag_x_max){
+		mag_x_max = mag_x;
+	}
+	if (mag_y < mag_y_min){
+		mag_y_min = mag_y;
+	}
+	if (mag_y > mag_y_max){
+		mag_y_max = mag_y;
+	}
+	if (mag_z < mag_z_min){
+		mag_z_min = mag_z;
+	}
+	if (mag_z > mag_z_max){
+		mag_z_max = mag_z;
+	}
+
+	mag_x_offset = (mag_x_min + mag_x_max) / 2;
+	mag_y_offset = (mag_y_min + mag_y_max) / 2;
+	mag_z_offset = (mag_z_min + mag_z_max) / 2;
+}
+
+// Sensor Init Functions -------------------------------------------------------------------
 void init_MMC5603(void) {
 	uint8_t odr_value = 100;  // Example: Set ODR to 1000 Hz by writing 255
 	uint8_t control_reg0 = 0b10000000;  // Set Cmm_freq_en and Take_meas_M
@@ -811,8 +841,10 @@ void init_commands(void)
 	snprintf(tel_off_command, sizeof(tel_off_command), "CMD,%s,CX,OFF", TEAM_ID);
 	snprintf(cal_comp_on_command, sizeof(cal_comp_on_command), "CMD,%s,CC,ON", TEAM_ID);
 	snprintf(cal_comp_off_command, sizeof(cal_comp_off_command), "CMD,%s,CC,OFF", TEAM_ID);
+	snprintf(set_camera_north_command, sizeof(set_camera_north_command), "CMD,%s,SCN", TEAM_ID);
 }
 
+// Xbee and Command Functions ----------------------------------------------------------------
 uint8_t calculate_checksum(const char *data) {
 	uint8_t checksum = 0;
 	while (*data) {
@@ -887,7 +919,7 @@ void handle_state(){
 	else if (current_movement == 0 && (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 || strncmp(state, "LANDED", strlen("LANDED")) == 0)){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "LANDED", strlen("LANDED"));
-		// Activate audio beacon and stop telemetry transmission
+		// stop telemetry transmission
 	}
 
 	else{
@@ -1001,20 +1033,6 @@ void handle_command(const char *cmd) {
 		sim_enabled = false;
 	}
 
-	// Beacon On
-	else if (strncmp(cmd, bcn_on_command, strlen(bcn_on_command)) == 0) {
-		beacon_status = 1;
-		set_cmd_echo("BCNON");
-		sim_enabled = false;
-	}
-
-	// Beacon Off
-	else if (strncmp(cmd, bcn_off_command, strlen(bcn_off_command)) == 0) {
-		beacon_status = 0;
-		set_cmd_echo("BCNOFF");
-		sim_enabled = false;
-	}
-
 	// Telemetry On
 	else if (strncmp(cmd, tel_on_command, strlen(tel_on_command)) == 0) {
 		telemetry_status = 1;
@@ -1050,6 +1068,14 @@ void handle_command(const char *cmd) {
 		sim_enabled = false;
 	}
 
+	// Set Camera North
+	else if (strncmp(cmd, set_camera_north_command, strlen(set_camera_north_command)) == 0) {
+		// Update variable
+		store_flash_data();
+		set_cmd_echo("SCN");
+		sim_enabled = false;
+	}
+
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
@@ -1082,32 +1108,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 	// Call function for next packet
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
-}
-
-void calibrate_mmc(){
-	read_MMC5603();
-	if (mag_x < mag_x_min){
-		mag_x_min = mag_x;
-	}
-	if (mag_x > mag_x_max){
-		mag_x_max = mag_x;
-	}
-	if (mag_y < mag_y_min){
-		mag_y_min = mag_y;
-	}
-	if (mag_y > mag_y_max){
-		mag_y_max = mag_y;
-	}
-	if (mag_z < mag_z_min){
-		mag_z_min = mag_z;
-	}
-	if (mag_z > mag_z_max){
-		mag_z_max = mag_z;
-	}
-
-	mag_x_offset = (mag_x_min + mag_x_max) / 2;
-	mag_y_offset = (mag_y_min + mag_y_max) / 2;
-	mag_z_offset = (mag_z_min + mag_z_max) / 2;
 }
 
 /* USER CODE END 0 */
@@ -1161,66 +1161,65 @@ int main(void)
 
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart2, rx_data, RX_BFR_SIZE);
 
+  Set_Servo_Angle(0);
+
   Stepper_Rotate(4096, 0);
 
   // Set North Direction Offset (It should be done when before the payload is launched)
   read_MMC5603();
-  north_direction_offset = direction;
+//  north_direction_offset = direction;
   direction_offset = direction; // Remove this line later, this should be first done when the camera needs to start to maintain north
 
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if (command_ready){
-		  handle_command(command_buffer);
-		  command_ready = false;
-	  }
-
-	  if (calibrating_compass == 1){
-		  calibrate_mmc();
-	  }
-
-	  if (HAL_I2C_GetState(&hi2c2) != HAL_I2C_STATE_READY) {
-	      init_sensors();
-	  }
-
-	  // Handle Mission Time
-	  mission_time_sec++;
-	  if ( mission_time_sec >= 60 ){
-		  mission_time_sec -= 60;
-		  mission_time_min += 1;
-	  }
-	  if ( mission_time_min >= 60 ){
-		  mission_time_min -= 60;
-		  mission_time_hr += 1;
-	  }
-	  if ( mission_time_hr >= 24 ){
-		  mission_time_hr -= 24;
-	  }
-
-	  handle_state();
-
-	  // Control Telemetry
-	  if (telemetry_status == 1){
-		  read_transmit_telemetry();
-	  }
-
 	  // Correction of Camera Angle
-	  Stepper_Correction(direction, 0);
+	  Stepper_Correction();
 
-	  // Control Beacon
-	  if (beacon_status == 1) {
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	  // Happens 1 time per second
+	  if (msCounter >= 1000){
+		  msCounter -= 1000;
+
+		  if (command_ready){
+			  handle_command(command_buffer);
+			  command_ready = false;
+		  }
+
+		  if (calibrating_compass == 1){
+			  calibrate_mmc();
+		  }
+
+		  if (HAL_I2C_GetState(&hi2c2) != HAL_I2C_STATE_READY) {
+			  init_sensors();
+		  }
+
+		  // Handle Mission Time
+		  mission_time_sec++;
+		  if ( mission_time_sec >= 60 ){
+			  mission_time_sec -= 60;
+			  mission_time_min += 1;
+		  }
+		  if ( mission_time_min >= 60 ){
+			  mission_time_min -= 60;
+			  mission_time_hr += 1;
+		  }
+		  if ( mission_time_hr >= 24 ){
+			  mission_time_hr -= 24;
+		  }
+
+		  handle_state();
+
+		  // Control Telemetry
+		  if (telemetry_status == 1){
+			  read_transmit_telemetry();
+		  }
 	  }
 
-	  else {
-		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-	  }
-
-	  HAL_Delay(1000);
+	  HAL_Delay(250);
 
 //	  for (int i = 0; i < 8; i++) {
 //	      Stepper_SetStep(i);   // Set step
@@ -1380,9 +1379,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 83;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4294967295;
+  htim2.Init.Period = 20000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -1405,10 +1404,10 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 1500;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
