@@ -29,6 +29,7 @@ running = True
 sim_enable = False
 telemetry_on = True
 calibrate_comp_on = False
+set_cam_on = False
 csv_indexer = 0
 
 # xbee communication parameters
@@ -98,7 +99,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
-        self.set_camera_north_button.clicked.connect(lambda: write_xbee("CMD" + TEAM_ID + ",SCN"))
+        self.set_camera_north_button.clicked.connect(self.set_camera_north_toggle)
         # self.deploy_auto_gyro_button.clicked.connect(None)
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
@@ -177,6 +178,19 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         global sim_enable
         sim_enable = False
         self.update_sim_button_colors()
+    
+    def set_camera_north_toggle(self):
+        global set_cam_on
+        set_cam_on = not set_cam_on
+        
+        if set_cam_on:
+            write_xbee("CMD," + TEAM_ID + ",SCN,ON")
+            self.set_camera_north_button.setText("Camera Is North")
+            self.make_button_green(self.set_camera_north_button)
+        else:
+            write_xbee("CMD," + TEAM_ID + ",SCN,OFF")
+            self.set_camera_north_button.setText("Set Camera North")
+            self.make_button_blue(self.set_camera_north_button)
 
     def calibrate_comp_toggle(self):
         global calibrate_comp_on

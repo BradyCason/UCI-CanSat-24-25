@@ -223,20 +223,18 @@ volatile uint32_t pulse_count = 0;
 //float direction_correction = 0;
 //int steps_needed = 0;
 double direction = 0;
-//double direction_offset = 0;
+double direction_offset = 0;
 //float north_direction_offset = 0;
 //float tolerate_direction = 0;
 double stepper_direction = 0;
 int stepIndex = 1;
-bool setting_cam_north = false;
 
 // Commands
 char sim_command[14];
 char simp_command[15];
 char set_time_command[13];
 char cal_alt_command[14];
-char set_camera_north_on_command[17];
-char set_camera_north_off_command[18];
+char set_camera_north_command[14];
 char bcn_on_command[16];
 char bcn_off_command[17];
 char tel_on_command[15];
@@ -338,22 +336,17 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
 // Rotate the motor to correct its direction to all way to the North
 void Stepper_Correction(){
 	read_MMC5603();
-	float dir_change = stepper_direction - direction;
+	float dir_change = -(direction - direction_offset - stepper_direction);
 	if (dir_change > 180) dir_change -= 360;
 	else if (dir_change < -180) dir_change += 360;
-
 	int num_steps = round(dir_change * STEPS_PER_REV / 360);
-
 	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
-	if (stepper_direction > 360) stepper_direction -= 360;
-	else if (stepper_direction < 0) stepper_direction += 360;
-
+//	stepper_direction = stepper_direction % 360;
 	Stepper_Rotate(num_steps, 0);
 }
 
 void set_stepper_north(){
-//	direction_offset = direction;
-	stepper_direction = direction;
+
 }
 
 // Servo Motor Functions -------------------------------------------------------------------------------
@@ -852,8 +845,7 @@ void init_commands(void)
 	snprintf(tel_off_command, sizeof(tel_off_command), "CMD,%s,CX,OFF", TEAM_ID);
 	snprintf(cal_comp_on_command, sizeof(cal_comp_on_command), "CMD,%s,CC,ON", TEAM_ID);
 	snprintf(cal_comp_off_command, sizeof(cal_comp_off_command), "CMD,%s,CC,OFF", TEAM_ID);
-	snprintf(set_camera_north_on_command, sizeof(set_camera_north_on_command), "CMD,%s,SCN,ON", TEAM_ID);
-	snprintf(set_camera_north_off_command, sizeof(set_camera_north_off_command), "CMD,%s,SCN,OFF", TEAM_ID);
+	snprintf(set_camera_north_command, sizeof(set_camera_north_command), "CMD,%s,SCN", TEAM_ID);
 }
 
 // Xbee and Command Functions ----------------------------------------------------------------
@@ -1080,22 +1072,13 @@ void handle_command(const char *cmd) {
 		sim_enabled = false;
 	}
 
-	// Set Camera North On
-	else if (strncmp(cmd, set_camera_north_on_command, strlen(set_camera_north_on_command)) == 0) {
+	// Set Camera North
+	else if (strncmp(cmd, set_camera_north_command, strlen(set_camera_north_command)) == 0) {
 		// Update variable
-		set_cmd_echo("SCNON");
-		setting_cam_north = true;
+		store_flash_data();
+		set_cmd_echo("SCN");
 		sim_enabled = false;
 	}
-
-	// Set Camera North Off
-		else if (strncmp(cmd, set_camera_north_off_command, strlen(set_camera_north_off_command)) == 0) {
-			// Update variable
-			set_cmd_echo("SCNOFF");
-			setting_cam_north = false;
-			set_stepper_north();
-			sim_enabled = false;
-		}
 
 }
 
@@ -1188,6 +1171,7 @@ int main(void)
 
   // Set North Direction Offset (It should be done when before the payload is launched)
   read_MMC5603();
+//  north_direction_offset = direction;
   set_stepper_north(); // Remove this line later, this should be first done when the camera needs to start to maintain north
 
   HAL_Delay(1000);
@@ -1198,9 +1182,7 @@ int main(void)
   while (1)
   {
 	  // Correction of Camera Angle
-	  if (!setting_cam_north){
-		  Stepper_Correction();
-	  }
+	  Stepper_Correction();
 
 	  // Happens 1 time per second
 	  if (msCounter >= 1000){
@@ -1241,7 +1223,7 @@ int main(void)
 		  }
 	  }
 
-	  HAL_Delay(50);
+	  HAL_Delay(250);
 
 //	  for (int i = 0; i < 8; i++) {
 //	      Stepper_SetStep(i);   // Set step

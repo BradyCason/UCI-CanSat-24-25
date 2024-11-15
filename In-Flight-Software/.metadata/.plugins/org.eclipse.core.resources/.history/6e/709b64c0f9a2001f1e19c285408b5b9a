@@ -341,13 +341,10 @@ void Stepper_Correction(){
 	float dir_change = stepper_direction - direction;
 	if (dir_change > 180) dir_change -= 360;
 	else if (dir_change < -180) dir_change += 360;
-
 	int num_steps = round(dir_change * STEPS_PER_REV / 360);
-
 	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
 	if (stepper_direction > 360) stepper_direction -= 360;
 	else if (stepper_direction < 0) stepper_direction += 360;
-
 	Stepper_Rotate(num_steps, 0);
 }
 

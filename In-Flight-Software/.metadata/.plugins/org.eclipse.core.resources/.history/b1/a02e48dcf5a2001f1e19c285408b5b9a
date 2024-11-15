@@ -228,7 +228,6 @@ double direction = 0;
 //float tolerate_direction = 0;
 double stepper_direction = 0;
 int stepIndex = 1;
-bool setting_cam_north = false;
 
 // Commands
 char sim_command[14];
@@ -338,16 +337,13 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
 // Rotate the motor to correct its direction to all way to the North
 void Stepper_Correction(){
 	read_MMC5603();
+//	float dir_change = -(direction - direction_offset - stepper_direction);
 	float dir_change = stepper_direction - direction;
 	if (dir_change > 180) dir_change -= 360;
 	else if (dir_change < -180) dir_change += 360;
-
 	int num_steps = round(dir_change * STEPS_PER_REV / 360);
-
 	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
-	if (stepper_direction > 360) stepper_direction -= 360;
-	else if (stepper_direction < 0) stepper_direction += 360;
-
+//	stepper_direction = stepper_direction % 360;
 	Stepper_Rotate(num_steps, 0);
 }
 
@@ -1092,7 +1088,7 @@ void handle_command(const char *cmd) {
 		else if (strncmp(cmd, set_camera_north_off_command, strlen(set_camera_north_off_command)) == 0) {
 			// Update variable
 			set_cmd_echo("SCNOFF");
-			setting_cam_north = false;
+			setting_cam_north = true;
 			set_stepper_north();
 			sim_enabled = false;
 		}
@@ -1198,9 +1194,7 @@ int main(void)
   while (1)
   {
 	  // Correction of Camera Angle
-	  if (!setting_cam_north){
-		  Stepper_Correction();
-	  }
+	  Stepper_Correction();
 
 	  // Happens 1 time per second
 	  if (msCounter >= 1000){
