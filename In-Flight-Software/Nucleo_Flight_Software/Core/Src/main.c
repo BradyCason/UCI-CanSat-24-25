@@ -243,6 +243,7 @@ char tel_on_command[15];
 char tel_off_command[16];
 char cal_comp_on_command[15];
 char cal_comp_off_command[16];
+char release_payload_command[22];
 
 // State Variables
 float prev_alt = 0;
@@ -854,6 +855,7 @@ void init_commands(void)
 	snprintf(cal_comp_off_command, sizeof(cal_comp_off_command), "CMD,%s,CC,OFF", TEAM_ID);
 	snprintf(set_camera_north_on_command, sizeof(set_camera_north_on_command), "CMD,%s,SCN,ON", TEAM_ID);
 	snprintf(set_camera_north_off_command, sizeof(set_camera_north_off_command), "CMD,%s,SCN,OFF", TEAM_ID);
+	snprintf(release_payload_command, sizeof(release_payload_command), "CMD,%s,MEC,PAYLOAD", TEAM_ID);
 }
 
 // Xbee and Command Functions ----------------------------------------------------------------
@@ -1089,13 +1091,21 @@ void handle_command(const char *cmd) {
 	}
 
 	// Set Camera North Off
-		else if (strncmp(cmd, set_camera_north_off_command, strlen(set_camera_north_off_command)) == 0) {
-			// Update variable
-			set_cmd_echo("SCNOFF");
-			setting_cam_north = false;
-			set_stepper_north();
-			sim_enabled = false;
-		}
+	else if (strncmp(cmd, set_camera_north_off_command, strlen(set_camera_north_off_command)) == 0) {
+		// Update variable
+		set_cmd_echo("SCNOFF");
+		setting_cam_north = false;
+		set_stepper_north();
+		sim_enabled = false;
+	}
+
+	// Release Payload
+	else if (strncmp(cmd, release_payload_command, strlen(release_payload_command)) == 0) {
+		// Update variable
+		set_cmd_echo("MECPAYLOAD");
+		Set_Servo_Angle(90);
+		sim_enabled = false;
+	}
 
 }
 

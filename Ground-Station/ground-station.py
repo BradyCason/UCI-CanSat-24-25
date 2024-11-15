@@ -100,7 +100,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
         self.set_camera_north_button.clicked.connect(self.set_camera_north_toggle)
-        # self.deploy_auto_gyro_button.clicked.connect(None)
+        self.release_payload_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD"))
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
@@ -110,7 +110,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_camera_north_button.clicked.connect(self.non_sim_button_clicked)
         self.set_time_utc_button.clicked.connect(self.non_sim_button_clicked)
         self.calibrate_alt_button.clicked.connect(self.non_sim_button_clicked)
-        self.deploy_auto_gyro_button.clicked.connect(self.non_sim_button_clicked)
+        self.release_payload_button.clicked.connect(self.non_sim_button_clicked)
         self.telemetry_toggle_button.clicked.connect(self.non_sim_button_clicked)
 
     def update(self):

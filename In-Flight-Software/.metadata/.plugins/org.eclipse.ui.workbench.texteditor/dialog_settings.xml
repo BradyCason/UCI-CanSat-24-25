@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Stepper_Rotate"/>
+		<item key="selection" value="Set_Servo_Angle"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="Stepper_Rotate"/>
-			<item value="stepIn"/>
-			<item value="Stepper_R\otate"/>
-			<item value="SysTick_Handler"/>
-			<item value="main"/>
-			<item value="stepper_correction"/>
+			<item value="Set_Servo_Angle"/>
+			<item value="d_comm"/>
+			<item value="servo"/>
+			<item value="stepper"/>
+			<item value="set_camera_north_off_command"/>
+			<item value="init_comm"/>
+			<item value="scnoff"/>
+			<item value="set_camera_north_on_command"/>
+			<item value="char set_camera_north_on_command[17];"/>
+			<item value="set_camera_north_command"/>
+			<item value="north_com"/>
+			<item value="set_step"/>
+			<item value="set_ste"/>
+			<item value="set stepp"/>
 			<item value="direction_offset"/>
-			<item value="beacon"/>
-			<item value="beacon_"/>
-			<item value="4096"/>
-			<item value="#include &lt;math.h&gt;"/>
-			<item value="direction"/>
-			<item value="direction_"/>
-			<item value="reset_mpu"/>
-			<item value="cal_alt_command"/>
 		</list>
 		<list key="replacehistory">
 			<item value="MPU6050_ADDRESS"/>

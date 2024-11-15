@@ -1307,7 +1307,7 @@ QPushButton:hover {
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="deploy_auto_gyro_button">
+            <widget class="QPushButton" name="release_payload_button">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1326,7 +1326,7 @@ QPushButton:hover {
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>Deploy Auto Gyro</string>
+              <string>Release Payload</string>
              </property>
             </widget>
            </item>
