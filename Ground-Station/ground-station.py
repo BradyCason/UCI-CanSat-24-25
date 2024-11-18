@@ -100,7 +100,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
         self.set_camera_north_button.clicked.connect(self.set_camera_north_toggle)
-        self.release_payload_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD"))
+        self.release_payload_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD,ON"))
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
@@ -308,6 +308,7 @@ def read_xbee():
             buffer = buffer[end_idx + 1:]
 
             try:
+                print(data)
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, float(checksum)):
                     if len(data.split(",")) == 25:
