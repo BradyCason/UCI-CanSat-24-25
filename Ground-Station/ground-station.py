@@ -59,11 +59,10 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.setup_UI()
         self.connect_buttons()
 
-        # start timer, check for updates to telemetry based on interval
-        # self.timer = QtCore.QTimer()
-        # self.timer.setInterval(20)
-        # self.timer.timeout.connect(self.update)
-        # self.timer.start()
+        self.update_timer = QtCore.QTimer()
+        self.update_timer.setInterval(100)  # Update every 100ms
+        self.update_timer.timeout.connect(self.update)
+        self.update_timer.start()
 
     def setup_UI(self):
         logo_pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(__file__), "gui", "logo.png")).scaled(self.logo.size(), aspectRatioMode=True)
@@ -256,13 +255,13 @@ class GraphWindow(pg.GraphicsLayoutWidget):
                     try:
                         self.graph_data[field].append(float(telemetry[field]))
                         if len(self.graph_data[field]) > 50:
-                            self.graph_data[field].pop()
+                            self.graph_data[field].pop(0)
                     except:
                         pass
                     self.graphs[field].curve.setData(self.graph_data[field])
 
-                    if len(self.graph_data[field]) > 50:
-                        self.graph_data[field] = self.graph_data[field][-50:]
+                    # if len(self.graph_data[field]) > 50:
+                    #     self.graph_data[field] = self.graph_data[field][-50:]
 
             self.previous_time = telemetry["GPS_TIME"]
 
@@ -273,7 +272,7 @@ def verify_checksum(data, checksum):
     return checksum == calc_checksum(data)
 
 def parse_xbee(data):
-    global sim, telemetry, w
+    global sim, telemetry
 
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
@@ -282,9 +281,6 @@ def parse_xbee(data):
     #     sim = True
     # else:
     #     sim = False
-
-    # Output to Ground Station
-    w.update()
 
     # Add data to csv file
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + '.csv')
@@ -308,7 +304,6 @@ def read_xbee():
             buffer = buffer[end_idx + 1:]
 
             try:
-                print(data)
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, float(checksum)):
                     if len(data.split(",")) == 25:
@@ -387,7 +382,6 @@ def main():
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)
-    global w
     w = GroundStationWindow()
 
     if (not SER_DEBUG):
