@@ -124,7 +124,6 @@ char command_buffer[RX_BFR_SIZE-1];
 I2C_HandleTypeDef hi2c2;
 
 TIM_HandleTypeDef htim2;
-TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
@@ -143,7 +142,6 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -516,7 +514,8 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	if (HAL_I2C_Master_Transmit(&hi2c2, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY) != HAL_OK) {
+	result = HAL_I2C_Master_Transmit(&hi2c2, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
 	}
@@ -623,22 +622,29 @@ void read_MPU6050(void) {
     }
 }
 
-void read_PA1010D(void)
+bool read_PA1010D()
 {
-	uint8_t pa1010d_i;
-	uint8_t pa1010d_bytebuf;
+	uint8_t pa_buf_index = 0;
+	uint8_t pa_bytebuf = 0;
+    bool ret = false;
 
 	/* PA1010D (GPS) */
 	if (HAL_I2C_IsDeviceReady(&hi2c2, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
-		for(pa1010d_i=0; pa1010d_i<255; pa1010d_i++){
-			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
-			if (pa1010d_bytebuf == '$'){
-				break;
+		for(pa_buf_index=0; pa_buf_index<255; pa_buf_index++){
+			HAL_I2C_Master_Receive(&hi2c2, PA1010D_ADDRESS, &pa_bytebuf, 1, HAL_MAX_DELAY);
+			if (pa_bytebuf == '$'){
+				ret = true;
+				break; // Idea: take away break statement and see what the whole sentence looks like
 			}
-			pa_buf[pa1010d_i] = pa1010d_bytebuf;
+			pa_buf[pa_buf_index] = pa_bytebuf;
 		}
 		parse_nmea(pa_buf);
 	}
+	return ret;
+}
+
+void flush_PA1010D(){
+	while(read_PA1010D());
 }
 
 void read_INA219(void) {
@@ -798,8 +804,10 @@ void read_sensors(void)
 {
 	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
-	read_MMC5603(); // Magnetic Field
-	read_PA1010D(); // GPS
+	if (setting_cam_north) read_MMC5603(); // Magnetic Field
+	for (int i = 0; i < 10; ++i){
+		read_PA1010D(); // GPS
+	}
 	calculate_auto_gyro_speed();
 //	read_INA219(); // Voltage
 }
@@ -824,6 +832,8 @@ void init_sensors(void)
 
 	read_PA1010D();
 	get_mission_time();
+
+	flush_PA1010D();
 }
 
 void init_commands(void)
@@ -1037,6 +1047,7 @@ void handle_command(const char *cmd) {
 		telemetry_status = 1;
 		set_cmd_echo("CXON");
 		sim_enabled = false;
+		flush_PA1010D();
 	}
 
 	// Telemetry Off
@@ -1163,7 +1174,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C2_Init();
   MX_TIM2_Init();
-  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
 //  store_flash_data();
@@ -1384,51 +1394,6 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
-
-}
-
-/**
-  * @brief TIM3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM3_Init(void)
-{
-
-  /* USER CODE BEGIN TIM3_Init 0 */
-
-  /* USER CODE END TIM3_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  /* USER CODE BEGIN TIM3_Init 1 */
-
-  /* USER CODE END TIM3_Init 1 */
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 999;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 7199;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM3_Init 2 */
-
-  /* USER CODE END TIM3_Init 2 */
 
 }
 

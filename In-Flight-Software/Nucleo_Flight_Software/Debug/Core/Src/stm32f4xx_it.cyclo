@@ -8,4 +8,3 @@
 ../Core/Src/stm32f4xx_it.c:174:6:PendSV_Handler	1
 ../Core/Src/stm32f4xx_it.c:187:6:SysTick_Handler	1
 ../Core/Src/stm32f4xx_it.c:210:6:EXTI9_5_IRQHandler	2
-../Core/Src/stm32f4xx_it.c:233:6:TIM3_IRQHandler	1

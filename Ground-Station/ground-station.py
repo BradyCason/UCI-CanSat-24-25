@@ -116,7 +116,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         global telemetry
         global telemetry_on
 
-        if telemetry_on:
+        if len(telemetry.keys()) > 0 and telemetry_on:
             for field in TELEMETRY_FIELDS:
                 if field != "TEAM_ID":
                     self.telemetry_labels[field].setText(telemetry[field])
