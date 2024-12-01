@@ -95,7 +95,6 @@ typedef uint8_t bool;
 #define SERVO_FREQUENCY 50
 
 #define PI 3.141592
-#define STEPS_PER_DEGREE 11.3777777778
 
 #define RX_BFR_SIZE 255
 #define TX_BFR_SIZE 255
