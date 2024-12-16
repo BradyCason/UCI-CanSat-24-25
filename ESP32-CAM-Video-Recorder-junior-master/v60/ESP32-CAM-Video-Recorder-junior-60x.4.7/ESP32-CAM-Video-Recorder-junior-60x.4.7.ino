@@ -128,7 +128,7 @@ int avi_length = 1800;            // how long a movie in seconds -- 1800 sec = 3
 int frame_interval = 0;          // record at full speed
 int speed_up_factor = 1;          // play at realtime
 int stream_delay = 500;           // minimum of 500 ms delay between frames
-int MagicNumber = 15;                // change this number to reset the eprom in your esp32 for file numbers
+int MagicNumber = 2;                // change this number to reset the eprom in your esp32 for file numbers
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1169,7 +1169,7 @@ static void another_save_avi(camera_fb_t * fb ) {
 
   movi_size = movi_size + remnant;
 
-  if ( do_it_now == 1 && frame_cnt < 1011) {
+  if ( do_it_now == 1) {
     do_it_now = 0;
     Serial.printf("Frame %6d, len %6d, extra  %4d, cam time %7d,  sd time %4d -- \n", gframe_cnt, gfblen, gj - 1, gmdelay / 1000, millis() - bw);
     logfile.printf("Frame % 6d, len % 6d, extra  % 4d, cam time % 7d,  sd time % 4d -- \n", gframe_cnt, gfblen, gj - 1, gmdelay / 1000, millis() - bw);
@@ -1436,12 +1436,12 @@ void setup() {
 
 
   // prio 6 - higher than the camera loop(), and the streaming
-  xTaskCreatePinnedToCore( the_camera_loop, "the_camera_loop", 3000, NULL, 6, &the_camera_loop_task, 0); // prio 3, core 0 //v56 core 1 as http dominating 0 ... back to 0, raise prio
+  xTaskCreatePinnedToCore( the_camera_loop, "the_camera_loop", 4000, NULL, 3, &the_camera_loop_task, 0); // prio 3, core 0 //v56 core 1 as http dominating 0 ... back to 0, raise prio
 
   delay(100);
 
   // prio 4 - higher than the cam_loop(), and the streaming
-  xTaskCreatePinnedToCore( the_sd_loop, "the_sd_loop", 2000, NULL, 4, &the_sd_loop_task, 1);  // prio 4, core 1
+  xTaskCreatePinnedToCore( the_sd_loop, "the_sd_loop", 6000, NULL, 4, &the_sd_loop_task, 1);  // prio 4, core 1
 
   delay(200);
 
@@ -1468,7 +1468,9 @@ void the_sd_loop (void* pvParameter) {
 
   while (1) {
     xSemaphoreTake( sd_go, portMAX_DELAY );            // we wait for camera loop to tell us to go
-    another_save_avi( fb_curr);                        // do the actual sd wrte
+    if(fb_curr != NULL){
+      another_save_avi( fb_curr);                        // do the actual sd wrte
+    }
     xSemaphoreGive( wait_for_sd );                     // tell camera loop we are done
   }
 }
@@ -1616,7 +1618,7 @@ void the_camera_loop (void* pvParameter) {
           most_recent_fps = 100.0 / ((millis() - time_before_last_100_frames) / 1000.0) ;
           most_recent_avg_framesize = (movi_size - bytes_before_last_100_frames) / 100;
 
-          if (Lots_of_Stats && frame_cnt < 1011) {
+          if (Lots_of_Stats) {
             Serial.printf("So far: %04d frames, in %6.1f seconds, for last 100 frames: avg frame size %6.1f kb, %.2f fps ...\n", frame_cnt, 0.001 * (millis() - avi_start_time), 1.0 / 1024  * most_recent_avg_framesize, most_recent_fps);
             logfile.printf("So far: %04d frames, in %6.1f seconds, for last 100 frames: avg frame size %6.1f kb, %.2f fps ...\n", frame_cnt, 0.001 * (millis() - avi_start_time), 1.0 / 1024  * most_recent_avg_framesize, most_recent_fps);
           }
