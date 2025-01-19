@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="read_sensors"/>
+		<item key="selection" value="main"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="main"/>
+			<item value="huart2"/>
+			<item value="huart"/>
+			<item value="usart2"/>
+			<item value="usart"/>
+			<item value="i2c2"/>
+			<item value="steps_per"/>
 			<item value="read_sensors"/>
 			<item value="read("/>
 			<item value="telemetry_"/>
@@ -16,15 +23,10 @@
 			<item value="telemetry_f"/>
 			<item value="bool"/>
 			<item value="read_pa"/>
-			<item value="read_"/>
-			<item value="read_senso"/>
-			<item value="pa_buf"/>
-			<item value="d read_pa1"/>
-			<item value="read_pa1"/>
-			<item value="pa1"/>
-			<item value="read_sens"/>
 		</list>
 		<list key="replacehistory">
+			<item value="huart1"/>
+			<item value="i2c1"/>
 			<item value="MPU6050_ADDRESS"/>
 			<item value="huart2"/>
 			<item value="hi2c2"/>
@@ -36,6 +38,6 @@
 		<item key="DIALOG_Y_ORIGIN" value="680"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 </section>

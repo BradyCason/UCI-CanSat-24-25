@@ -34,7 +34,7 @@ csv_indexer = 0
 
 # xbee communication parameters
 BAUDRATE = 115200
-COM_PORT = 5
+COM_PORT = 3
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
@@ -50,6 +50,9 @@ START_DELIMITER = "~"
 
 class GroundStationWindow(QtWidgets.QMainWindow):
     def __init__(self):
+        '''
+        Initialize the Ground Station Window, and start timer loop for updating UI
+        '''
         super().__init__()
 
         # Load the UI
@@ -65,6 +68,9 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.update_timer.start()
 
     def setup_UI(self):
+        '''
+        Set UI to initial State
+        '''
         logo_pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(__file__), "gui", "logo.png")).scaled(self.logo.size(), aspectRatioMode=True)
         self.logo.setPixmap(logo_pixmap)
         self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(__file__), "gui", "logo.png")))
@@ -92,6 +98,9 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.make_button_red(self.telemetry_toggle_button)
 
     def connect_buttons(self):
+        '''
+        Connect Buttons to their functions
+        '''
         self.sim_enable_button.clicked.connect(lambda: self.handle_simulation("ENABLE"))
         self.sim_activate_button.clicked.connect(lambda: self.handle_simulation("ACTIVATE"))
         self.sim_disable_button.clicked.connect(lambda: self.handle_simulation("DISABLE"))
@@ -113,6 +122,9 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.telemetry_toggle_button.clicked.connect(self.non_sim_button_clicked)
 
     def update(self):
+        '''
+        Set telemetry fields to most recent data
+        '''
         global telemetry
         global telemetry_on
 
@@ -124,15 +136,27 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.graph_window.update()
 
     def make_button_green(self, button):
+        '''
+        Takes in a button object and makes the background green
+        '''
         button.setStyleSheet("QPushButton{background-color: rgba(40, 167, 69, 1);} QPushButton:hover{background-color: rgba(36, 149, 62, 1);}")
 
     def make_button_red(self, button):
+        '''
+        Takes in a button object and makes the background red
+        '''
         button.setStyleSheet("QPushButton{background-color: rgba(220, 53, 69, 1);} QPushButton:hover{background-color: rgba(200, 45, 59, 1);}")
 
     def make_button_blue(self, button):
+        '''
+        Takes in a button object and makes the background blue
+        '''
         button.setStyleSheet("QPushButton{background-color: rgba(33,125,182,1);} QPushButton:hover{background-color: rgba(27, 100, 150, 1);}")
 
     def handle_simulation(self, cmd):
+        '''
+        Send a simulation command: ("ACTIVATE", "ENABLE", "DISABLE")
+        '''
         global sim, sim_enable, csv_indexer
 
         if cmd == "ACTIVATE" and sim_enable == False or cmd == "ENABLE" and sim_enable == True:
@@ -158,6 +182,10 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             time.sleep(1)
 
     def update_sim_button_colors(self):
+        '''
+        Set simulation buttons to the correct colors based off of
+        if it is active, enabled, or disabled
+        '''
         global sim, sim_enable
 
         if (sim):
@@ -174,11 +202,17 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.make_button_blue(self.sim_disable_button)
 
     def non_sim_button_clicked(self):
+        '''
+        Disable simulation when any button is pressed
+        '''
         global sim_enable
         sim_enable = False
         self.update_sim_button_colors()
     
     def set_camera_north_toggle(self):
+        '''
+        Handle "set camera north" button press
+        '''
         global set_cam_on
         set_cam_on = not set_cam_on
         
@@ -192,6 +226,9 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.make_button_blue(self.set_camera_north_button)
 
     def calibrate_comp_toggle(self):
+        '''
+        Handle "calibrate compass" button press
+        '''
         global calibrate_comp_on
         calibrate_comp_on = not calibrate_comp_on
 
@@ -220,6 +257,9 @@ class GroundStationWindow(QtWidgets.QMainWindow):
 
 class GraphWindow(pg.GraphicsLayoutWidget):
     def __init__(self):
+        '''
+        Initialize Graphing Window UI
+        '''
         super().__init__()
 
         self.layout = QtWidgets.QVBoxLayout()
@@ -246,9 +286,12 @@ class GraphWindow(pg.GraphicsLayoutWidget):
         self.previous_time = ""
 
     def update(self):
+        '''
+        Add new data points to graphs if necessary
+        '''
         global telemetry
 
-        if self.previous_time != telemetry["GPS_TIME"]:
+        if self.previous_time != telemetry["MISSION_TIME"]:
 
             for field in GRAPHED_FIELDS:
                 if telemetry[field] != "N/A":
@@ -257,21 +300,30 @@ class GraphWindow(pg.GraphicsLayoutWidget):
                         if len(self.graph_data[field]) > 50:
                             self.graph_data[field].pop(0)
                     except:
-                        pass
+                        print("Error")
                     self.graphs[field].curve.setData(self.graph_data[field])
 
                     # if len(self.graph_data[field]) > 50:
                     #     self.graph_data[field] = self.graph_data[field][-50:]
 
-            self.previous_time = telemetry["GPS_TIME"]
+            self.previous_time = telemetry["MISSION_TIME"]
 
 def calc_checksum(data):
+    '''
+    Calculate Checksum based off of packet data
+    '''
     return sum(data.encode()) % 256
 
 def verify_checksum(data, checksum):
+    '''
+    Return a boolean of if the checksum is correct
+    '''
     return checksum == calc_checksum(data)
 
 def parse_xbee(data):
+    '''
+    Parse the data from an incoming Xbee packet
+    '''
     global sim, telemetry
 
     for i in range(len(data)):
@@ -289,6 +341,9 @@ def parse_xbee(data):
         writer_object.writerow(telemetry.values())
 
 def read_xbee():
+    '''
+    Read packets from the Xbee module
+    '''
     buffer = ""
     while True:     # Keep running as long as the serial connection is open
         if ser.inWaiting() > 0:
@@ -332,6 +387,9 @@ def read_xbee():
             #         print("Failed to read frame:", frame)
 
 def write_xbee(cmd):
+    '''
+    Write commands to the Xbee
+    '''
     # Frame Format: ~<data>,<checksum>
 
     '''
@@ -357,6 +415,9 @@ def write_xbee(cmd):
     print("Packet Sent: " + cmd)
 
 def send_simp_data():
+    '''
+    Send simulated pressure data from the csv file at 1 Hz
+    '''
     global sim, running
     global csv_indexer
     csv_file = open(os.path.join(os.path.dirname(__file__), "pres.csv"), 'r')
