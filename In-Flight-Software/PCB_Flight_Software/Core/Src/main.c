@@ -238,6 +238,7 @@ char tel_off_command[16];
 char cal_comp_on_command[15];
 char cal_comp_off_command[16];
 char release_payload_command[25];
+reset_release_payload_command[26];
 
 // State Variables
 float prev_alt = 0;
@@ -847,6 +848,7 @@ void init_commands(void)
 	snprintf(set_camera_north_on_command, sizeof(set_camera_north_on_command), "CMD,%s,SCN,ON", TEAM_ID);
 	snprintf(set_camera_north_off_command, sizeof(set_camera_north_off_command), "CMD,%s,SCN,OFF", TEAM_ID);
 	snprintf(release_payload_command, sizeof(release_payload_command), "CMD,%s,MEC,PAYLOAD,ON", TEAM_ID);
+	snprintf(reset_release_payload_command, sizeof(reset_release_payload_command), "CMD,%s,MEC,PAYLOAD,OFF", TEAM_ID);
 }
 
 // Xbee and Command Functions ----------------------------------------------------------------
@@ -1094,11 +1096,18 @@ void handle_command(const char *cmd) {
 	// Release Payload
 	else if (strncmp(cmd, release_payload_command, strlen(release_payload_command)) == 0) {
 		// Update variable
-		set_cmd_echo("MECPAYLOAD");
+		set_cmd_echo("MECPAYLOADON");
 		Set_Servo_Angle(90);
 		sim_enabled = false;
 	}
 
+	// Reset Payload Release
+	else if (strncmp(cmd, reset_release_payload_command, strlen(reset_release_payload_command)) == 0) {
+		// Update variable
+		set_cmd_echo("MECPAYLOADOFF");
+		Set_Servo_Angle(0);
+		sim_enabled = false;
+	}
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){

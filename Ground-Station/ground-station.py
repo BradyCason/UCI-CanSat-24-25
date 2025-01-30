@@ -36,7 +36,7 @@ csv_indexer = 0
 BAUDRATE = 115200
 COM_PORT = 3
 
-SER_DEBUG = False       # Set as True whenever testing without XBee connected
+SER_DEBUG = True       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
     # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
     ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
@@ -66,6 +66,8 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.update_timer.setInterval(100)  # Update every 100ms
         self.update_timer.timeout.connect(self.update)
         self.update_timer.start()
+
+        self.payload_released = False
 
     def setup_UI(self):
         '''
@@ -108,7 +110,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
         self.set_camera_north_button.clicked.connect(self.set_camera_north_toggle)
-        self.release_payload_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD,ON"))
+        self.release_payload_button.clicked.connect(self.release_payload_clicked)
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
         self.show_graphs_button.clicked.connect(self.graph_window.show)
@@ -253,6 +255,18 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             write_xbee("CMD,"+ TEAM_ID + ",CX,OFF")
             self.telemetry_toggle_button.setText("Telemetry Toggle: Off")
             self.make_button_red(self.telemetry_toggle_button)
+
+    def release_payload_clicked(self):
+        self.payload_released = not self.payload_released
+
+        if self.payload_released:
+            write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD,ON")
+            self.release_payload_button.setText("Reset Payload Release")
+            self.make_button_red(self.release_payload_button)
+        else:
+            write_xbee("CMD," + TEAM_ID + ",MEC,PAYLOAD,OFF")
+            self.release_payload_button.setText("Release Payload")
+            self.make_button_blue(self.release_payload_button)
 
 
 class GraphWindow(pg.GraphicsLayoutWidget):
