@@ -799,13 +799,13 @@ void init_INA219(void)
 
 void read_sensors(void)
 {
-	read_MPU6050(); // Accel/ tilt
+//	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
-	if (setting_cam_north) read_MMC5603(); // Magnetic Field
-	for (int i = 0; i < 10; ++i){
-		read_PA1010D(); // GPS
-	}
-	calculate_auto_gyro_speed();
+//	if (setting_cam_north) read_MMC5603(); // Magnetic Field
+//	for (int i = 0; i < 10; ++i){
+//		read_PA1010D(); // GPS
+//	}
+//	calculate_auto_gyro_speed();
 //	read_INA219(); // Voltage
 }
 
@@ -817,20 +817,20 @@ void reset_MPU6050(void) {
 
 void init_sensors(void)
 {
-	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
-		reset_MPU6050();
-	}
-
-	init_MPU6050(); // Must be first
+//	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+//		reset_MPU6050();
+//	}
+//
+//	init_MPU6050(); // Must be first
 	init_MPL3115A2();
-	init_MMC5603();
-	init_PA1010D();
+//	init_MMC5603();
+//	init_PA1010D();
 //	init_INA219();
 
-	read_PA1010D();
-	get_mission_time();
+//	read_PA1010D();
+//	get_mission_time();
 
-	flush_PA1010D();
+//	flush_PA1010D();
 }
 
 void init_commands(void)
@@ -1182,9 +1182,10 @@ int main(void)
   store_flash_data(); // Do this the first time to put the data into flash memory.
   load_flash_data();
 
-  result = HAL_I2C_IsDeviceReady(&hi2c1, MPU6050_ADDRESS, 3, 5);
+//  result = HAL_I2C_IsDeviceReady(&hi2c1, MMC5603_ADDRESS, 3, 5);
+  result = HAL_I2C_GetState(&hi2c1);
 
-  init_sensors();
+//  init_sensors();
   init_commands();
   Servo_Init();
 
@@ -1193,7 +1194,7 @@ int main(void)
   Set_Servo_Angle(0);
 
   // Set North Direction Offset
-  read_MMC5603();
+//  read_MMC5603();
   set_stepper_north();
 
   /* USER CODE END 2 */
@@ -1242,7 +1243,7 @@ int main(void)
 
 		  // Control Telemetry
 		  if (telemetry_status == 1){
-			  read_transmit_telemetry();
+//			  read_transmit_telemetry();
 		  }
 	  }
 
