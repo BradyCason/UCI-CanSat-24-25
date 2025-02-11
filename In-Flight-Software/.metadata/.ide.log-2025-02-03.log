@@ -1,0 +1,230 @@
+2025-02-04 00:04:11,689 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:04:11,811 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:08:16,741 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:08:16,866 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:11:27,333 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 805979152 Bytes (1073741824)
+2025-02-04 00:11:27,414 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 824730152 Bytes (1073741824)
+2025-02-04 00:11:27,929 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 866796560 Bytes (1073741824)
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: TIM1_8
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: SYS
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: RCC
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: NVIC
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: USART
+2025-02-04 00:11:28,006 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: GPIO
+2025-02-04 00:11:28,007 [INFO] CodeGenerator:807 - code generatio: config db path: C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.12.0.202406281431\\db\
+2025-02-04 00:11:28,008 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:11:28,008 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:11:28,008 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:11:28,008 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:11:28,060 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp_save
+2025-02-04 00:11:28,134 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp
+2025-02-04 00:11:28,149 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp_save
+2025-02-04 00:11:28,217 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp
+2025-02-04 00:11:28,301 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c_save
+2025-02-04 00:11:28,431 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c
+2025-02-04 00:11:28,438 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h_save
+2025-02-04 00:11:28,497 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h
+2025-02-04 00:11:28,514 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c_save
+2025-02-04 00:11:28,628 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c
+2025-02-04 00:11:28,641 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp_save
+2025-02-04 00:11:28,696 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp
+2025-02-04 00:11:28,712 [INFO] CodeEngine:311 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-02-04 00:11:28,795 [INFO] CodeEngine:335 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h
+2025-02-04 00:11:28,818 [WARN] IPConfigManager:3554 - IP not found : TIM
+2025-02-04 00:11:28,818 [WARN] CodeGenerator:4002 - IP not found : null
+2025-02-04 00:11:28,835 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h_save
+2025-02-04 00:11:28,901 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h
+2025-02-04 00:11:28,917 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c_save
+2025-02-04 00:11:29,119 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c
+2025-02-04 00:11:29,421 [INFO] ProjectBuilder:3249 - Time for Copy HAL[1] : 165mS.
+2025-02-04 00:11:29,424 [INFO] ProjectBuilder:4828 - Project Generator version: 4.4.0-B60
+2025-02-04 00:11:29,466 [INFO] ConfigFileManager:1531 - The Die is : DIE441
+2025-02-04 00:11:30,041 [INFO] ProjectBuilder:5097 - Time for Generating toolchain IDE Files: 616mS.
+2025-02-04 00:11:30,041 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 0mS.
+2025-02-04 00:11:30,043 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 0mS.
+2025-02-04 00:13:33,833 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 796481960 Bytes (1073741824)
+2025-02-04 00:13:33,935 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 815505256 Bytes (1073741824)
+2025-02-04 00:13:34,469 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 858347944 Bytes (1073741824)
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: TIM1_8
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: SYS
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: RCC
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: NVIC
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: USART
+2025-02-04 00:13:34,543 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: GPIO
+2025-02-04 00:13:34,543 [INFO] CodeGenerator:807 - code generatio: config db path: C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.12.0.202406281431\\db\
+2025-02-04 00:13:34,544 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:13:34,544 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:13:34,544 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:13:34,544 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:13:34,596 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp_save
+2025-02-04 00:13:34,679 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp
+2025-02-04 00:13:34,696 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp_save
+2025-02-04 00:13:34,761 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp
+2025-02-04 00:13:34,868 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c_save
+2025-02-04 00:13:34,936 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c
+2025-02-04 00:13:34,940 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h_save
+2025-02-04 00:13:34,999 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h
+2025-02-04 00:13:35,022 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c_save
+2025-02-04 00:13:35,139 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c
+2025-02-04 00:13:35,152 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp_save
+2025-02-04 00:13:35,199 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp
+2025-02-04 00:13:35,215 [INFO] CodeEngine:311 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-02-04 00:13:35,298 [INFO] CodeEngine:335 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h
+2025-02-04 00:13:35,321 [WARN] IPConfigManager:3554 - IP not found : TIM
+2025-02-04 00:13:35,321 [WARN] CodeGenerator:4002 - IP not found : null
+2025-02-04 00:13:35,338 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h_save
+2025-02-04 00:13:35,395 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h
+2025-02-04 00:13:35,410 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c_save
+2025-02-04 00:13:35,567 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c
+2025-02-04 00:13:35,870 [INFO] ProjectBuilder:3249 - Time for Copy HAL[1] : 192mS.
+2025-02-04 00:13:35,873 [INFO] ProjectBuilder:4828 - Project Generator version: 4.4.0-B60
+2025-02-04 00:13:35,919 [INFO] ConfigFileManager:1531 - The Die is : DIE441
+2025-02-04 00:13:36,497 [INFO] ProjectBuilder:5097 - Time for Generating toolchain IDE Files: 624mS.
+2025-02-04 00:13:36,498 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 1mS.
+2025-02-04 00:13:36,500 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 0mS.
+2025-02-04 00:16:58,447 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:16:58,447 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,947 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,948 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,948 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,948 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,950 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,950 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,951 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:19:59,951 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,080 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,080 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,080 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,080 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,082 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,082 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,082 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:00,082 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,713 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,713 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,713 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,713 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,715 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,715 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,715 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,715 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,810 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,810 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,811 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,811 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,812 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,812 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,812 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:01,812 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,619 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,619 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,619 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,619 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,621 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,621 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,622 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,622 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,756 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,756 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,756 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,756 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,759 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,759 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,759 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:05,759 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,206 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,206 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,206 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,206 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,209 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,209 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,209 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,209 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,334 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,334 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,334 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,334 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,336 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,336 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,336 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:07,336 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,475 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,475 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,476 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,476 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,478 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,478 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,478 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,478 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,601 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,601 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,602 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,602 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,604 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,604 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,604 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:08,604 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:12,918 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 901029680 Bytes (1073741824)
+2025-02-04 00:20:12,981 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 918855472 Bytes (1073741824)
+2025-02-04 00:20:13,500 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 724836872 Bytes (1073741824)
+2025-02-04 00:20:13,598 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: TIM1_8
+2025-02-04 00:20:13,598 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: SYS
+2025-02-04 00:20:13,598 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: RCC
+2025-02-04 00:20:13,598 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:20:13,598 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: I2C
+2025-02-04 00:20:13,599 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: NVIC
+2025-02-04 00:20:13,599 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: USART
+2025-02-04 00:20:13,599 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: GPIO
+2025-02-04 00:20:13,600 [INFO] CodeGenerator:807 - code generatio: config db path: C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.12.0.202406281431\\db\
+2025-02-04 00:20:13,601 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:13,601 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:13,601 [WARN] IP:2191 - I2C_Coeff_DF not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:13,602 [WARN] IP:2191 - Analog_Filter not found: check if there is a RefParameter without a condition.
+2025-02-04 00:20:13,681 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp_save
+2025-02-04 00:20:13,805 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\license.tmp
+2025-02-04 00:20:13,824 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp_save
+2025-02-04 00:20:13,905 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\gpio.tmp
+2025-02-04 00:20:14,030 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c_save
+2025-02-04 00:20:14,160 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_it.c
+2025-02-04 00:20:14,165 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h_save
+2025-02-04 00:20:14,218 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_it.h
+2025-02-04 00:20:14,236 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c_save
+2025-02-04 00:20:14,342 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\stm32f4xx_hal_msp.c
+2025-02-04 00:20:14,354 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp_save
+2025-02-04 00:20:14,400 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\MXTmpFiles\system.tmp
+2025-02-04 00:20:14,415 [INFO] CodeEngine:311 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h_save
+2025-02-04 00:20:14,492 [INFO] CodeEngine:335 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\stm32f4xx_hal_conf.h
+2025-02-04 00:20:14,513 [WARN] IPConfigManager:3554 - IP not found : TIM
+2025-02-04 00:20:14,514 [WARN] CodeGenerator:4002 - IP not found : null
+2025-02-04 00:20:14,528 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h_save
+2025-02-04 00:20:14,586 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Inc\main.h
+2025-02-04 00:20:14,599 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c_save
+2025-02-04 00:20:14,724 [INFO] CodeEngine:279 - Generated code: C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\Core\Src\main.c
+2025-02-04 00:20:14,971 [INFO] ProjectBuilder:3249 - Time for Copy HAL[1] : 142mS.
+2025-02-04 00:20:14,973 [INFO] ProjectBuilder:4828 - Project Generator version: 4.4.0-B60
+2025-02-04 00:20:15,016 [INFO] ConfigFileManager:1531 - The Die is : DIE441
+2025-02-04 00:20:15,610 [INFO] ProjectBuilder:5097 - Time for Generating toolchain IDE Files: 637mS.
+2025-02-04 00:20:15,610 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 0mS.
+2025-02-04 00:20:15,613 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 1mS.
+2025-02-04 00:26:23,703 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:26:23,892 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:26:36,217 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:26:36,509 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:26:44,678 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:26:44,775 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:26:55,666 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:26:55,756 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:38:22,693 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:38:22,825 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:41:26,207 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:41:26,325 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:50:11,184 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:50:11,302 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:54:23,737 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:54:23,854 [INFO] WebApp:186 - Connection restablished
+2025-02-04 00:58:30,715 [INFO] WebApp:189 - Connection lost
+2025-02-04 00:58:30,832 [INFO] WebApp:186 - Connection restablished

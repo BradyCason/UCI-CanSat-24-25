@@ -93,6 +93,8 @@ typedef uint8_t bool;
 #define SERVO_MIN_PULSE_WIDTH 600   // 0° (0.5 ms)
 #define SERVO_MAX_PULSE_WIDTH 2400  // 180° (2.5 ms)
 #define SERVO_FREQUENCY 50
+#define SERVO_ANGLE_CLOSED 0
+#define SERVO_ANGLE_OPEN 90
 
 #define PI 3.141592
 
@@ -214,23 +216,20 @@ float current;
 volatile uint32_t pulse_count = 0;
 
 // Stepper Variables
-//float direction_correction = 0;
-//int steps_needed = 0;
 double direction = 0;
-//double direction_offset = 0;
-//float north_direction_offset = 0;
-//float tolerate_direction = 0;
 double stepper_direction = 0;
 int stepIndex = 1;
 bool setting_cam_north = false;
+bool north_cam_on = true;
 
 // Commands
 char sim_command[14];
 char simp_command[15];
 char set_time_command[13];
 char cal_alt_command[14];
-char set_camera_north_on_command[17];
-char set_camera_north_off_command[18];
+char set_camera_north_command[14];
+char activate_north_cam_command[21];
+char deactivate_north_cam_command[22];
 char bcn_on_command[16];
 char bcn_off_command[17];
 char tel_on_command[15];
@@ -238,7 +237,7 @@ char tel_off_command[16];
 char cal_comp_on_command[15];
 char cal_comp_off_command[16];
 char release_payload_command[25];
-reset_release_payload_command[26];
+char reset_release_payload_command[26];
 
 // State Variables
 float prev_alt = 0;
@@ -247,9 +246,9 @@ float prev_alt = 0;
 //float mag_x_offset = 0.173406959;
 //float mag_y_offset = 0.0170800537;
 //float mag_z_offset = -0.435796857;
-float mag_x_offset;
-float mag_y_offset;
-float mag_z_offset;
+float mag_x_offset = 0;
+float mag_y_offset = 0;
+float mag_z_offset = 0;
 float mag_x_min = 0;
 float mag_y_min = 0;
 float mag_z_min = 0;
@@ -277,10 +276,13 @@ uint8_t steps[8][4] = {
 };
 
 HAL_StatusTypeDef result;
+HAL_StatusTypeDef result2;
+HAL_I2C_StateTypeDef state_result;
+HAL_I2C_StateTypeDef state_result2;
 
 //Set up Interrupt handler to invoke data transmit from xbee to the board.
 void USART1_IRQHandler(void) {
-    HAL_UART_IRQHandler(&huart1);
+	HAL_UART_IRQHandler(&huart1);
 }
 
 // Auto Gyro Rotation Sensor ------------------------------------------------------------
@@ -290,50 +292,6 @@ void calculate_auto_gyro_speed(void)
 {
     auto_gyro_rotation_rate = (pulse_count * 360) / PULSES_PER_ROTATION;
     pulse_count = 0;
-}
-
-// Stepper Motor Functions ---------------------------------------------------------------------------
-void Stepper_SetStep(uint8_t i) {
-    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[i][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[i][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[i][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[i][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-}
-
-// Rotate the motor a specified number of steps
-void Stepper_Rotate(int stepsCount, int delayMs) {
-    int direction = (stepsCount > 0) ? 1 : -1;
-    stepsCount = abs(stepsCount);
-
-    for (int i = 0; i < stepsCount; i++) {
-        Stepper_SetStep(stepIndex);
-        HAL_Delay(delayMs);
-
-        stepIndex += direction;
-        if (stepIndex >= 8) stepIndex = 0;
-        else if (stepIndex < 0) stepIndex = 7;
-    }
-}
-
-// Rotate the motor to correct its direction to all way to the North
-void Stepper_Correction(){
-	read_MMC5603();
-	float dir_change = stepper_direction - direction;
-	if (dir_change > 180) dir_change -= 360;
-	else if (dir_change < -180) dir_change += 360;
-
-	int num_steps = round(dir_change * STEPS_PER_REV / 360);
-
-	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
-	if (stepper_direction > 360) stepper_direction -= 360;
-	else if (stepper_direction < 0) stepper_direction += 360;
-
-	Stepper_Rotate(num_steps, 0);
-}
-
-void set_stepper_north(){
-//	direction_offset = direction;
-	stepper_direction = direction;
 }
 
 // Servo Motor Functions -------------------------------------------------------------------------------
@@ -356,7 +314,7 @@ void Set_Servo_Angle(uint8_t angle) {
 }
 
 void Servo_Init() {
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 1
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 3
 }
 
 // Flash Data Functions ---------------------------------------------------------------------------------
@@ -511,7 +469,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	result = HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -520,7 +478,7 @@ void read_MMC5603(void) {
 //	HAL_Delay(10);
 
 	// Read 9 bytes of data from the sensor
-	if (HAL_I2C_Master_Receive(&hi2c1, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
+	if (HAL_I2C_Master_Receive(&hi2c3, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
 		// Handle reception error
 		return;
 	}
@@ -552,7 +510,7 @@ void read_MPL3115A2(void)
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
     // Combine pressure bytes into a 20-bit integer
     uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
@@ -583,11 +541,11 @@ void read_MPU6050(void) {
 	int16_t raw_gyro_y = 0;
 	int16_t raw_gyro_z = 0;
 
-	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c1, MPU6050_ADDRESS, 3, 5);
+	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c3, MPU6050_ADDRESS, 3, 5);
     if (mpu_ret == HAL_OK){
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c1, MPU6050_ADDRESS, &imu_addr, 1, 100);
+		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &imu_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c1, MPU6050_ADDRESS, mpu_buf, 6, 100);
+			mpu_ret = HAL_I2C_Master_Receive(&hi2c3, MPU6050_ADDRESS, mpu_buf, 6, 100);
 			if ( mpu_ret == HAL_OK ) {
 				// shift first byte left, add second byte
 				raw_accel_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf[1]);
@@ -601,9 +559,9 @@ void read_MPU6050(void) {
 			}
 		}
 
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c1, MPU6050_ADDRESS, &gyro_addr, 1, 100);
+		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &gyro_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c1, MPU6050_ADDRESS, mpu_buf, 6, 100);
+			mpu_ret = HAL_I2C_Master_Receive(&hi2c3, MPU6050_ADDRESS, mpu_buf, 6, 100);
 			if ( mpu_ret == HAL_OK ) {
 				// shift first byte left, add second byte
 				raw_gyro_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf [1]);
@@ -626,9 +584,9 @@ bool read_PA1010D()
     bool ret = false;
 
 	/* PA1010D (GPS) */
-	if (HAL_I2C_IsDeviceReady(&hi2c1, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
+	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
 		for(pa_buf_index=0; pa_buf_index<255; pa_buf_index++){
-			HAL_I2C_Master_Receive(&hi2c1, PA1010D_ADDRESS, &pa_bytebuf, 1, HAL_MAX_DELAY);
+			HAL_I2C_Master_Receive(&hi2c3, PA1010D_ADDRESS, &pa_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa_bytebuf == '$'){
 				ret = true;
 				break; // Idea: take away break statement and see what the whole sentence looks like
@@ -648,11 +606,11 @@ void read_INA219(void) {
 	/* INA219 (CURRENT/VOLTAGE) */
 	uint8_t bus_add = 0x02; // need to use separate registers for everything
 
-	ina_ret = HAL_I2C_IsDeviceReady(&hi2c1, INA219_ADDRESS, 3, 5);
+	ina_ret = HAL_I2C_IsDeviceReady(&hi2c3, INA219_ADDRESS, 3, 5);
 	if (ina_ret == HAL_OK) {
-		ina_ret = HAL_I2C_Master_Transmit(&hi2c1, INA219_ADDRESS, &bus_add, 1, 100);
+		ina_ret = HAL_I2C_Master_Transmit(&hi2c3, INA219_ADDRESS, &bus_add, 1, 100);
 		if (ina_ret == HAL_OK) {
-			HAL_I2C_Master_Receive(&hi2c1, INA219_ADDRESS, ina_buf, 2, 10);
+			HAL_I2C_Master_Receive(&hi2c3, INA219_ADDRESS, ina_buf, 2, 10);
 
 			//raw_shunt_voltage = abs((int16_t)(ina_buf[0] << 8 | ina_buf[1]));
 			raw_bus_voltage = (int16_t)(ina_buf[0] << 8 | ina_buf [1]);
@@ -705,25 +663,25 @@ void init_MMC5603(void) {
 	uint8_t control_reg2 = 0b00010000;  // Set Cmm_en to enable continuous mode
 
 	// Configure Control Register 1
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
 	HAL_Delay(20);
 	uint8_t set_bit = 0b00001000;
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
 	HAL_Delay(1);
 	uint8_t reset_bit = 0b00010000;
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &reset_bit, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &reset_bit, 1, HAL_MAX_DELAY);
 	HAL_Delay(1);
 
 	// Set Output Data Rate
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
 	HAL_Delay(10);
 
 	// Configure Control Register 0
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
 	HAL_Delay(10);
 
 	// Configure Control Register 2
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1D, I2C_MEMADD_SIZE_8BIT, &control_reg2, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1D, I2C_MEMADD_SIZE_8BIT, &control_reg2, 1, HAL_MAX_DELAY);
 
 	// Optionally: Add a delay to allow the sensor to stabilize
 	HAL_Delay(10);
@@ -733,13 +691,13 @@ void init_MPL3115A2(void)
 {
 	// Check the WHO_AM_I register to verify sensor is connected
 	uint8_t who_am_i = 0;
-	HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
 	if (who_am_i == 0xC4)
 	{
 		// WHO_AM_I is correct, now configure the sensor
 //		uint8_t data = 0xB9; // Altimeter mode
 		uint8_t data = 0x39; // Barometer mode
-		HAL_I2C_Mem_Write(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_CTRL_REG1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Write(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_CTRL_REG1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	}
 	else
 	{
@@ -755,30 +713,30 @@ void init_MPU6050(void)
 	uint8_t clockSource = 0x01;
 
 	// wake up sensor
-	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
 
 	// set sample rate to 1kHz, config ranges
-	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x1B, 1, &mpu_set_fs_range, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x1c, 1, &mpu_set_fs_range, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, I2C_MEMADD_SIZE_8BIT, &clockSource, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x1B, 1, &mpu_set_fs_range, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x1c, 1, &mpu_set_fs_range, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, I2C_MEMADD_SIZE_8BIT, &clockSource, 1, HAL_MAX_DELAY);
 }
 
 void init_PA1010D(void)
 {
 	uint8_t pa1010d_bytebuf;
 
-	HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
-	HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
-//	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
-//	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
-//	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
+	HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
+	HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
+//	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
+//	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
+//	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
 
 //	HAL_Delay(10000);
 	//Wait for stabilization
 	for(int j=0; j<10; j++){
 		for(int i=0; i<255; i++){
-			HAL_I2C_Master_Receive(&hi2c1, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
+			HAL_I2C_Master_Receive(&hi2c3, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -794,18 +752,18 @@ void init_PA1010D(void)
 void init_INA219(void)
 {
 	uint8_t ina_config[2] = {0b00000001, 0b00011101};
-	HAL_I2C_Mem_Write(&hi2c1, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+	HAL_I2C_Mem_Write(&hi2c3, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
 {
-//	read_MPU6050(); // Accel/ tilt
+	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
-//	if (setting_cam_north) read_MMC5603(); // Magnetic Field
-//	for (int i = 0; i < 10; ++i){
-//		read_PA1010D(); // GPS
-//	}
-//	calculate_auto_gyro_speed();
+	if (!north_cam_on) read_MMC5603(); // Magnetic Field
+	for (int i = 0; i < 10; ++i){
+		read_PA1010D(); // GPS
+	}
+	calculate_auto_gyro_speed();
 //	read_INA219(); // Voltage
 }
 
@@ -817,20 +775,20 @@ void reset_MPU6050(void) {
 
 void init_sensors(void)
 {
-//	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
-//		reset_MPU6050();
-//	}
-//
-//	init_MPU6050(); // Must be first
+	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+		reset_MPU6050();
+	}
+
+	init_MPU6050(); // Must be first
 	init_MPL3115A2();
-//	init_MMC5603();
-//	init_PA1010D();
+	init_MMC5603();
+	init_PA1010D();
 //	init_INA219();
 
-//	read_PA1010D();
-//	get_mission_time();
+	read_PA1010D();
+	get_mission_time();
 
-//	flush_PA1010D();
+	flush_PA1010D();
 }
 
 void init_commands(void)
@@ -845,10 +803,54 @@ void init_commands(void)
 	snprintf(tel_off_command, sizeof(tel_off_command), "CMD,%s,CX,OFF", TEAM_ID);
 	snprintf(cal_comp_on_command, sizeof(cal_comp_on_command), "CMD,%s,CC,ON", TEAM_ID);
 	snprintf(cal_comp_off_command, sizeof(cal_comp_off_command), "CMD,%s,CC,OFF", TEAM_ID);
-	snprintf(set_camera_north_on_command, sizeof(set_camera_north_on_command), "CMD,%s,SCN,ON", TEAM_ID);
-	snprintf(set_camera_north_off_command, sizeof(set_camera_north_off_command), "CMD,%s,SCN,OFF", TEAM_ID);
+	snprintf(set_camera_north_command, sizeof(set_camera_north_command), "CMD,%s,SCN", TEAM_ID);
+	snprintf(activate_north_cam_command, sizeof(activate_north_cam_command), "CMD,%s,MEC,CAM,ON", TEAM_ID);
+	snprintf(deactivate_north_cam_command, sizeof(deactivate_north_cam_command), "CMD,%s,MEC,CAM,OFF", TEAM_ID);
 	snprintf(release_payload_command, sizeof(release_payload_command), "CMD,%s,MEC,PAYLOAD,ON", TEAM_ID);
 	snprintf(reset_release_payload_command, sizeof(reset_release_payload_command), "CMD,%s,MEC,PAYLOAD,OFF", TEAM_ID);
+}
+
+// Stepper Motor Functions ---------------------------------------------------------------------------
+void Stepper_SetStep(uint8_t i) {
+    HAL_GPIO_WritePin(IN1_PORT, IN1_PIN, steps[i][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN2_PORT, IN2_PIN, steps[i][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN3_PORT, IN3_PIN, steps[i][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(IN4_PORT, IN4_PIN, steps[i][3] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+// Rotate the motor a specified number of steps
+void Stepper_Rotate(int stepsCount, int delayMs) {
+    int direction = (stepsCount > 0) ? 1 : -1;
+    stepsCount = abs(stepsCount);
+
+    for (int i = 0; i < stepsCount; i++) {
+        Stepper_SetStep(stepIndex);
+        HAL_Delay(delayMs);
+
+        stepIndex += direction;
+        if (stepIndex >= 8) stepIndex = 0;
+        else if (stepIndex < 0) stepIndex = 7;
+    }
+}
+
+// Rotate the motor to correct its direction to all way to the North
+void Stepper_Correction(){
+	read_MMC5603();
+	float dir_change = stepper_direction - direction;
+	if (dir_change > 180) dir_change -= 360;
+	else if (dir_change < -180) dir_change += 360;
+
+	int num_steps = round(dir_change * STEPS_PER_REV / 360);
+
+	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
+	if (stepper_direction > 360) stepper_direction -= 360;
+	else if (stepper_direction < 0) stepper_direction += 360;
+
+	Stepper_Rotate(num_steps, 0);
+}
+
+void set_stepper_north(){
+	stepper_direction = direction;
 }
 
 // Xbee and Command Functions ----------------------------------------------------------------
@@ -1076,20 +1078,27 @@ void handle_command(const char *cmd) {
 		sim_enabled = false;
 	}
 
-	// Set Camera North On
-	else if (strncmp(cmd, set_camera_north_on_command, strlen(set_camera_north_on_command)) == 0) {
+	// Set Camera North
+	else if (strncmp(cmd, set_camera_north_command, strlen(set_camera_north_command)) == 0) {
 		// Update variable
-		set_cmd_echo("SCNON");
-		setting_cam_north = true;
+		set_cmd_echo("SCN");
+		set_stepper_north();
 		sim_enabled = false;
 	}
 
-	// Set Camera North Off
-	else if (strncmp(cmd, set_camera_north_off_command, strlen(set_camera_north_off_command)) == 0) {
+	// Activate North Camera
+	else if (strncmp(cmd, activate_north_cam_command, strlen(activate_north_cam_command)) == 0) {
 		// Update variable
-		set_cmd_echo("SCNOFF");
-		setting_cam_north = false;
-		set_stepper_north();
+		set_cmd_echo("MECCAMON");
+		north_cam_on = true;
+		sim_enabled = false;
+	}
+
+	// Activate North Camera
+	else if (strncmp(cmd, deactivate_north_cam_command, strlen(deactivate_north_cam_command)) == 0) {
+		// Update variable
+		set_cmd_echo("MECCAMOFF");
+		north_cam_on = false;
 		sim_enabled = false;
 	}
 
@@ -1097,7 +1106,7 @@ void handle_command(const char *cmd) {
 	else if (strncmp(cmd, release_payload_command, strlen(release_payload_command)) == 0) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADON");
-		Set_Servo_Angle(90);
+		Set_Servo_Angle(SERVO_ANGLE_OPEN);
 		sim_enabled = false;
 	}
 
@@ -1105,7 +1114,7 @@ void handle_command(const char *cmd) {
 	else if (strncmp(cmd, reset_release_payload_command, strlen(reset_release_payload_command)) == 0) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADOFF");
-		Set_Servo_Angle(0);
+		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 		sim_enabled = false;
 	}
 }
@@ -1138,7 +1147,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 	}
 
 	// Call function for next packet
-	uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+	uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
 
 }
 
@@ -1179,22 +1188,21 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  store_flash_data(); // Do this the first time to put the data into flash memory.
+//  store_flash_data(); // Do this the first time to put the data into flash memory.
   load_flash_data();
 
-//  result = HAL_I2C_IsDeviceReady(&hi2c1, MMC5603_ADDRESS, 3, 5);
-  result = HAL_I2C_GetState(&hi2c1);
-
-//  init_sensors();
+  init_sensors();
   init_commands();
   Servo_Init();
 
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
 
-  Set_Servo_Angle(0);
+  Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 
   // Set North Direction Offset
-//  read_MMC5603();
+  result2 = HAL_I2C_IsDeviceReady(&hi2c3, MMC5603_ADDRESS, 3, 5);
+  read_MMC5603();
   set_stepper_north();
 
   /* USER CODE END 2 */
@@ -1203,8 +1211,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
 	  // Correction of Camera Angle
-	  if (!setting_cam_north){
+	  if (north_cam_on){
 		  Stepper_Correction();
 	  }
 
@@ -1221,7 +1230,7 @@ int main(void)
 			  calibrate_mmc();
 		  }
 
-		  if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+		  if (HAL_I2C_GetState(&hi2c3) != HAL_I2C_STATE_READY) {
 			  init_sensors();
 		  }
 
@@ -1243,7 +1252,7 @@ int main(void)
 
 		  // Control Telemetry
 		  if (telemetry_status == 1){
-//			  read_transmit_telemetry();
+			  read_transmit_telemetry();
 		  }
 	  }
 
@@ -1288,7 +1297,7 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
@@ -1385,7 +1394,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 83;
+  htim2.Init.Prescaler = 15;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 20000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

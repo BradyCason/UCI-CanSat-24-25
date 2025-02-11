@@ -29,14 +29,14 @@ running = True
 sim_enable = False
 telemetry_on = True
 calibrate_comp_on = False
-set_cam_on = False
+north_cam_on = False
 csv_indexer = 0
 
 # xbee communication parameters
 BAUDRATE = 115200
 COM_PORT = 3
 
-SER_DEBUG = True       # Set as True whenever testing without XBee connected
+SER_DEBUG = False       # Set as True whenever testing without XBee connected
 if (not SER_DEBUG):
     # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
     ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
@@ -109,7 +109,8 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
-        self.set_camera_north_button.clicked.connect(self.set_camera_north_toggle)
+        self.set_camera_north_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",SCN"))
+        self.activate_north_cam_button.clicked.connect(self.camera_north_toggle)
         self.release_payload_button.clicked.connect(self.release_payload_clicked)
         self.calibrate_comp_button.clicked.connect(self.calibrate_comp_toggle)
         self.telemetry_toggle_button.clicked.connect(self.toggle_telemetry)
@@ -211,21 +212,21 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         sim_enable = False
         self.update_sim_button_colors()
     
-    def set_camera_north_toggle(self):
+    def camera_north_toggle(self):
         '''
-        Handle "set camera north" button press
+        Handle "activate north camera" button press
         '''
-        global set_cam_on
-        set_cam_on = not set_cam_on
+        global north_cam_on
+        north_cam_on = not north_cam_on
         
-        if set_cam_on:
-            write_xbee("CMD," + TEAM_ID + ",SCN,ON")
-            self.set_camera_north_button.setText("Camera Is North")
-            self.make_button_green(self.set_camera_north_button)
+        if north_cam_on:
+            write_xbee("CMD," + TEAM_ID + ",MEC,CAM,ON")
+            self.activate_north_cam_button.setText("Deactivate North Camera")
+            self.make_button_green(self.activate_north_cam_button)
         else:
-            write_xbee("CMD," + TEAM_ID + ",SCN,OFF")
-            self.set_camera_north_button.setText("Set Camera North")
-            self.make_button_blue(self.set_camera_north_button)
+            write_xbee("CMD," + TEAM_ID + ",MEC,CAM,OFF")
+            self.activate_north_cam_button.setText("Activate North Camera")
+            self.make_button_blue(self.activate_north_cam_button)
 
     def calibrate_comp_toggle(self):
         '''

@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="result = "/>
+		<item key="selection" value="north_cam_on"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="result = "/>
-			<item value="address"/>
-			<item value="result ="/>
-			<item value="reset ="/>
-			<item value="hi2c3"/>
-			<item value="hi2c1"/>
-			<item value="mpl"/>
-			<item value="init_sens"/>
-			<item value="clock"/>
-			<item value="init_mpu"/>
-			<item value="read_pa"/>
-			<item value="i2c3"/>
-			<item value="init_sen"/>
-			<item value="reset_"/>
-			<item value="reset"/>
+			<item value="north_cam_on"/>
+			<item value="cam_north"/>
+			<item value="functions"/>
+			<item value="camera_nort"/>
+			<item value="set_cam"/>
+			<item value="set_camera_north_on_command"/>
+			<item value="set_camera_north_command"/>
+			<item value="activate_north_cam_command"/>
+			<item value="reset_release_payload_command"/>
+			<item value="set_camera_north"/>
+			<item value="mec,"/>
+			<item value="init_mmc"/>
+			<item value="read_mmc"/>
+			<item value="mag_x"/>
+			<item value="raw_mag_x"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
@@ -35,8 +35,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="142"/>
-		<item key="DIALOG_Y_ORIGIN" value="680"/>
+		<item key="DIALOG_X_ORIGIN" value="1515"/>
+		<item key="DIALOG_Y_ORIGIN" value="617"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>

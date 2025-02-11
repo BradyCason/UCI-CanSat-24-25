@@ -1,6 +1,15 @@
-test
 accel_x
 result
 gps_altitude
 altitude
 pressure
+state_result
+state_result2
+result2
+gyro_x
+telemetry_status
+auto_gyro_rotation_rate
+mag_x
+mag_x_offset
+raw_x
+north_cam_on
