@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="north_cam_on"/>
+		<item key="selection" value="OPEN"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="north_cam_on"/>
-			<item value="cam_north"/>
-			<item value="functions"/>
-			<item value="camera_nort"/>
-			<item value="set_cam"/>
-			<item value="set_camera_north_on_command"/>
-			<item value="set_camera_north_command"/>
-			<item value="activate_north_cam_command"/>
-			<item value="reset_release_payload_command"/>
-			<item value="set_camera_north"/>
-			<item value="mec,"/>
-			<item value="init_mmc"/>
-			<item value="read_mmc"/>
-			<item value="mag_x"/>
-			<item value="raw_mag_x"/>
+			<item value="open"/>
+			<item value="min_pulse"/>
+			<item value="htim2.Init.Period"/>
+			<item value="servo"/>
+			<item value="SERVO_MAX_PULSE_WIDTH"/>
+			<item value="setting_cam_north"/>
+			<item value="pulse ="/>
+			<item value="SERVO_FREQUENCY"/>
+			<item value="SERVO_MIN_PULSE_WIDTH"/>
+			<item value="Set_Servo_Angle"/>
+			<item value="servo_op"/>
+			<item value="result2"/>
+			<item value="read_pa"/>
+			<item value="init_pa"/>
+			<item value="ini"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
@@ -39,6 +39,6 @@
 		<item key="DIALOG_Y_ORIGIN" value="617"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 </section>

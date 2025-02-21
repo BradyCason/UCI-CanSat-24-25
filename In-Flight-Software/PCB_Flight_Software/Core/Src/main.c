@@ -67,7 +67,7 @@ typedef uint8_t bool;
 #define INA219_ADDRESS (0x40 << 1)
 
 // LM393 (Auto Gyro Speed)
-#define PULSES_PER_ROTATION 40
+#define PULSES_PER_ROTATION 60
 #define AUTO_GYRO_TIME_INTERVAL_MS 1000
 
 // Flash Memory
@@ -90,11 +90,11 @@ typedef uint8_t bool;
 #define STEPS_PER_REV 4096
 
 // Servo
-#define SERVO_MIN_PULSE_WIDTH 600   // 0° (0.5 ms)
-#define SERVO_MAX_PULSE_WIDTH 2400  // 180° (2.5 ms)
+#define SERVO_MIN_PULSE_WIDTH 700   // 0° (0.5 ms)
+#define SERVO_MAX_PULSE_WIDTH 2500  // 180° (2.5 ms)
 #define SERVO_FREQUENCY 50
-#define SERVO_ANGLE_CLOSED 0
-#define SERVO_ANGLE_OPEN 90
+#define SERVO_ANGLE_CLOSED 100
+#define SERVO_ANGLE_OPEN 65
 
 #define PI 3.141592
 
@@ -219,8 +219,7 @@ volatile uint32_t pulse_count = 0;
 double direction = 0;
 double stepper_direction = 0;
 int stepIndex = 1;
-bool setting_cam_north = false;
-bool north_cam_on = true;
+bool north_cam_on = false;
 
 // Commands
 char sim_command[14];
@@ -261,6 +260,8 @@ bool sim_enabled = false;
 char rx_data[255];
 HAL_StatusTypeDef uart_received;
 bool calibrating_compass = 0;
+float apogee_altitude = 0;
+bool payload_released = false;
 
 volatile uint32_t msCounter = 0;
 
@@ -579,6 +580,8 @@ void read_MPU6050(void) {
 
 bool read_PA1010D()
 {
+	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, 5) != HAL_OK) return false;
+
 	uint8_t pa_buf_index = 0;
 	uint8_t pa_bytebuf = 0;
     bool ret = false;
@@ -724,6 +727,7 @@ void init_MPU6050(void)
 
 void init_PA1010D(void)
 {
+	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, 5) != HAL_OK) return;
 	uint8_t pa1010d_bytebuf;
 
 	HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
@@ -769,13 +773,13 @@ void read_sensors(void)
 
 void reset_MPU6050(void) {
     uint8_t reset_command = 0x80;  // Set the reset bit in PWR_MGMT_1
-    HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1, &reset_command, 1, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, 1, &reset_command, 1, HAL_MAX_DELAY);
     HAL_Delay(100); // Wait for reset to complete
 }
 
 void init_sensors(void)
 {
-	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+	if (HAL_I2C_GetState(&hi2c3) != HAL_I2C_STATE_READY) {
 		reset_MPU6050();
 	}
 
@@ -899,11 +903,15 @@ void handle_state(){
 		current_movement = 1;
 	}
 
-	// Probe Release if limit switch
-	if (0 == 1){
+	// Probe Release if Descending and not released and alt < apogee_alt
+	if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 && altitude <= apogee_altitude * 0.75 && !payload_released){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
 		// Deploy Auto Gyro
+		Set_Servo_Angle(SERVO_ANGLE_OPEN);
+		payload_released = true;
+		north_cam_on = true;
+
 	}
 
 	// Ascent if ascending and probe not released
@@ -913,9 +921,10 @@ void handle_state(){
 	}
 
 	// Apogee if current state is ascent and now stationary or descending
-	else if ((strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 || strncmp(state, "PROBE_RELEASE", strlen("PROBE_RELEASE")) == 0) && current_movement != 1){
+	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 && current_movement != 1){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "APOGEE", strlen("APOGEE"));
+		apogee_altitude = altitude;
 	}
 
 	// Descent if not apogee and descending
@@ -929,6 +938,9 @@ void handle_state(){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "LANDED", strlen("LANDED"));
 		// stop telemetry transmission
+		telemetry_status = 0;
+		// Turn off north cam
+		north_cam_on = false;
 	}
 
 	else{
@@ -1115,6 +1127,7 @@ void handle_command(const char *cmd) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADOFF");
 		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+		payload_released = false;
 		sim_enabled = false;
 	}
 }
@@ -1419,7 +1432,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1500;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)

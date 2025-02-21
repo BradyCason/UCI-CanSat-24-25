@@ -1756,7 +1756,7 @@ void Set_Servo_Angle(uint8_t angle) {
 void Servo_Init() {
  8001398:	b580      	push	{r7, lr}
  800139a:	af00      	add	r7, sp, #0
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 1
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 3
  800139c:	2108      	movs	r1, #8
  800139e:	4802      	ldr	r0, [pc, #8]	@ (80013a8 <Servo_Init+0x10>)
  80013a0:	f006 f8b8 	bl	8007514 <HAL_TIM_PWM_Start>
