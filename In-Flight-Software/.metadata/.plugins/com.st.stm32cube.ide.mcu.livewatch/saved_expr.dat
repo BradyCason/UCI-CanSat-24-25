@@ -13,3 +13,5 @@ mag_x
 mag_x_offset
 raw_x
 north_cam_on
+pulse_count
+apogee_altitude

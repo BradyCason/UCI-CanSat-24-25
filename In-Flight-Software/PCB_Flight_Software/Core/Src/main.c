@@ -93,8 +93,8 @@ typedef uint8_t bool;
 #define SERVO_MIN_PULSE_WIDTH 700   // 0° (0.5 ms)
 #define SERVO_MAX_PULSE_WIDTH 2500  // 180° (2.5 ms)
 #define SERVO_FREQUENCY 50
-#define SERVO_ANGLE_CLOSED 100
-#define SERVO_ANGLE_OPEN 65
+#define SERVO_ANGLE_CLOSED 180
+#define SERVO_ANGLE_OPEN 135
 
 #define PI 3.141592
 

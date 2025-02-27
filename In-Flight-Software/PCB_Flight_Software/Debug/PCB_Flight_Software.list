@@ -37,15 +37,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000213c4  00000000  00000000  00026f9b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00016061  00000000  00000000  0004835f  2**0
+ 17 .debug_line   0001605a  00000000  00000000  0004835f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000c81d8  00000000  00000000  0005e3c0  2**0
+ 18 .debug_str    000c81d9  00000000  00000000  0005e3b9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00126598  2**0
+ 19 .comment      00000043  00000000  00000000  00126592  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000681c  00000000  00000000  001265dc  2**2
+ 20 .debug_frame  0000681c  00000000  00000000  001265d8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000007b  00000000  00000000  0012cdf8  2**0
+ 21 .debug_line_str 0000007b  00000000  00000000  0012cdf4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -4358,18 +4358,18 @@ void handle_state(){
 
 	// Determine ascending, descending, or stationary
 	if (altitude < (prev_alt + 0.5) && altitude > (prev_alt - 0.5)){
- 8002842:	4b7c      	ldr	r3, [pc, #496]	@ (8002a34 <handle_state+0x1f8>)
+ 8002842:	4b7b      	ldr	r3, [pc, #492]	@ (8002a30 <handle_state+0x1f4>)
  8002844:	681b      	ldr	r3, [r3, #0]
  8002846:	4618      	mov	r0, r3
  8002848:	f7fd fe9e 	bl	8000588 <__aeabi_f2d>
  800284c:	4604      	mov	r4, r0
  800284e:	460d      	mov	r5, r1
- 8002850:	4b79      	ldr	r3, [pc, #484]	@ (8002a38 <handle_state+0x1fc>)
+ 8002850:	4b78      	ldr	r3, [pc, #480]	@ (8002a34 <handle_state+0x1f8>)
  8002852:	681b      	ldr	r3, [r3, #0]
  8002854:	4618      	mov	r0, r3
  8002856:	f7fd fe97 	bl	8000588 <__aeabi_f2d>
  800285a:	f04f 0200 	mov.w	r2, #0
- 800285e:	4b77      	ldr	r3, [pc, #476]	@ (8002a3c <handle_state+0x200>)
+ 800285e:	4b76      	ldr	r3, [pc, #472]	@ (8002a38 <handle_state+0x1fc>)
  8002860:	f7fd fd34 	bl	80002cc <__adddf3>
  8002864:	4602      	mov	r2, r0
  8002866:	460b      	mov	r3, r1
@@ -4379,18 +4379,18 @@ void handle_state(){
  8002870:	4603      	mov	r3, r0
  8002872:	2b00      	cmp	r3, #0
  8002874:	d01c      	beq.n	80028b0 <handle_state+0x74>
- 8002876:	4b6f      	ldr	r3, [pc, #444]	@ (8002a34 <handle_state+0x1f8>)
+ 8002876:	4b6e      	ldr	r3, [pc, #440]	@ (8002a30 <handle_state+0x1f4>)
  8002878:	681b      	ldr	r3, [r3, #0]
  800287a:	4618      	mov	r0, r3
  800287c:	f7fd fe84 	bl	8000588 <__aeabi_f2d>
  8002880:	4604      	mov	r4, r0
  8002882:	460d      	mov	r5, r1
- 8002884:	4b6c      	ldr	r3, [pc, #432]	@ (8002a38 <handle_state+0x1fc>)
+ 8002884:	4b6b      	ldr	r3, [pc, #428]	@ (8002a34 <handle_state+0x1f8>)
  8002886:	681b      	ldr	r3, [r3, #0]
  8002888:	4618      	mov	r0, r3
  800288a:	f7fd fe7d 	bl	8000588 <__aeabi_f2d>
  800288e:	f04f 0200 	mov.w	r2, #0
- 8002892:	4b6a      	ldr	r3, [pc, #424]	@ (8002a3c <handle_state+0x200>)
+ 8002892:	4b69      	ldr	r3, [pc, #420]	@ (8002a38 <handle_state+0x1fc>)
  8002894:	f7fd fd18 	bl	80002c8 <__aeabi_dsub>
  8002898:	4602      	mov	r2, r0
  800289a:	460b      	mov	r3, r1
@@ -4406,9 +4406,9 @@ void handle_state(){
  80028ae:	e00f      	b.n	80028d0 <handle_state+0x94>
 	}
 	else if (altitude < prev_alt) {
- 80028b0:	4b60      	ldr	r3, [pc, #384]	@ (8002a34 <handle_state+0x1f8>)
+ 80028b0:	4b5f      	ldr	r3, [pc, #380]	@ (8002a30 <handle_state+0x1f4>)
  80028b2:	ed93 7a00 	vldr	s14, [r3]
- 80028b6:	4b60      	ldr	r3, [pc, #384]	@ (8002a38 <handle_state+0x1fc>)
+ 80028b6:	4b5f      	ldr	r3, [pc, #380]	@ (8002a34 <handle_state+0x1f8>)
  80028b8:	edd3 7a00 	vldr	s15, [r3]
  80028bc:	eeb4 7ae7 	vcmpe.f32	s14, s15
  80028c0:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
@@ -4427,24 +4427,24 @@ void handle_state(){
 	// Probe Release if Descending and not released and alt < apogee_alt
 	if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 && altitude <= apogee_altitude * 0.75 && !payload_released){
  80028d0:	220a      	movs	r2, #10
- 80028d2:	495b      	ldr	r1, [pc, #364]	@ (8002a40 <handle_state+0x204>)
- 80028d4:	485b      	ldr	r0, [pc, #364]	@ (8002a44 <handle_state+0x208>)
+ 80028d2:	495a      	ldr	r1, [pc, #360]	@ (8002a3c <handle_state+0x200>)
+ 80028d4:	485a      	ldr	r0, [pc, #360]	@ (8002a40 <handle_state+0x204>)
  80028d6:	f007 fd5f 	bl	800a398 <strncmp>
  80028da:	4603      	mov	r3, r0
  80028dc:	2b00      	cmp	r3, #0
  80028de:	d132      	bne.n	8002946 <handle_state+0x10a>
- 80028e0:	4b54      	ldr	r3, [pc, #336]	@ (8002a34 <handle_state+0x1f8>)
+ 80028e0:	4b53      	ldr	r3, [pc, #332]	@ (8002a30 <handle_state+0x1f4>)
  80028e2:	681b      	ldr	r3, [r3, #0]
  80028e4:	4618      	mov	r0, r3
  80028e6:	f7fd fe4f 	bl	8000588 <__aeabi_f2d>
  80028ea:	4604      	mov	r4, r0
  80028ec:	460d      	mov	r5, r1
- 80028ee:	4b56      	ldr	r3, [pc, #344]	@ (8002a48 <handle_state+0x20c>)
+ 80028ee:	4b55      	ldr	r3, [pc, #340]	@ (8002a44 <handle_state+0x208>)
  80028f0:	681b      	ldr	r3, [r3, #0]
  80028f2:	4618      	mov	r0, r3
  80028f4:	f7fd fe48 	bl	8000588 <__aeabi_f2d>
  80028f8:	f04f 0200 	mov.w	r2, #0
- 80028fc:	4b53      	ldr	r3, [pc, #332]	@ (8002a4c <handle_state+0x210>)
+ 80028fc:	4b52      	ldr	r3, [pc, #328]	@ (8002a48 <handle_state+0x20c>)
  80028fe:	f7fd fe9b 	bl	8000638 <__aeabi_dmul>
  8002902:	4602      	mov	r2, r0
  8002904:	460b      	mov	r3, r1
@@ -4454,35 +4454,35 @@ void handle_state(){
  800290e:	4603      	mov	r3, r0
  8002910:	2b00      	cmp	r3, #0
  8002912:	d018      	beq.n	8002946 <handle_state+0x10a>
- 8002914:	4b4e      	ldr	r3, [pc, #312]	@ (8002a50 <handle_state+0x214>)
+ 8002914:	4b4d      	ldr	r3, [pc, #308]	@ (8002a4c <handle_state+0x210>)
  8002916:	781b      	ldrb	r3, [r3, #0]
  8002918:	2b00      	cmp	r3, #0
  800291a:	d114      	bne.n	8002946 <handle_state+0x10a>
 		memset(state, 0, sizeof(state));
  800291c:	220e      	movs	r2, #14
  800291e:	2100      	movs	r1, #0
- 8002920:	4848      	ldr	r0, [pc, #288]	@ (8002a44 <handle_state+0x208>)
+ 8002920:	4847      	ldr	r0, [pc, #284]	@ (8002a40 <handle_state+0x204>)
  8002922:	f007 fd22 	bl	800a36a <memset>
 		strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
- 8002926:	4a47      	ldr	r2, [pc, #284]	@ (8002a44 <handle_state+0x208>)
- 8002928:	4b4a      	ldr	r3, [pc, #296]	@ (8002a54 <handle_state+0x218>)
+ 8002926:	4a46      	ldr	r2, [pc, #280]	@ (8002a40 <handle_state+0x204>)
+ 8002928:	4b49      	ldr	r3, [pc, #292]	@ (8002a50 <handle_state+0x214>)
  800292a:	4614      	mov	r4, r2
  800292c:	cb0f      	ldmia	r3, {r0, r1, r2, r3}
  800292e:	c407      	stmia	r4!, {r0, r1, r2}
  8002930:	7023      	strb	r3, [r4, #0]
 		// Deploy Auto Gyro
 		Set_Servo_Angle(SERVO_ANGLE_OPEN);
- 8002932:	2041      	movs	r0, #65	@ 0x41
+ 8002932:	2087      	movs	r0, #135	@ 0x87
  8002934:	f7fe fba2 	bl	800107c <Set_Servo_Angle>
 		payload_released = true;
- 8002938:	4b45      	ldr	r3, [pc, #276]	@ (8002a50 <handle_state+0x214>)
+ 8002938:	4b44      	ldr	r3, [pc, #272]	@ (8002a4c <handle_state+0x210>)
  800293a:	2201      	movs	r2, #1
  800293c:	701a      	strb	r2, [r3, #0]
 		north_cam_on = true;
- 800293e:	4b46      	ldr	r3, [pc, #280]	@ (8002a58 <handle_state+0x21c>)
+ 800293e:	4b45      	ldr	r3, [pc, #276]	@ (8002a54 <handle_state+0x218>)
  8002940:	2201      	movs	r2, #1
  8002942:	701a      	strb	r2, [r3, #0]
- 8002944:	e06e      	b.n	8002a24 <handle_state+0x1e8>
+ 8002944:	e06c      	b.n	8002a20 <handle_state+0x1e4>
 
 	}
 
@@ -4494,147 +4494,150 @@ void handle_state(){
 		memset(state, 0, sizeof(state));
  800294e:	220e      	movs	r2, #14
  8002950:	2100      	movs	r1, #0
- 8002952:	483c      	ldr	r0, [pc, #240]	@ (8002a44 <handle_state+0x208>)
+ 8002952:	483b      	ldr	r0, [pc, #236]	@ (8002a40 <handle_state+0x204>)
  8002954:	f007 fd09 	bl	800a36a <memset>
 		strncpy(state, "ASCENDING", strlen("ASCENDING"));
- 8002958:	4b3a      	ldr	r3, [pc, #232]	@ (8002a44 <handle_state+0x208>)
- 800295a:	4a40      	ldr	r2, [pc, #256]	@ (8002a5c <handle_state+0x220>)
+ 8002958:	4b39      	ldr	r3, [pc, #228]	@ (8002a40 <handle_state+0x204>)
+ 800295a:	4a3f      	ldr	r2, [pc, #252]	@ (8002a58 <handle_state+0x21c>)
  800295c:	ca07      	ldmia	r2, {r0, r1, r2}
  800295e:	c303      	stmia	r3!, {r0, r1}
  8002960:	701a      	strb	r2, [r3, #0]
- 8002962:	e05f      	b.n	8002a24 <handle_state+0x1e8>
+ 8002962:	e05d      	b.n	8002a20 <handle_state+0x1e4>
 	}
 
 	// Apogee if current state is ascent and now stationary or descending
-	else if ((strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 || strncmp(state, "PROBE_RELEASE", strlen("PROBE_RELEASE")) == 0) && current_movement != 1){
+	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 && current_movement != 1){
  8002964:	2209      	movs	r2, #9
- 8002966:	493d      	ldr	r1, [pc, #244]	@ (8002a5c <handle_state+0x220>)
- 8002968:	4836      	ldr	r0, [pc, #216]	@ (8002a44 <handle_state+0x208>)
+ 8002966:	493c      	ldr	r1, [pc, #240]	@ (8002a58 <handle_state+0x21c>)
+ 8002968:	4835      	ldr	r0, [pc, #212]	@ (8002a40 <handle_state+0x204>)
  800296a:	f007 fd15 	bl	800a398 <strncmp>
  800296e:	4603      	mov	r3, r0
  8002970:	2b00      	cmp	r3, #0
- 8002972:	d007      	beq.n	8002984 <handle_state+0x148>
- 8002974:	220d      	movs	r2, #13
- 8002976:	4937      	ldr	r1, [pc, #220]	@ (8002a54 <handle_state+0x218>)
- 8002978:	4832      	ldr	r0, [pc, #200]	@ (8002a44 <handle_state+0x208>)
- 800297a:	f007 fd0d 	bl	800a398 <strncmp>
- 800297e:	4603      	mov	r3, r0
- 8002980:	2b00      	cmp	r3, #0
- 8002982:	d114      	bne.n	80029ae <handle_state+0x172>
- 8002984:	f997 3007 	ldrsb.w	r3, [r7, #7]
- 8002988:	2b01      	cmp	r3, #1
- 800298a:	d010      	beq.n	80029ae <handle_state+0x172>
+ 8002972:	d114      	bne.n	800299e <handle_state+0x162>
+ 8002974:	f997 3007 	ldrsb.w	r3, [r7, #7]
+ 8002978:	2b01      	cmp	r3, #1
+ 800297a:	d010      	beq.n	800299e <handle_state+0x162>
 		memset(state, 0, sizeof(state));
- 800298c:	220e      	movs	r2, #14
- 800298e:	2100      	movs	r1, #0
- 8002990:	482c      	ldr	r0, [pc, #176]	@ (8002a44 <handle_state+0x208>)
- 8002992:	f007 fcea 	bl	800a36a <memset>
+ 800297c:	220e      	movs	r2, #14
+ 800297e:	2100      	movs	r1, #0
+ 8002980:	482f      	ldr	r0, [pc, #188]	@ (8002a40 <handle_state+0x204>)
+ 8002982:	f007 fcf2 	bl	800a36a <memset>
 		strncpy(state, "APOGEE", strlen("APOGEE"));
- 8002996:	4b2b      	ldr	r3, [pc, #172]	@ (8002a44 <handle_state+0x208>)
- 8002998:	4a31      	ldr	r2, [pc, #196]	@ (8002a60 <handle_state+0x224>)
- 800299a:	e892 0003 	ldmia.w	r2, {r0, r1}
- 800299e:	6018      	str	r0, [r3, #0]
- 80029a0:	3304      	adds	r3, #4
- 80029a2:	8019      	strh	r1, [r3, #0]
+ 8002986:	4b2e      	ldr	r3, [pc, #184]	@ (8002a40 <handle_state+0x204>)
+ 8002988:	4a34      	ldr	r2, [pc, #208]	@ (8002a5c <handle_state+0x220>)
+ 800298a:	e892 0003 	ldmia.w	r2, {r0, r1}
+ 800298e:	6018      	str	r0, [r3, #0]
+ 8002990:	3304      	adds	r3, #4
+ 8002992:	8019      	strh	r1, [r3, #0]
 		apogee_altitude = altitude;
- 80029a4:	4b23      	ldr	r3, [pc, #140]	@ (8002a34 <handle_state+0x1f8>)
- 80029a6:	681b      	ldr	r3, [r3, #0]
- 80029a8:	4a27      	ldr	r2, [pc, #156]	@ (8002a48 <handle_state+0x20c>)
- 80029aa:	6013      	str	r3, [r2, #0]
- 80029ac:	e03a      	b.n	8002a24 <handle_state+0x1e8>
+ 8002994:	4b26      	ldr	r3, [pc, #152]	@ (8002a30 <handle_state+0x1f4>)
+ 8002996:	681b      	ldr	r3, [r3, #0]
+ 8002998:	4a2a      	ldr	r2, [pc, #168]	@ (8002a44 <handle_state+0x208>)
+ 800299a:	6013      	str	r3, [r2, #0]
+ 800299c:	e040      	b.n	8002a20 <handle_state+0x1e4>
 	}
 
 	// Descent if not apogee and descending
 	else if (current_movement == -1){
- 80029ae:	f997 3007 	ldrsb.w	r3, [r7, #7]
- 80029b2:	f1b3 3fff 	cmp.w	r3, #4294967295
- 80029b6:	d10a      	bne.n	80029ce <handle_state+0x192>
+ 800299e:	f997 3007 	ldrsb.w	r3, [r7, #7]
+ 80029a2:	f1b3 3fff 	cmp.w	r3, #4294967295
+ 80029a6:	d10a      	bne.n	80029be <handle_state+0x182>
 		memset(state, 0, sizeof(state));
- 80029b8:	220e      	movs	r2, #14
- 80029ba:	2100      	movs	r1, #0
- 80029bc:	4821      	ldr	r0, [pc, #132]	@ (8002a44 <handle_state+0x208>)
- 80029be:	f007 fcd4 	bl	800a36a <memset>
+ 80029a8:	220e      	movs	r2, #14
+ 80029aa:	2100      	movs	r1, #0
+ 80029ac:	4824      	ldr	r0, [pc, #144]	@ (8002a40 <handle_state+0x204>)
+ 80029ae:	f007 fcdc 	bl	800a36a <memset>
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
- 80029c2:	4b20      	ldr	r3, [pc, #128]	@ (8002a44 <handle_state+0x208>)
- 80029c4:	4a1e      	ldr	r2, [pc, #120]	@ (8002a40 <handle_state+0x204>)
- 80029c6:	ca07      	ldmia	r2, {r0, r1, r2}
- 80029c8:	c303      	stmia	r3!, {r0, r1}
- 80029ca:	801a      	strh	r2, [r3, #0]
- 80029cc:	e02a      	b.n	8002a24 <handle_state+0x1e8>
+ 80029b2:	4b23      	ldr	r3, [pc, #140]	@ (8002a40 <handle_state+0x204>)
+ 80029b4:	4a21      	ldr	r2, [pc, #132]	@ (8002a3c <handle_state+0x200>)
+ 80029b6:	ca07      	ldmia	r2, {r0, r1, r2}
+ 80029b8:	c303      	stmia	r3!, {r0, r1}
+ 80029ba:	801a      	strh	r2, [r3, #0]
+ 80029bc:	e030      	b.n	8002a20 <handle_state+0x1e4>
 	}
 
 	// Landed if not moving and was previously descending or landed
 	else if (current_movement == 0 && (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 || strncmp(state, "LANDED", strlen("LANDED")) == 0)){
- 80029ce:	f997 3007 	ldrsb.w	r3, [r7, #7]
+ 80029be:	f997 3007 	ldrsb.w	r3, [r7, #7]
+ 80029c2:	2b00      	cmp	r3, #0
+ 80029c4:	d122      	bne.n	8002a0c <handle_state+0x1d0>
+ 80029c6:	220a      	movs	r2, #10
+ 80029c8:	491c      	ldr	r1, [pc, #112]	@ (8002a3c <handle_state+0x200>)
+ 80029ca:	481d      	ldr	r0, [pc, #116]	@ (8002a40 <handle_state+0x204>)
+ 80029cc:	f007 fce4 	bl	800a398 <strncmp>
+ 80029d0:	4603      	mov	r3, r0
  80029d2:	2b00      	cmp	r3, #0
- 80029d4:	d11c      	bne.n	8002a10 <handle_state+0x1d4>
- 80029d6:	220a      	movs	r2, #10
- 80029d8:	4919      	ldr	r1, [pc, #100]	@ (8002a40 <handle_state+0x204>)
- 80029da:	481a      	ldr	r0, [pc, #104]	@ (8002a44 <handle_state+0x208>)
+ 80029d4:	d007      	beq.n	80029e6 <handle_state+0x1aa>
+ 80029d6:	2206      	movs	r2, #6
+ 80029d8:	4921      	ldr	r1, [pc, #132]	@ (8002a60 <handle_state+0x224>)
+ 80029da:	4819      	ldr	r0, [pc, #100]	@ (8002a40 <handle_state+0x204>)
  80029dc:	f007 fcdc 	bl	800a398 <strncmp>
  80029e0:	4603      	mov	r3, r0
  80029e2:	2b00      	cmp	r3, #0
- 80029e4:	d007      	beq.n	80029f6 <handle_state+0x1ba>
- 80029e6:	2206      	movs	r2, #6
- 80029e8:	491e      	ldr	r1, [pc, #120]	@ (8002a64 <handle_state+0x228>)
- 80029ea:	4816      	ldr	r0, [pc, #88]	@ (8002a44 <handle_state+0x208>)
- 80029ec:	f007 fcd4 	bl	800a398 <strncmp>
- 80029f0:	4603      	mov	r3, r0
- 80029f2:	2b00      	cmp	r3, #0
- 80029f4:	d10c      	bne.n	8002a10 <handle_state+0x1d4>
+ 80029e4:	d112      	bne.n	8002a0c <handle_state+0x1d0>
 		memset(state, 0, sizeof(state));
- 80029f6:	220e      	movs	r2, #14
- 80029f8:	2100      	movs	r1, #0
- 80029fa:	4812      	ldr	r0, [pc, #72]	@ (8002a44 <handle_state+0x208>)
- 80029fc:	f007 fcb5 	bl	800a36a <memset>
+ 80029e6:	220e      	movs	r2, #14
+ 80029e8:	2100      	movs	r1, #0
+ 80029ea:	4815      	ldr	r0, [pc, #84]	@ (8002a40 <handle_state+0x204>)
+ 80029ec:	f007 fcbd 	bl	800a36a <memset>
 		strncpy(state, "LANDED", strlen("LANDED"));
- 8002a00:	4b10      	ldr	r3, [pc, #64]	@ (8002a44 <handle_state+0x208>)
- 8002a02:	4a18      	ldr	r2, [pc, #96]	@ (8002a64 <handle_state+0x228>)
- 8002a04:	e892 0003 	ldmia.w	r2, {r0, r1}
- 8002a08:	6018      	str	r0, [r3, #0]
- 8002a0a:	3304      	adds	r3, #4
- 8002a0c:	8019      	strh	r1, [r3, #0]
- 8002a0e:	e009      	b.n	8002a24 <handle_state+0x1e8>
+ 80029f0:	4b13      	ldr	r3, [pc, #76]	@ (8002a40 <handle_state+0x204>)
+ 80029f2:	4a1b      	ldr	r2, [pc, #108]	@ (8002a60 <handle_state+0x224>)
+ 80029f4:	e892 0003 	ldmia.w	r2, {r0, r1}
+ 80029f8:	6018      	str	r0, [r3, #0]
+ 80029fa:	3304      	adds	r3, #4
+ 80029fc:	8019      	strh	r1, [r3, #0]
 		// stop telemetry transmission
+		telemetry_status = 0;
+ 80029fe:	4b19      	ldr	r3, [pc, #100]	@ (8002a64 <handle_state+0x228>)
+ 8002a00:	2200      	movs	r2, #0
+ 8002a02:	601a      	str	r2, [r3, #0]
+		// Turn off north cam
+		north_cam_on = false;
+ 8002a04:	4b13      	ldr	r3, [pc, #76]	@ (8002a54 <handle_state+0x218>)
+ 8002a06:	2200      	movs	r2, #0
+ 8002a08:	701a      	strb	r2, [r3, #0]
+ 8002a0a:	e009      	b.n	8002a20 <handle_state+0x1e4>
 	}
 
 	else{
 		memset(state, 0, sizeof(state));
- 8002a10:	220e      	movs	r2, #14
- 8002a12:	2100      	movs	r1, #0
- 8002a14:	480b      	ldr	r0, [pc, #44]	@ (8002a44 <handle_state+0x208>)
- 8002a16:	f007 fca8 	bl	800a36a <memset>
+ 8002a0c:	220e      	movs	r2, #14
+ 8002a0e:	2100      	movs	r1, #0
+ 8002a10:	480b      	ldr	r0, [pc, #44]	@ (8002a40 <handle_state+0x204>)
+ 8002a12:	f007 fcaa 	bl	800a36a <memset>
 		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
- 8002a1a:	4b0a      	ldr	r3, [pc, #40]	@ (8002a44 <handle_state+0x208>)
- 8002a1c:	4a12      	ldr	r2, [pc, #72]	@ (8002a68 <handle_state+0x22c>)
- 8002a1e:	ca07      	ldmia	r2, {r0, r1, r2}
- 8002a20:	c303      	stmia	r3!, {r0, r1}
- 8002a22:	801a      	strh	r2, [r3, #0]
+ 8002a16:	4b0a      	ldr	r3, [pc, #40]	@ (8002a40 <handle_state+0x204>)
+ 8002a18:	4a13      	ldr	r2, [pc, #76]	@ (8002a68 <handle_state+0x22c>)
+ 8002a1a:	ca07      	ldmia	r2, {r0, r1, r2}
+ 8002a1c:	c303      	stmia	r3!, {r0, r1}
+ 8002a1e:	801a      	strh	r2, [r3, #0]
 	}
 
 	prev_alt = altitude;
- 8002a24:	4b03      	ldr	r3, [pc, #12]	@ (8002a34 <handle_state+0x1f8>)
- 8002a26:	681b      	ldr	r3, [r3, #0]
- 8002a28:	4a03      	ldr	r2, [pc, #12]	@ (8002a38 <handle_state+0x1fc>)
- 8002a2a:	6013      	str	r3, [r2, #0]
+ 8002a20:	4b03      	ldr	r3, [pc, #12]	@ (8002a30 <handle_state+0x1f4>)
+ 8002a22:	681b      	ldr	r3, [r3, #0]
+ 8002a24:	4a03      	ldr	r2, [pc, #12]	@ (8002a34 <handle_state+0x1f8>)
+ 8002a26:	6013      	str	r3, [r2, #0]
 }
- 8002a2c:	bf00      	nop
- 8002a2e:	3708      	adds	r7, #8
- 8002a30:	46bd      	mov	sp, r7
- 8002a32:	bdb0      	pop	{r4, r5, r7, pc}
- 8002a34:	200005fc 	.word	0x200005fc
- 8002a38:	20000988 	.word	0x20000988
- 8002a3c:	3fe00000 	.word	0x3fe00000
- 8002a40:	0800dcf0 	.word	0x0800dcf0
- 8002a44:	20000004 	.word	0x20000004
- 8002a48:	20000ab4 	.word	0x20000ab4
- 8002a4c:	3fe80000 	.word	0x3fe80000
- 8002a50:	20000ab8 	.word	0x20000ab8
- 8002a54:	0800dcfc 	.word	0x0800dcfc
- 8002a58:	20000868 	.word	0x20000868
- 8002a5c:	0800dd0c 	.word	0x0800dd0c
- 8002a60:	0800dd18 	.word	0x0800dd18
- 8002a64:	0800dd20 	.word	0x0800dd20
+ 8002a28:	bf00      	nop
+ 8002a2a:	3708      	adds	r7, #8
+ 8002a2c:	46bd      	mov	sp, r7
+ 8002a2e:	bdb0      	pop	{r4, r5, r7, pc}
+ 8002a30:	200005fc 	.word	0x200005fc
+ 8002a34:	20000988 	.word	0x20000988
+ 8002a38:	3fe00000 	.word	0x3fe00000
+ 8002a3c:	0800dcf0 	.word	0x0800dcf0
+ 8002a40:	20000004 	.word	0x20000004
+ 8002a44:	20000ab4 	.word	0x20000ab4
+ 8002a48:	3fe80000 	.word	0x3fe80000
+ 8002a4c:	20000ab8 	.word	0x20000ab8
+ 8002a50:	0800dcfc 	.word	0x0800dcfc
+ 8002a54:	20000868 	.word	0x20000868
+ 8002a58:	0800dd0c 	.word	0x0800dd0c
+ 8002a5c:	0800dd18 	.word	0x0800dd18
+ 8002a60:	0800dd20 	.word	0x0800dd20
+ 8002a64:	200000a8 	.word	0x200000a8
  8002a68:	0800dd28 	.word	0x0800dd28
 
 08002a6c <read_transmit_telemetry>:
@@ -5282,7 +5285,7 @@ void handle_command(const char *cmd) {
  8002f62:	482d      	ldr	r0, [pc, #180]	@ (8003018 <handle_command+0x560>)
  8002f64:	f7ff fd90 	bl	8002a88 <set_cmd_echo>
 		Set_Servo_Angle(SERVO_ANGLE_OPEN);
- 8002f68:	2041      	movs	r0, #65	@ 0x41
+ 8002f68:	2087      	movs	r0, #135	@ 0x87
  8002f6a:	f7fe f887 	bl	800107c <Set_Servo_Angle>
 		sim_enabled = false;
  8002f6e:	4b13      	ldr	r3, [pc, #76]	@ (8002fbc <handle_command+0x504>)
@@ -5305,7 +5308,7 @@ void handle_command(const char *cmd) {
  8002f8e:	4824      	ldr	r0, [pc, #144]	@ (8003020 <handle_command+0x568>)
  8002f90:	f7ff fd7a 	bl	8002a88 <set_cmd_echo>
 		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
- 8002f94:	2064      	movs	r0, #100	@ 0x64
+ 8002f94:	20b4      	movs	r0, #180	@ 0xb4
  8002f96:	f7fe f871 	bl	800107c <Set_Servo_Angle>
 		payload_released = false;
  8002f9a:	4b22      	ldr	r3, [pc, #136]	@ (8003024 <handle_command+0x56c>)
@@ -5531,7 +5534,7 @@ int main(void)
  8003126:	701a      	strb	r2, [r3, #0]
 
   Set_Servo_Angle(SERVO_ANGLE_CLOSED);
- 8003128:	2064      	movs	r0, #100	@ 0x64
+ 8003128:	20b4      	movs	r0, #180	@ 0xb4
  800312a:	f7fd ffa7 	bl	800107c <Set_Servo_Angle>
 
   // Set North Direction Offset

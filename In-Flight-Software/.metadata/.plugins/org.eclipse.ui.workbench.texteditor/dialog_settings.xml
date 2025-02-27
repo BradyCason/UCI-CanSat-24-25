@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="OPEN"/>
+		<item key="selection" value="north_cam_on"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="open"/>
-			<item value="min_pulse"/>
-			<item value="htim2.Init.Period"/>
-			<item value="servo"/>
-			<item value="SERVO_MAX_PULSE_WIDTH"/>
-			<item value="setting_cam_north"/>
-			<item value="pulse ="/>
-			<item value="SERVO_FREQUENCY"/>
-			<item value="SERVO_MIN_PULSE_WIDTH"/>
-			<item value="Set_Servo_Angle"/>
-			<item value="servo_op"/>
-			<item value="result2"/>
-			<item value="read_pa"/>
-			<item value="init_pa"/>
-			<item value="ini"/>
+			<item value="north_cam_on"/>
+			<item value="telemetry_status"/>
+			<item value="telemetry_"/>
+			<item value="telemetry_on"/>
+			<item value="handle_state"/>
+			<item value="apogee_alt"/>
+			<item value="payload_rel"/>
+			<item value="payload"/>
+			<item value="payload_r"/>
+			<item value="payload_"/>
+			<item value="apogee_altitude"/>
+			<item value="altitude"/>
+			<item value="height"/>
+			<item value="state"/>
+			<item value="state ="/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
