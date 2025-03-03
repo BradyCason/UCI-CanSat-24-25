@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="handle_st"/>
+		<item key="selection" value="handle_state"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="handle_st"/>
+			<item value="handle_state"/>
+			<item value="handle_command"/>
+			<item value="smoothed_alt"/>
+			<item value="_alt"/>
+			<item value=",rst"/>
+			<item value="rst"/>
+			<item value="reset_release_payload_command"/>
 			<item value="calibrate"/>
+			<item value="handle_st"/>
 			<item value="result ="/>
 			<item value="handle_s"/>
 			<item value="handle_"/>
-			<item value="smoothed_alt"/>
-			<item value="handle_state"/>
 			<item value="handle state"/>
 			<item value="read_"/>
 			<item value="north_cam_on"/>
-			<item value="telemetry_status"/>
-			<item value="telemetry_"/>
-			<item value="telemetry_on"/>
-			<item value="apogee_alt"/>
-			<item value="payload_rel"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>

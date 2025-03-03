@@ -237,6 +237,7 @@ char cal_comp_on_command[15];
 char cal_comp_off_command[16];
 char release_payload_command[25];
 char reset_release_payload_command[26];
+char reset_state_command[14];
 
 // State Variables
 float prev_alt = 0;
@@ -816,6 +817,7 @@ void init_commands(void)
 	snprintf(deactivate_north_cam_command, sizeof(deactivate_north_cam_command), "CMD,%s,MEC,CAM,OFF", TEAM_ID);
 	snprintf(release_payload_command, sizeof(release_payload_command), "CMD,%s,MEC,PAYLOAD,ON", TEAM_ID);
 	snprintf(reset_release_payload_command, sizeof(reset_release_payload_command), "CMD,%s,MEC,PAYLOAD,OFF", TEAM_ID);
+	snprintf(reset_state_command, sizeof(reset_state_command), "CMD,%s,RST", TEAM_ID);
 }
 
 // Stepper Motor Functions ---------------------------------------------------------------------------
@@ -894,7 +896,7 @@ void send_packet(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	float noise_threshold = 0.4;
+	float noise_threshold = 0.75;
 	float landing_threshold = 0.2;
 
 	smoothed_alt = 0.8 * smoothed_alt + 0.2 * altitude;
@@ -1046,6 +1048,7 @@ void handle_command(const char *cmd) {
 			strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
 		}
 
+		prev_alt = 0;
 		smoothed_alt = 0;
 
 		sim_enabled = false;
@@ -1125,6 +1128,21 @@ void handle_command(const char *cmd) {
 		set_cmd_echo("MECPAYLOADOFF");
 		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 		payload_released = false;
+		sim_enabled = false;
+	}
+
+	// Reset State
+	else if (strncmp(cmd, reset_state_command, strlen(reset_state_command)) == 0) {
+		// Update variable
+		set_cmd_echo("RST");
+		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+		payload_released = false;
+		north_cam_on = false;
+		prev_alt = altitude;
+		smoothed_alt = altitude;
+		telemetry_status = 1;
+		memset(state, 0, sizeof(state));
+		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
 		sim_enabled = false;
 	}
 }
@@ -1216,6 +1234,7 @@ int main(void)
   set_stepper_north();
 
   read_MPL3115A2();
+  prev_alt = altitude;
   smoothed_alt = altitude;
 
   /* USER CODE END 2 */

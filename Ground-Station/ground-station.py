@@ -106,6 +106,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.sim_enable_button.clicked.connect(lambda: self.handle_simulation("ENABLE"))
         self.sim_activate_button.clicked.connect(lambda: self.handle_simulation("ACTIVATE"))
         self.sim_disable_button.clicked.connect(lambda: self.handle_simulation("DISABLE"))
+        self.reset_state_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",RST"))
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
@@ -117,6 +118,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.show_graphs_button.clicked.connect(self.graph_window.show)
 
         # Connect non-sim buttons to update sim button colors
+        self.reset_state_button.clicked.connect(self.non_sim_button_clicked)
         self.set_time_gps_button.clicked.connect(self.non_sim_button_clicked)
         self.set_camera_north_button.clicked.connect(self.non_sim_button_clicked)
         self.set_time_utc_button.clicked.connect(self.non_sim_button_clicked)
