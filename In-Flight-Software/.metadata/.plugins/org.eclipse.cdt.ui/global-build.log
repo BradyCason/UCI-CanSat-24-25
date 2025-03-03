@@ -14275,3 +14275,2193 @@ Finished building: default.size.stdout
  
 Finished building: PCB_Flight_Software.list
  
+11:12:07 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58052	    672	   4000	  62724	   f504	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:13:20 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58052	    672	   4000	  62724	   f504	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:15:45 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58052	    672	   4000	  62724	   f504	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:22:55 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:600:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  600 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:440:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  440 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:751:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  751 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:440:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  440 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1143:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1143 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1151:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1151 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1153:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1153 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:862:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  862 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1157:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1157 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1164:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1164 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1213:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1213 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:910:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  910 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:921:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  921 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:927:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  927 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:940:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  940 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                 strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1052:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1052 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1039:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1039 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1039:48: note: directive argument in the range [-128, 127]
+ 1039 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1039:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1039 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58060	    672	   4000	  62732	   f50c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:52:45 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1151:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1151 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1159:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1159 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1161:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1161 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1165:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1165 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1172:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1172 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1221:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1221 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:918:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  918 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:929:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  929 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:935:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  935 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:942:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  942 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:948:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  948 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:957:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  957 |                 strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1060:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1060 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1047:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1047 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1047:48: note: directive argument in the range [-128, 127]
+ 1047 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1047:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1047 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4008	  62788	   f544	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:56:43 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4008	  62788	   f544	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+12:00:03 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4008	  62788	   f544	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+12:02:33 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4008	  62788	   f544	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+12:05:36 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1150:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1150 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1158:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1158 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1160:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1160 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1164:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1164 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1171:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1171 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1220:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1220 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:917:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  917 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:928:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:947:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  947 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:956:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  956 |                 strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1059:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1059 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1046:48: note: directive argument in the range [-128, 127]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4008	  62788	   f544	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:08:16 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1154:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1154 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1162:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1162 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1164:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1164 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1168:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1168 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1175:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1175 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1224:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1224 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:917:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  917 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:928:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:947:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  947 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:956:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  956 |                 strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1059:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1059 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1046:48: note: directive argument in the range [-128, 127]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58140	    672	   4008	  62820	   f564	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:10:58 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58140	    672	   4008	  62820	   f564	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+12:14:59 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1154:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1154 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1162:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1162 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1164:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1164 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1168:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1168 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1175:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1175 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1224:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1224 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:917:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  917 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:928:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:947:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  947 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1059:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1059 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1046:48: note: directive argument in the range [-128, 127]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58116	    672	   4008	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:17:05 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1154:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1154 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1162:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1162 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1164:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1164 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1168:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1168 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1175:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1175 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1224:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1224 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:917:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  917 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:928:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:947:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  947 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1059:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1059 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1046:48: note: directive argument in the range [-128, 127]
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1046:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1046 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58116	    672	   4008	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:25:29 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1156:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1156 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1164:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1164 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1166:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1166 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1170:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1170 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1177:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1177 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1226:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1226 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:919:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  919 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:930:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  930 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:943:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  943 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1061:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1061 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1048:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1048:48: note: directive argument in the range [-128, 127]
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1048:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58148	    672	   4008	  62828	   f56c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:29:44 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1156:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1156 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1164:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1164 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1166:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1166 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1170:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1170 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1177:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1177 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1226:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1226 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:919:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  919 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:930:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  930 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:943:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  943 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1061:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1061 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1048:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1048:48: note: directive argument in the range [-128, 127]
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1048:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1048 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58076	    672	   4008	  62756	   f524	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+12:32:25 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:602:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  602 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:753:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  753 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:442:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  442 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1160:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1160 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1168:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1168 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1170:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1170 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:864:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  864 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1174:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1174 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1181:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1181 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1230:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1230 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:923:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  923 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:940:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  940 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:947:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  947 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:953:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  953 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1065:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1065 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1052:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1052 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1052:48: note: directive argument in the range [-128, 127]
+ 1052 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1052:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1052 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58092	    672	   4008	  62772	   f534	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+10:55:32 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1162:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1162 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1170:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1170 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1172:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1172 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1176:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1176 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1183:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1183 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1232:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1232 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:925:17: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  925 |                 strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:942:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  942 |                 strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:955:17: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  955 |                 strncpy(state, "LANDED", strlen("LANDED"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1067:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1067 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1054:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1054 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1054:48: note: directive argument in the range [-128, 127]
+ 1054 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1054:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1054 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58196	    672	   4016	  62884	   f5a4	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+10:56:16 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58196	    672	   4016	  62884	   f5a4	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+10:56:32 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58196	    672	   4016	  62884	   f5a4	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+10:57:08 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58196	    672	   4016	  62884	   f5a4	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:14:49 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:899:38: error: 'previous_alt' undeclared (first use in this function); did you mean 'prev_alt'?
+  899 |         float delta = smoothed_alt - previous_alt;
+      |                                      ^~~~~~~~~~~~
+      |                                      prev_alt
+../Core/Src/main.c:899:38: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:946:34: error: 'landing_threshold' undeclared (first use in this function); did you mean 'noise_threshold'?
+  946 |                 if (abs(delta) < landing_threshold){
+      |                                  ^~~~~~~~~~~~~~~~~
+      |                                  noise_threshold
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1205:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1205 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1213:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1213 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1215:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1215 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1219:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1219 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1226:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1226 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1275:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1275 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:927:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  927 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:935:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  935 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:940:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  940 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:957:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  957 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1110:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1110 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j20 all" terminated with exit code 2. Build might be incomplete.
+11:15:34 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1206:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1206 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1214:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1214 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1216:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1216 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1220:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1220 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1227:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1227 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1276:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1276 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:958:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  958 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1111:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1111 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1098:48: note: directive argument in the range [-128, 127]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:15:57 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:16:28 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:16:56 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:17:34 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:18:16 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:18:51 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:19:23 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:20:48 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:21:52 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4016	  62796	   f54c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:24:43 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1204:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1204 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1212:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1212 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1214:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1214 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1218:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1218 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1225:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1225 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1274:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1274 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:958:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  958 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1111:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1111 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1098:48: note: directive argument in the range [-128, 127]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58084	    672	   4000	  62756	   f524	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:25:04 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58084	    672	   4000	  62756	   f524	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:26:24 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58084	    672	   4000	  62756	   f524	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:27:04 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58084	    672	   4000	  62756	   f524	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:28:06 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1204:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1204 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1212:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1212 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1214:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1214 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1218:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1218 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1225:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1225 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1274:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1274 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:936:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  936 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:941:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  941 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:949:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  949 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:958:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  958 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1111:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1111 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1098:48: note: directive argument in the range [-128, 127]
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1098:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1098 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4000	  62780	   f53c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:30:00 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  58108	    672	   4000	  62780	   f53c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+11:35:30 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1207:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1207 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1215:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1215 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1217:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1217 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1221:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1221 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1228:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1228 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1277:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1277 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                         strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:939:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  939 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:944:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  944 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:952:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  952 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:961:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  961 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1114:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1114 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1101:48: note: directive argument in the range [-128, 127]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58156	    672	   4000	  62828	   f56c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:36:10 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1207:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1207 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1215:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1215 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1217:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1217 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1221:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1221 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1228:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1228 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1277:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1277 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                         strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:939:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  939 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:944:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  944 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:952:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  952 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:961:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  961 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1114:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1114 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1101:48: note: directive argument in the range [-128, 127]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58156	    672	   4000	  62828	   f56c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:39:35 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1207:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1207 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1215:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1215 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1217:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1217 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1221:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1221 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1228:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1228 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1277:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1277 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:928:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  928 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:934:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  934 |                         strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:939:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  939 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:944:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  944 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:952:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  952 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:961:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  961 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1114:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1114 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1101:48: note: directive argument in the range [-128, 127]
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1101:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1101 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58148	    672	   4000	  62820	   f564	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 
+11:46:42 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F412Rx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'read_PA1010D':
+../Core/Src/main.c:603:28: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  603 |                 parse_nmea(pa_buf);
+      |                            ^~~~~~
+      |                            |
+      |                            uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'init_PA1010D':
+../Core/Src/main.c:754:36: warning: pointer targets in passing argument 1 of 'parse_nmea' differ in signedness [-Wpointer-sign]
+  754 |                         parse_nmea(pa_buf);
+      |                                    ^~~~~~
+      |                                    |
+      |                                    uint8_t * {aka unsigned char *}
+../Core/Src/main.c:443:23: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  443 | bool parse_nmea(char *buf){
+      |                 ~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_UARTEx_RxEventCallback':
+../Core/Src/main.c:1189:35: warning: pointer targets in initialization of 'char *' from 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+ 1189 |                 char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+      |                                   ^
+../Core/Src/main.c:1197:69: warning: pointer targets in passing argument 1 of 'strtol' differ in signedness [-Wpointer-sign]
+ 1197 |                         uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~
+      |                                                                     |
+      |                                                                     uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:29:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdlib.h:171:40: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  171 | long    strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~^~~
+../Core/Src/main.c:1199:74: warning: pointer targets in passing argument 1 of 'calculate_checksum' differ in signedness [-Wpointer-sign]
+ 1199 |                         uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+      |                                                                          ^~~~~~~~~~~~~
+      |                                                                          |
+      |                                                                          uint8_t * {aka unsigned char *}
+../Core/Src/main.c:865:40: note: expected 'const char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  865 | uint8_t calculate_checksum(const char *data) {
+      |                            ~~~~~~~~~~~~^~~~
+../Core/Src/main.c:1203:56: warning: pointer targets in passing argument 2 of 'strcpy' differ in signedness [-Wpointer-sign]
+ 1203 |                                 strcpy(command_buffer, &rx_packet[1]);
+      |                                                        ^~~~~~~~~~~~~
+      |                                                        |
+      |                                                        uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/string.h:38:36: note: expected 'const char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+   38 | char    *strcpy (char *__restrict, const char *__restrict);
+      |                                    ^
+../Core/Src/main.c:1210:60: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1210 |         uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+      |                                                            ^~~~~~~
+      |                                                            |
+      |                                                            char *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:411,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Src/main.c:20:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:1259:56: warning: pointer targets in passing argument 2 of 'HAL_UARTEx_ReceiveToIdle_IT' differ in signedness [-Wpointer-sign]
+ 1259 |   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
+      |                                                        ^~~~~~~
+      |                                                        |
+      |                                                        char *
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:757:83: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'char *'
+  757 | HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+      |                                                                          ~~~~~~~~~^~~~~
+../Core/Src/main.c: In function 'handle_state':
+../Core/Src/main.c:907:25: warning: 'strncpy' output truncated before terminating nul copying 9 bytes from a string of the same length [-Wstringop-truncation]
+  907 |                         strncpy(state, "ASCENDING", strlen("ASCENDING"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:913:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  913 |                         strncpy(state, "APOGEE", strlen("APOGEE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:918:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  918 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:924:25: warning: 'strncpy' output truncated before terminating nul copying 13 bytes from a string of the same length [-Wstringop-truncation]
+  924 |                         strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:932:25: warning: 'strncpy' output truncated before terminating nul copying 6 bytes from a string of the same length [-Wstringop-truncation]
+  932 |                         strncpy(state, "LANDED", strlen("LANDED"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:937:17: warning: 'strncpy' output truncated before terminating nul copying 10 bytes from a string of the same length [-Wstringop-truncation]
+  937 |                 strncpy(state, "DESCENDING", strlen("DESCENDING"));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'handle_command':
+../Core/Src/main.c:1096:25: warning: 'strncpy' output truncated before terminating nul copying 12 bytes from a string of the same length [-Wstringop-truncation]
+ 1096 |                         strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1083:60: warning: ':' directive output may be truncated writing 1 byte into a region of size between 0 and 4 [-Wformat-truncation=]
+ 1083 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                            ^
+../Core/Src/main.c:1083:48: note: directive argument in the range [-128, 127]
+ 1083 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                                                ^~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1083:25: note: 'snprintf' output between 11 and 17 bytes into a destination of size 11
+ 1083 |                         snprintf(cmd_echo, 11, "ST%02d:%02d:%02d", mission_time_hr, mission_time_min, mission_time_sec);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-gcc -o "PCB_Flight_Software.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\PCB_Flight_Software\STM32F412RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PCB_Flight_Software.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: PCB_Flight_Software.elf
+ 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+arm-none-eabi-objdump -h -S PCB_Flight_Software.elf  > "PCB_Flight_Software.list"
+   text	   data	    bss	    dec	    hex	filename
+  58172	    672	   4000	  62844	   f57c	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+Finished building: PCB_Flight_Software.list
+ 

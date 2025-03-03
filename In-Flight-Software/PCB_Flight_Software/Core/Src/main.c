@@ -240,6 +240,7 @@ char reset_release_payload_command[26];
 
 // State Variables
 float prev_alt = 0;
+float smoothed_alt = 0;
 
 // Other Variables
 //float mag_x_offset = 0.173406959;
@@ -262,6 +263,9 @@ HAL_StatusTypeDef uart_received;
 bool calibrating_compass = 0;
 float apogee_altitude = 0;
 bool payload_released = false;
+int alt_increasing_count = 0;
+int alt_decreasing_count = 0;
+int alt_non_increasing_count = 0;
 
 volatile uint32_t msCounter = 0;
 
@@ -470,7 +474,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -890,65 +894,56 @@ void send_packet(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	int8_t current_movement;
+	float noise_threshold = 0.4;
+	float landing_threshold = 0.2;
 
-	// Determine ascending, descending, or stationary
-	if (altitude < (prev_alt + 0.5) && altitude > (prev_alt - 0.5)){
-		current_movement = 0;
-	}
-	else if (altitude < prev_alt) {
-		current_movement = -1;
-	}
-	else {
-		current_movement = 1;
-	}
+	smoothed_alt = 0.8 * smoothed_alt + 0.2 * altitude;
+	float delta = smoothed_alt - prev_alt;
 
-	// Probe Release if Descending and not released and alt < apogee_alt
-	if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 && altitude <= apogee_altitude * 0.75 && !payload_released){
+
+	if (strncmp(state, "LAUNCH_PAD", strlen("LAUNCH_PAD")) == 0){
+		if (delta > noise_threshold){
+			memset(state, 0, sizeof(state));
+			strncpy(state, "ASCENDING", strlen("ASCENDING"));
+		}
+	}
+	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
+		if (delta < -noise_threshold){
+			memset(state, 0, sizeof(state));
+			strncpy(state, "APOGEE", strlen("APOGEE"));
+		}
+	}
+	else if (strncmp(state, "APOGEE", strlen("APOGEE")) == 0){
 		memset(state, 0, sizeof(state));
-		strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
-		// Deploy Auto Gyro
-		Set_Servo_Angle(SERVO_ANGLE_OPEN);
-		payload_released = true;
-		north_cam_on = true;
-
-	}
-
-	// Ascent if ascending and probe not released
-	else if (current_movement == 1){
-		memset(state, 0, sizeof(state));
-		strncpy(state, "ASCENDING", strlen("ASCENDING"));
-	}
-
-	// Apogee if current state is ascent and now stationary or descending
-	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0 && current_movement != 1){
-		memset(state, 0, sizeof(state));
-		strncpy(state, "APOGEE", strlen("APOGEE"));
+		strncpy(state, "DESCENDING", strlen("DESCENDING"));
 		apogee_altitude = altitude;
 	}
-
-	// Descent if not apogee and descending
-	else if (current_movement == -1){
+	else if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0){
+		if (altitude <= apogee_altitude * 0.75 && !payload_released){
+			memset(state, 0, sizeof(state));
+			strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
+			// Deploy Auto Gyro
+			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+			payload_released = true;
+			north_cam_on = true;
+		}
+		if (abs(delta) < landing_threshold){
+			memset(state, 0, sizeof(state));
+			strncpy(state, "LANDED", strlen("LANDED"));
+		}
+	}
+	else if (strncmp(state, "PROBE_RELEASE", strlen("PROBE_RELEASE")) == 0){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
 	}
-
-	// Landed if not moving and was previously descending or landed
-	else if (current_movement == 0 && (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0 || strncmp(state, "LANDED", strlen("LANDED")) == 0)){
-		memset(state, 0, sizeof(state));
-		strncpy(state, "LANDED", strlen("LANDED"));
+	else if (strncmp(state, "LANDED", strlen("LANDED")) == 0){
 		// stop telemetry transmission
 		telemetry_status = 0;
 		// Turn off north cam
 		north_cam_on = false;
 	}
 
-	else{
-		memset(state, 0, sizeof(state));
-		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
-	}
-
-	prev_alt = altitude;
+	prev_alt = smoothed_alt;
 }
 
 void read_transmit_telemetry (){
@@ -1050,6 +1045,8 @@ void handle_command(const char *cmd) {
 			memset(state, 0, sizeof(state));
 			strncpy(state, "LAUNCH-READY", strlen("LAUNCH-READY"));
 		}
+
+		smoothed_alt = 0;
 
 		sim_enabled = false;
 	}
@@ -1217,6 +1214,9 @@ int main(void)
   result2 = HAL_I2C_IsDeviceReady(&hi2c3, MMC5603_ADDRESS, 3, 5);
   read_MMC5603();
   set_stepper_north();
+
+  read_MPL3115A2();
+  smoothed_alt = altitude;
 
   /* USER CODE END 2 */
 
