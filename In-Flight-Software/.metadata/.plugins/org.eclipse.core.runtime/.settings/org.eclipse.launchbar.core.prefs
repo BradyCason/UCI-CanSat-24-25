@@ -9,5 +9,6 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Nucleo_Flight_Software\ Debug/a
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Nucleo_Flight_Software\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Nucleo_Sensor_Test\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Nucleo_Sensor_Test\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:PCB_Flight_Software\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Test\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Test\ Debug/activeLaunchTarget=null\:---

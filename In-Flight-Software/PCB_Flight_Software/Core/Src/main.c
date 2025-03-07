@@ -475,7 +475,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	result = HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -548,6 +548,7 @@ void read_MPU6050(void) {
 	int16_t raw_gyro_z = 0;
 
 	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c3, MPU6050_ADDRESS, 3, 5);
+	result = mpu_ret;
     if (mpu_ret == HAL_OK){
 		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &imu_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
@@ -1218,6 +1219,9 @@ int main(void)
 
 //  store_flash_data(); // Do this the first time to put the data into flash memory.
   load_flash_data();
+
+
+  HAL_Delay(100);
 
   init_sensors();
   init_commands();
