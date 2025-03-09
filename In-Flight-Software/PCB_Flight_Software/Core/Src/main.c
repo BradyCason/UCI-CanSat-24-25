@@ -475,7 +475,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -548,7 +548,6 @@ void read_MPU6050(void) {
 	int16_t raw_gyro_z = 0;
 
 	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c3, MPU6050_ADDRESS, 3, 5);
-	result = mpu_ret;
     if (mpu_ret == HAL_OK){
 		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &imu_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
@@ -881,12 +880,28 @@ void send_packet(){
 	packet_count += 1;
 
 	snprintf(data, sizeof(data),
-		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s",
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
 		 gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, mag_x, mag_y, mag_z,
 		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
-		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo);
+		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction);
+
+	uint8_t checksum = calculate_checksum(data);
+	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
+
+	// Send the packet using HAL_UART_Transmit
+	HAL_UART_Transmit(&huart1, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
+}
+
+void send_mmc_plot_packet(){
+
+	char packet[512];  // Buffer for packet
+	char data[480];    // Buffer for data without checksum
+
+	snprintf(data, sizeof(data),
+		"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d",
+		 mag_x, mag_y, mag_x_offset, mag_y_offset, mag_x_min, mag_x_max, mag_y_min, mag_y_max, (int)direction);
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
@@ -1248,23 +1263,27 @@ int main(void)
   while (1)
   {
 
+	  if (command_ready){
+		  handle_command(command_buffer);
+		  command_ready = false;
+	  }
+
 	  // Correction of Camera Angle
 	  if (north_cam_on){
 		  Stepper_Correction();
 	  }
 
+	  if (calibrating_compass == 1){
+		  calibrate_mmc();
+		  if (msCounter >= 250){
+			  send_mmc_plot_packet();
+			  msCounter -= 250;
+		  }
+	  }
+
 	  // Happens 1 time per second
 	  if (msCounter >= 1000){
 		  msCounter -= 1000;
-
-		  if (command_ready){
-			  handle_command(command_buffer);
-			  command_ready = false;
-		  }
-
-		  if (calibrating_compass == 1){
-			  calibrate_mmc();
-		  }
 
 		  if (HAL_I2C_GetState(&hi2c3) != HAL_I2C_STATE_READY) {
 			  init_sensors();

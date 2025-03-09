@@ -8,6 +8,7 @@ import pyqtgraph as pg
 from csv import writer, reader
 from datetime import datetime
 import pytz
+import matplotlib.pyplot as plt
 
 TEAM_ID = "3141"
 
@@ -15,10 +16,10 @@ TELEMETRY_FIELDS = ["TEAM_ID", "MISSION_TIME", "PACKET_COUNT", "MODE", "STATE", 
                     "TEMPERATURE", "PRESSURE", "VOLTAGE", "GYRO_R", "GYRO_P", "GYRO_Y", "ACCEL_R",
                     "ACCEL_P", "ACCEL_Y", "MAG_R", "MAG_P", "MAG_Y", "AUTO_GYRO_ROTATION_RATE",
                     "GPS_TIME", "GPS_ALTITUDE", "GPS_LATITUDE", "GPS_LONGITUDE", "GPS_SATS",
-                    "CMD_ECHO" ]
+                    "CMD_ECHO", "HEADING"]
 GRAPHED_FIELDS = ["PACKET_COUNT", "ALTITUDE", "TEMPERATURE", "PRESSURE", "VOLTAGE", "GYRO_R", 
                   "GYRO_P", "GYRO_Y", "ACCEL_R", "ACCEL_P", "ACCEL_Y", "MAG_R", "MAG_P", "MAG_Y",
-                  "AUTO_GYRO_ROTATION_RATE", "GPS_ALTITUDE", "GPS_LATITUDE", "GPS_LONGITUDE", "GPS_SATS"]
+                  "AUTO_GYRO_ROTATION_RATE", "GPS_ALTITUDE", "GPS_LATITUDE", "GPS_LONGITUDE", "GPS_SATS", "HEADING"]
 
 current_time = time.time()
 local_time = time.localtime(current_time)
@@ -69,6 +70,8 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.update_timer.start()
 
         self.payload_released = False
+
+        self.compass_plotter = None
 
     def setup_UI(self):
         '''
@@ -242,10 +245,14 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             write_xbee("CMD,"+ TEAM_ID + ",CC,ON")
             self.calibrate_comp_button.setText("Stop Calibrating Compass")
             self.make_button_green(self.calibrate_comp_button)
+
+            self.compass_plotter = CalibrateCompassPlotter()
         else:
             write_xbee("CMD,"+ TEAM_ID + ",CC,OFF")
             self.calibrate_comp_button.setText("Calibrate Compass")
             self.make_button_blue(self.calibrate_comp_button)
+
+            self.compass_plotter.close_plot()
 
     def toggle_telemetry(self):
         global telemetry_on
@@ -272,6 +279,80 @@ class GroundStationWindow(QtWidgets.QMainWindow):
             self.release_payload_button.setText("Release Payload")
             self.make_button_blue(self.release_payload_button)
 
+class CalibrateCompassPlotter:
+    def __init__(self):
+        # Data storage
+        self.x_vals, self.y_vals = [], []
+        self.x_offsets, self.y_offsets = [], []
+
+        # Setup plot
+        plt.ion()
+        self.fig, self.ax = plt.subplots()
+        self.fig.canvas.mpl_connect('close_event', self.on_close)
+        self.val_scatter = self.ax.scatter(self.x_vals, self.y_vals, color='blue', label='Compass Reading')
+        self.offset_scatter = self.ax.scatter(self.x_offsets, self.y_offsets, color='red', label='Offset')
+        plt.gcf().canvas.manager.set_window_title('Compass Calibration Data')
+
+        self.ax.set_xlim(-0.75, 0.75)
+        self.ax.set_ylim(-0.75, 0.75)
+        self.ax.set_aspect('equal', adjustable='box')
+        self.ax.grid(True)
+        self.ax.legend()
+
+        self.x_min_line = None
+        self.x_max_line = None
+        self.y_min_line = None
+        self.y_max_line = None
+        self.heading_text = None
+
+        self.manual_closing = False
+    
+    def add_points(self, points):
+        # Append new data points
+        self.x_vals.append(points[0])
+        self.y_vals.append(points[1])
+        self.x_offsets.append(points[2])
+        self.y_offsets.append(points[3])
+
+        # Update plot data
+        self.val_scatter.set_offsets(list(zip(self.x_vals, self.y_vals)))
+        self.offset_scatter.set_offsets([(points[2], points[3])])
+
+        if self.x_min_line:
+            self.x_min_line.remove()
+        if self.x_max_line:
+            self.x_max_line.remove()
+        if self.y_min_line:
+            self.y_min_line.remove()
+        if self.y_max_line:
+            self.y_max_line.remove()
+        if self.heading_text:
+            self.heading_text.remove()
+        self.x_min_line = self.ax.axvline(x=points[4], color='green', linestyle='--', label='X Min')
+        self.x_max_line = self.ax.axvline(x=points[5], color='green', linestyle='--', label='X Max')
+        self.y_min_line = self.ax.axhline(y=points[6], color='purple', linestyle='--', label='Y Min')
+        self.y_max_line = self.ax.axhline(y=points[7], color='purple', linestyle='--', label='Y Max')
+        self.heading_text = self.ax.text(0, 1, f'Heading:{str(int(points[8]))}°', fontsize=12, color='black',
+                                         horizontalalignment='left', verticalalignment='bottom', transform=self.ax.transAxes)
+
+
+        # Refresh plot
+        self.ax.relim()
+        self.ax.autoscale_view()
+        global calibrate_comp_on
+        if calibrate_comp_on:
+            plt.draw()
+    
+    def close_plot(self):
+        # Close the plot window
+        self.manual_closing = True
+        plt.close(self.fig)
+
+    def on_close(self, args):
+        global w
+        global calibrate_comp_on
+        if (not self.manual_closing):
+            w.calibrate_comp_toggle()
 
 class GraphWindow(pg.GraphicsLayoutWidget):
     def __init__(self):
@@ -382,13 +463,17 @@ def read_xbee():
             try:
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, float(checksum)):
-                    if len(data.split(",")) == 25:
+                    if len(data.split(",")) == 26:
                         parse_xbee(data.split(","))
+                    elif len(data.split(",")) == 9 and calibrate_comp_on:
+                        global w
+                        w.compass_plotter.add_points([float(x) for x in data.split(",")])
                     else:
                         print("Incorrect number of fields in frame: ", frame)
                 else:
                     print("Failed to read frame:", frame)
-            except:
+            except Exception as e:
+                print(e)
                 print("Error reading frame: ", frame)
 
             # start_byte = ser.read(1)
@@ -464,6 +549,7 @@ def main():
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)
+    global w
     w = GroundStationWindow()
 
     if (not SER_DEBUG):

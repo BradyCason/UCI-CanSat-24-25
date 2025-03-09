@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>994</width>
-    <height>1052</height>
+    <width>825</width>
+    <height>881</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -837,6 +837,21 @@ QPushButton:hover {
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="heading_label">
+               <property name="font">
+                <font>
+                 <family>Sans Serif Collection</family>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Heading (°):</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="mag_r_label">
                <property name="font">
                 <font>
@@ -974,6 +989,21 @@ QPushButton:hover {
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
               <widget class="QLabel" name="VOLTAGE">
+               <property name="font">
+                <font>
+                 <family>Sans Serif Collection</family>
+                 <pointsize>10</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>N/A</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="HEADING">
                <property name="font">
                 <font>
                  <family>Sans Serif Collection</family>
@@ -1348,8 +1378,8 @@ QPushButton:hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>994</width>
-     <height>26</height>
+     <width>825</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
