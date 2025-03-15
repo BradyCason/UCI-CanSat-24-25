@@ -106,6 +106,8 @@ typedef uint8_t bool;
 #define I2C_SDA_PIN GPIO_PIN_7
 #define I2C_PORT GPIOB
 
+#define DELTA_BUFFER_SIZE 5
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -241,7 +243,8 @@ char reset_state_command[14];
 
 // State Variables
 float prev_alt = 0;
-float smoothed_alt = 0;
+float delta_buffer[DELTA_BUFFER_SIZE] = {0};
+int delta_index = 0;
 
 // Other Variables
 //float mag_x_offset = 0.173406959;
@@ -475,7 +478,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	result = HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -910,23 +913,38 @@ void send_mmc_plot_packet(){
 	HAL_UART_Transmit(&huart1, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
 }
 
+void reset_delta_buffer(){
+	for(int i = 0; i < DELTA_BUFFER_SIZE; ++i){
+		delta_buffer[i] = 0;
+	}
+}
+
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
 	float noise_threshold = 0.75;
 	float landing_threshold = 0.2;
 
-	smoothed_alt = 0.8 * smoothed_alt + 0.2 * altitude;
-	float delta = smoothed_alt - prev_alt;
+	float delta = altitude - prev_alt;
 
+	// Update delta buffer
+	delta_buffer[delta_index] = delta;
+	delta_index = (delta_index + 1) % DELTA_BUFFER_SIZE;  // Circular buffer index
+
+	// Compute rolling average of deltas
+	float avg_delta = 0;
+	for (int i = 0; i < DELTA_BUFFER_SIZE; i++) {
+		avg_delta += delta_buffer[i];
+	}
+	avg_delta /= DELTA_BUFFER_SIZE;  // Take the average
 
 	if (strncmp(state, "LAUNCH_PAD", strlen("LAUNCH_PAD")) == 0){
-		if (delta > noise_threshold){
+		if (avg_delta > noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "ASCENDING", strlen("ASCENDING"));
 		}
 	}
 	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
-		if (delta < -noise_threshold){
+		if (avg_delta < -noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "APOGEE", strlen("APOGEE"));
 		}
@@ -945,7 +963,7 @@ void handle_state(){
 			payload_released = true;
 			north_cam_on = true;
 		}
-		if (abs(delta) < landing_threshold){
+		if (abs(avg_delta) < landing_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "LANDED", strlen("LANDED"));
 		}
@@ -961,7 +979,7 @@ void handle_state(){
 		north_cam_on = false;
 	}
 
-	prev_alt = smoothed_alt;
+	prev_alt = altitude;
 }
 
 void read_transmit_telemetry (){
@@ -1065,7 +1083,7 @@ void handle_command(const char *cmd) {
 		}
 
 		prev_alt = 0;
-		smoothed_alt = 0;
+		reset_delta_buffer();
 
 		sim_enabled = false;
 	}
@@ -1155,7 +1173,7 @@ void handle_command(const char *cmd) {
 		payload_released = false;
 		north_cam_on = false;
 		prev_alt = altitude;
-		smoothed_alt = altitude;
+		reset_delta_buffer();
 		telemetry_status = 1;
 		memset(state, 0, sizeof(state));
 		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
@@ -1237,8 +1255,9 @@ int main(void)
 
 
   HAL_Delay(100);
-
   init_sensors();
+  HAL_Delay(100);
+
   init_commands();
   Servo_Init();
 
@@ -1248,13 +1267,13 @@ int main(void)
   Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 
   // Set North Direction Offset
-  result2 = HAL_I2C_IsDeviceReady(&hi2c3, MMC5603_ADDRESS, 3, 5);
+  HAL_I2C_IsDeviceReady(&hi2c3, MMC5603_ADDRESS, 3, 5);
   read_MMC5603();
   set_stepper_north();
 
   read_MPL3115A2();
   prev_alt = altitude;
-  smoothed_alt = altitude;
+  reset_delta_buffer();
 
   /* USER CODE END 2 */
 

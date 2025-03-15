@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="send_mm"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="smoothed_alt"/>
+			<item value="result2 ="/>
+			<item value="result ="/>
+			<item value="delta_"/>
+			<item value="reset_del"/>
+			<item value="reset_"/>
+			<item value="read_MPL3115A2"/>
+			<item value="define"/>
+			<item value="delta_buffer"/>
+			<item value="prev_alt"/>
+			<item value="reset_state_command"/>
+			<item value=",rst"/>
 			<item value="send_mm"/>
 			<item value="read_mmc"/>
 			<item value="send_pa"/>
-			<item value="direction"/>
-			<item value="heading"/>
-			<item value="mag_x_offset"/>
-			<item value="send_m"/>
-			<item value="calibrate_mm"/>
-			<item value="init_mmc"/>
-			<item value=".2f"/>
-			<item value=".ff"/>
-			<item value="result ="/>
-			<item value="mag_x ="/>
-			<item value="mag_x"/>
-			<item value="calibrate_mmc"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
