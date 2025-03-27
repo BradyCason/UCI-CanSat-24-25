@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value=""/>
+		<item key="selection" value="calculate_altitude"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="calculate_altitude"/>
+			<item value="read_"/>
 			<item value="smoothed_alt"/>
 			<item value="result2 ="/>
 			<item value="result ="/>
@@ -21,8 +23,6 @@
 			<item value="reset_state_command"/>
 			<item value=",rst"/>
 			<item value="send_mm"/>
-			<item value="read_mmc"/>
-			<item value="send_pa"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>

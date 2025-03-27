@@ -33,6 +33,8 @@ calibrate_comp_on = False
 north_cam_on = False
 csv_indexer = 0
 
+packet_count = 0
+
 # xbee communication parameters
 BAUDRATE = 115200
 COM_PORT = 3
@@ -427,6 +429,9 @@ def parse_xbee(data):
 
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
+    
+    packet_count += 1
+    telemetry["PACKET_COUNT"] = packet_count
 
     # if data[3] == "S":
     #     sim = True
