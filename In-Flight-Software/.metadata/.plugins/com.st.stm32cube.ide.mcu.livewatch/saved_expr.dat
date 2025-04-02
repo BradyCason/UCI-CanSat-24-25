@@ -10,3 +10,4 @@ state
 voltage
 north_cam_on
 delta_buffer
+cmd_echo

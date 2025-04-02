@@ -112,7 +112,7 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         self.sim_enable_button.clicked.connect(lambda: self.handle_simulation("ENABLE"))
         self.sim_activate_button.clicked.connect(lambda: self.handle_simulation("ACTIVATE"))
         self.sim_disable_button.clicked.connect(lambda: self.handle_simulation("DISABLE"))
-        self.reset_state_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",RST"))
+        self.reset_state_button.clicked.connect(self.reset_state)
         self.set_time_gps_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST,GPS"))
         self.set_time_utc_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",ST," + datetime.now(pytz.timezone("UTC")).strftime("%H:%M:%S")))
         self.calibrate_alt_button.clicked.connect(lambda: write_xbee("CMD," + TEAM_ID + ",CAL"))
@@ -220,6 +220,11 @@ class GroundStationWindow(QtWidgets.QMainWindow):
         sim_enable = False
         self.update_sim_button_colors()
     
+    def reset_state(self):
+        global packet_count
+        packet_count = 0
+        write_xbee("CMD," + TEAM_ID + ",RST")
+
     def camera_north_toggle(self):
         '''
         Handle "activate north camera" button press
@@ -425,13 +430,13 @@ def parse_xbee(data):
     '''
     Parse the data from an incoming Xbee packet
     '''
-    global sim, telemetry
+    global sim, telemetry, packet_count
 
     for i in range(len(data)):
         telemetry[TELEMETRY_FIELDS[i]] = data[i]
     
     packet_count += 1
-    telemetry["PACKET_COUNT"] = packet_count
+    telemetry["PACKET_COUNT"] = str(packet_count)
 
     # if data[3] == "S":
     #     sim = True

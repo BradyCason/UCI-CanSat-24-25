@@ -77,6 +77,9 @@ typedef uint8_t bool;
 #define FLASH_MAG_Y_OFFSET_ADDRESS 0x080E0008
 #define FLASH_MAG_Z_OFFSET_ADDRESS 0x080E000C
 #define FLASH_TIME_DIF_ADDRESS 0x080E0010
+#define FLASH_APOGEE_ALT_ADDRESS 0x080E0014
+#define FLASH_PAYLOAD_RELEASED_ADDRESS 0x080E0018
+#define FLASH_STATE_ADDRESS 0x080E001C
 
 // Stepper Motor
 #define IN1_PIN GPIO_PIN_6
@@ -107,6 +110,9 @@ typedef uint8_t bool;
 #define I2C_PORT GPIOB
 
 #define DELTA_BUFFER_SIZE 5
+
+#define MIN_STATE_MAINTAINED_ALT 10
+#define DEFAULT_APOGEE_ALT 1000
 
 /* USER CODE END PD */
 
@@ -352,19 +358,27 @@ void store_flash_data(){
 	FLASH_Erase_Sector(SECTOR, FLASH_VOLTAGE_RANGE_2);
 	HAL_Delay(100);
 
-	uint32_t altitude_offset_bits, mag_x_offset_bits, mag_y_offset_bits, mag_z_offset_bits;
+	uint32_t altitude_offset_bits, mag_x_offset_bits, mag_y_offset_bits, mag_z_offset_bits, apogee_altitude_bits;
+	uint32_t payload_released_bits = payload_released ? 1 : 0;
 
 	// Copy the float data into the 32-bit unsigned integer variables
 	memcpy(&altitude_offset_bits, &altitude_offset, sizeof(altitude_offset));
 	memcpy(&mag_x_offset_bits, &mag_x_offset, sizeof(mag_x_offset));
 	memcpy(&mag_y_offset_bits, &mag_y_offset, sizeof(mag_y_offset));
 	memcpy(&mag_z_offset_bits, &mag_z_offset, sizeof(mag_z_offset));
+	memcpy(&apogee_altitude_bits, &apogee_altitude, sizeof(apogee_altitude));
 
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_ALTITUDE_OFFSET_ADDRESS, altitude_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_X_OFFSET_ADDRESS, mag_x_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Y_OFFSET_ADDRESS, mag_y_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_MAG_Z_OFFSET_ADDRESS, mag_z_offset_bits);
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_TIME_DIF_ADDRESS, get_time_dif());
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_APOGEE_ALT_ADDRESS, apogee_altitude_bits);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_PAYLOAD_RELEASED_ADDRESS, payload_released_bits);
+
+	for (uint16_t i = 0; i < 14; i++) {
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, FLASH_STATE_ADDRESS + i, state[i]);
+	}
 	HAL_Delay(100);
 
 	HAL_FLASH_Lock();
@@ -387,6 +401,13 @@ void load_flash_data(){
 	memcpy(&mag_y_offset, (float*)FLASH_MAG_Y_OFFSET_ADDRESS, sizeof(float));
 	memcpy(&mag_z_offset, (float*)FLASH_MAG_Z_OFFSET_ADDRESS, sizeof(float));
 	memcpy(&time_dif, (int32_t*)FLASH_TIME_DIF_ADDRESS, sizeof(int32_t));
+	memcpy(&apogee_altitude, (float*)FLASH_APOGEE_ALT_ADDRESS, sizeof(float));
+
+	uint32_t readWord;
+	memcpy(&readWord, (uint32_t*)FLASH_PAYLOAD_RELEASED_ADDRESS, sizeof(uint32_t));
+	payload_released = (readWord != 0);
+
+	memcpy(state, (uint8_t*)FLASH_STATE_ADDRESS, 14);
 
 	HAL_FLASH_Lock();
 }
@@ -941,18 +962,21 @@ void handle_state(){
 		if (avg_delta > noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "ASCENDING", strlen("ASCENDING"));
+			store_flash_data();
 		}
 	}
 	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
 		if (avg_delta < -noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "APOGEE", strlen("APOGEE"));
+			store_flash_data();
 		}
 	}
 	else if (strncmp(state, "APOGEE", strlen("APOGEE")) == 0){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
 		apogee_altitude = altitude;
+		store_flash_data();
 	}
 	else if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0){
 		if (altitude <= apogee_altitude * 0.75 && !payload_released){
@@ -966,6 +990,7 @@ void handle_state(){
 		if (abs(avg_delta) < landing_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "LANDED", strlen("LANDED"));
+			store_flash_data();
 		}
 	}
 	else if (strncmp(state, "PROBE_RELEASE", strlen("PROBE_RELEASE")) == 0){
@@ -1153,6 +1178,7 @@ void handle_command(const char *cmd) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADON");
 		Set_Servo_Angle(SERVO_ANGLE_OPEN);
+		payload_released = true;
 		sim_enabled = false;
 	}
 
@@ -1169,15 +1195,57 @@ void handle_command(const char *cmd) {
 	else if (strncmp(cmd, reset_state_command, strlen(reset_state_command)) == 0) {
 		// Update variable
 		set_cmd_echo("RST");
-		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
-		payload_released = false;
-		north_cam_on = false;
+		reset_state();
+		sim_enabled = false;
+	}
+}
+
+void reset_state(){
+	Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+	payload_released = false;
+	north_cam_on = false;
+	prev_alt = altitude;
+	reset_delta_buffer();
+	telemetry_status = 1;
+	memset(state, 0, sizeof(state));
+	strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
+	apogee_altitude = DEFAULT_APOGEE_ALT;
+	store_flash_data();
+}
+
+void initial_state_reset(){
+	read_MPL3115A2();
+	prev_alt = altitude;
+	reset_delta_buffer();
+
+	// Set North Direction Offset
+	read_MMC5603();
+	set_stepper_north();
+
+	if (altitude > MIN_STATE_MAINTAINED_ALT){
+		// Assume there was a power reset during flight. Use configurations from flash
+		if (payload_released)
+			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+		else
+			Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+
+		// Lost Power during flight. Reseting to previous state
+		if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
+			Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+			north_cam_on = false;
+		}
+		else if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0){
+			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+		}
+
 		prev_alt = altitude;
 		reset_delta_buffer();
 		telemetry_status = 1;
-		memset(state, 0, sizeof(state));
-		strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
-		sim_enabled = false;
+		store_flash_data();
+		result = 2;
+	}
+	else{
+		reset_state();
 	}
 }
 
@@ -1250,9 +1318,7 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-//  store_flash_data(); // Do this the first time to put the data into flash memory.
   load_flash_data();
-
 
   HAL_Delay(100);
   init_sensors();
@@ -1261,19 +1327,11 @@ int main(void)
   init_commands();
   Servo_Init();
 
+  // Initialize Xbee receiving
   HAL_NVIC_EnableIRQ(USART1_IRQn);
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
 
-  Set_Servo_Angle(SERVO_ANGLE_CLOSED);
-
-  // Set North Direction Offset
-  HAL_I2C_IsDeviceReady(&hi2c3, MMC5603_ADDRESS, 3, 5);
-  read_MMC5603();
-  set_stepper_north();
-
-  read_MPL3115A2();
-  prev_alt = altitude;
-  reset_delta_buffer();
+  initial_state_reset();
 
   /* USER CODE END 2 */
 
