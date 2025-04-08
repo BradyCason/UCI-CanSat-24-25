@@ -499,7 +499,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	HAL_I2C_Master_Transmit(&hi2c3, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -508,7 +508,7 @@ void read_MMC5603(void) {
 //	HAL_Delay(10);
 
 	// Read 9 bytes of data from the sensor
-	if (HAL_I2C_Master_Receive(&hi2c3, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
+	if (HAL_I2C_Master_Receive(&hi2c1, MMC5603_ADDRESS, mmc5603_buf, 9, HAL_MAX_DELAY) != HAL_OK) {
 		// Handle reception error
 		return;
 	}
@@ -540,7 +540,7 @@ void read_MPL3115A2(void)
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    HAL_I2C_Mem_Read(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
     // Combine pressure bytes into a 20-bit integer
     uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
@@ -571,11 +571,11 @@ void read_MPU6050(void) {
 	int16_t raw_gyro_y = 0;
 	int16_t raw_gyro_z = 0;
 
-	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c3, MPU6050_ADDRESS, 3, 5);
+	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c1, MPU6050_ADDRESS, 3, 5);
     if (mpu_ret == HAL_OK){
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &imu_addr, 1, 100);
+		mpu_ret = HAL_I2C_Master_Transmit(&hi2c1, MPU6050_ADDRESS, &imu_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c3, MPU6050_ADDRESS, mpu_buf, 6, 100);
+			mpu_ret = HAL_I2C_Master_Receive(&hi2c1, MPU6050_ADDRESS, mpu_buf, 6, 100);
 			if ( mpu_ret == HAL_OK ) {
 				// shift first byte left, add second byte
 				raw_accel_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf[1]);
@@ -589,9 +589,9 @@ void read_MPU6050(void) {
 			}
 		}
 
-		mpu_ret = HAL_I2C_Master_Transmit(&hi2c3, MPU6050_ADDRESS, &gyro_addr, 1, 100);
+		mpu_ret = HAL_I2C_Master_Transmit(&hi2c1, MPU6050_ADDRESS, &gyro_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
-			mpu_ret = HAL_I2C_Master_Receive(&hi2c3, MPU6050_ADDRESS, mpu_buf, 6, 100);
+			mpu_ret = HAL_I2C_Master_Receive(&hi2c1, MPU6050_ADDRESS, mpu_buf, 6, 100);
 			if ( mpu_ret == HAL_OK ) {
 				// shift first byte left, add second byte
 				raw_gyro_x = (int16_t)(mpu_buf[0] << 8 | mpu_buf [1]);
@@ -609,16 +609,16 @@ void read_MPU6050(void) {
 
 bool read_PA1010D()
 {
-	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, 5) != HAL_OK) return false;
+	if (HAL_I2C_IsDeviceReady(&hi2c1, PA1010D_ADDRESS, 3, 5) != HAL_OK) return false;
 
 	uint8_t pa_buf_index = 0;
 	uint8_t pa_bytebuf = 0;
     bool ret = false;
 
 	/* PA1010D (GPS) */
-	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
+	if (HAL_I2C_IsDeviceReady(&hi2c1, PA1010D_ADDRESS, 3, HAL_MAX_DELAY) == HAL_OK){
 		for(pa_buf_index=0; pa_buf_index<255; pa_buf_index++){
-			HAL_I2C_Master_Receive(&hi2c3, PA1010D_ADDRESS, &pa_bytebuf, 1, HAL_MAX_DELAY);
+			HAL_I2C_Master_Receive(&hi2c1, PA1010D_ADDRESS, &pa_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa_bytebuf == '$'){
 				ret = true;
 				break; // Idea: take away break statement and see what the whole sentence looks like
@@ -636,29 +636,55 @@ void flush_PA1010D(){
 
 void read_INA219(void) {
 	/* INA219 (CURRENT/VOLTAGE) */
-	uint8_t bus_add = 0x02; // need to use separate registers for everything
 
-	ina_ret = HAL_I2C_IsDeviceReady(&hi2c3, INA219_ADDRESS, 3, 5);
+	// OLD CODE --------------------------------------------------------------------------
+//	uint8_t bus_add = 0x02; // need to use separate registers for everything
+//
+//	ina_ret = HAL_I2C_IsDeviceReady(&hi2c1, INA219_ADDRESS, 3, 5);
+//	if (ina_ret == HAL_OK) {
+//		ina_ret = HAL_I2C_Master_Transmit(&hi2c1, INA219_ADDRESS, &bus_add, 1, 100);
+//		if (ina_ret == HAL_OK) {
+//			HAL_I2C_Master_Receive(&hi2c1, INA219_ADDRESS, ina_buf, 2, 10);
+//
+//			//raw_shunt_voltage = abs((int16_t)(ina_buf[0] << 8 | ina_buf[1]));
+//			raw_bus_voltage = (int16_t)(ina_buf[0] << 8 | ina_buf [1]);
+//			//raw_power = (int16_t)(ina_buf[4] << 8 | ina_buf [5]);
+//			//raw_current = (int16_t)(ina_buf[6] << 8 | ina_buf [7]);
+//
+//			//shunt_voltage = raw_shunt_voltage*10.0;
+//			bus_voltage = raw_bus_voltage/1600.0;
+//			//power = raw_power*20/32768.0;
+//			//current = raw_current/32768.0;
+//
+//			voltage = bus_voltage;
+//		}
+//
+//	}
+
+
+	// NEW CODE ----------------------------------------------------------------------------
+	uint8_t reg = 0x02;  // Bus voltage register
+	uint8_t ina_buf[2];
+
+	ina_ret = HAL_I2C_IsDeviceReady(&hi2c1, INA219_ADDRESS, 3, 5);
 	if (ina_ret == HAL_OK) {
-		ina_ret = HAL_I2C_Master_Transmit(&hi2c3, INA219_ADDRESS, &bus_add, 1, 100);
+		// Write the register address
+		ina_ret = HAL_I2C_Master_Transmit(&hi2c1, INA219_ADDRESS, &reg, 1, 100);
 		if (ina_ret == HAL_OK) {
-			HAL_I2C_Master_Receive(&hi2c3, INA219_ADDRESS, ina_buf, 2, 10);
+			// Read 2 bytes from that register
+			ina_ret = HAL_I2C_Master_Receive(&hi2c1, INA219_ADDRESS, ina_buf, 2, 10);
+			if (ina_ret == HAL_OK) {
+				uint16_t raw_bus_voltage = (ina_buf[0] << 8) | ina_buf[1];
+				raw_bus_voltage >>= 3;  // per datasheet, remove unused bits
 
-			//raw_shunt_voltage = abs((int16_t)(ina_buf[0] << 8 | ina_buf[1]));
-			raw_bus_voltage = (int16_t)(ina_buf[0] << 8 | ina_buf [1]);
-			//raw_power = (int16_t)(ina_buf[4] << 8 | ina_buf [5]);
-			//raw_current = (int16_t)(ina_buf[6] << 8 | ina_buf [7]);
+				float bus_voltage = raw_bus_voltage * 0.004;  // each bit = 4mV
+				voltage = bus_voltage;
 
-			//shunt_voltage = raw_shunt_voltage*10.0;
-			bus_voltage = raw_bus_voltage/1600.0;
-			//power = raw_power*20/32768.0;
-			//current = raw_current/32768.0;
-
-			voltage = bus_voltage;
+				// For debug:
+				// printf("Bus voltage: %.3f V\n", voltage);
+			}
 		}
-
 	}
-
 }
 
 void calibrate_mmc(){
@@ -695,25 +721,25 @@ void init_MMC5603(void) {
 	uint8_t control_reg2 = 0b00010000;  // Set Cmm_en to enable continuous mode
 
 	// Configure Control Register 1
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
 	HAL_Delay(20);
 	uint8_t set_bit = 0b00001000;
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
 	HAL_Delay(1);
 	uint8_t reset_bit = 0b00010000;
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &reset_bit, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &reset_bit, 1, HAL_MAX_DELAY);
 	HAL_Delay(1);
 
 	// Set Output Data Rate
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1A, I2C_MEMADD_SIZE_8BIT, &odr_value, 1, HAL_MAX_DELAY);
 	HAL_Delay(10);
 
 	// Configure Control Register 0
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &control_reg0, 1, HAL_MAX_DELAY);
 	HAL_Delay(10);
 
 	// Configure Control Register 2
-	HAL_I2C_Mem_Write(&hi2c3, MMC5603_ADDRESS, 0x1D, I2C_MEMADD_SIZE_8BIT, &control_reg2, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1D, I2C_MEMADD_SIZE_8BIT, &control_reg2, 1, HAL_MAX_DELAY);
 
 	// Optionally: Add a delay to allow the sensor to stabilize
 	HAL_Delay(10);
@@ -723,13 +749,13 @@ void init_MPL3115A2(void)
 {
 	// Check the WHO_AM_I register to verify sensor is connected
 	uint8_t who_am_i = 0;
-	HAL_I2C_Mem_Read(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &who_am_i, 1, HAL_MAX_DELAY);
 	if (who_am_i == 0xC4)
 	{
 		// WHO_AM_I is correct, now configure the sensor
 //		uint8_t data = 0xB9; // Altimeter mode
 		uint8_t data = 0x39; // Barometer mode
-		HAL_I2C_Mem_Write(&hi2c3, MPL3115A2_ADDRESS, MPL3115A2_CTRL_REG1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
+		HAL_I2C_Mem_Write(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_CTRL_REG1, I2C_MEMADD_SIZE_8BIT, &data, 1, HAL_MAX_DELAY);
 	}
 	else
 	{
@@ -745,31 +771,31 @@ void init_MPU6050(void)
 	uint8_t clockSource = 0x01;
 
 	// wake up sensor
-	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
+	result = HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
 
 	// set sample rate to 1kHz, config ranges
-	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x1B, 1, &mpu_set_fs_range, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x1c, 1, &mpu_set_fs_range, 1, 1000);
-	HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, I2C_MEMADD_SIZE_8BIT, &clockSource, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x1B, 1, &mpu_set_fs_range, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x1c, 1, &mpu_set_fs_range, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, I2C_MEMADD_SIZE_8BIT, &clockSource, 1, 1000);
 }
 
 void init_PA1010D(void)
 {
-	if (HAL_I2C_IsDeviceReady(&hi2c3, PA1010D_ADDRESS, 3, 5) != HAL_OK) return;
+	if (HAL_I2C_IsDeviceReady(&hi2c1, PA1010D_ADDRESS, 3, 5) != HAL_OK) return;
 	uint8_t pa1010d_bytebuf;
 
-	HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
-	HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
-//	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
-//	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
-//	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c3, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
+	HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_MODE, strlen( (char *)PA1010D_MODE), 1000);
+	HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_RATE, strlen( (char *)PA1010D_RATE), 1000);
+//	pa_init_ret[1] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_INIT, strlen( (char *)PA1010D_INIT), 1000);
+//	pa_init_ret[2] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_SAT, strlen( (char *)PA1010D_SAT), 1000);
+//	pa_init_ret[3] = HAL_I2C_Master_Transmit(&hi2c1, PA1010D_ADDRESS, PA1010D_CFG, strlen( (char *)PA1010D_CFG), 1000);
 
 //	HAL_Delay(10000);
 	//Wait for stabilization
 	for(int j=0; j<10; j++){
 		for(int i=0; i<255; i++){
-			HAL_I2C_Master_Receive(&hi2c3, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
+			HAL_I2C_Master_Receive(&hi2c1, PA1010D_ADDRESS, &pa1010d_bytebuf, 1, HAL_MAX_DELAY);
 			if (pa1010d_bytebuf == '$'){
 				break;
 			}
@@ -784,44 +810,54 @@ void init_PA1010D(void)
 
 void init_INA219(void)
 {
-	uint8_t ina_config[2] = {0b00000001, 0b00011101};
-	HAL_I2C_Mem_Write(&hi2c3, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+	// OLD CODE --------------------------------------------------------------------------
+//	uint8_t ina_config[2] = {0b00000001, 0b00011101};
+//	result2 = HAL_I2C_Mem_Write(&hi2c1, (uint16_t) INA219_ADDRESS, 0x05, 1, ina_config, 2, 1000);
+
+	// NEW CODE --------------------------------------------------------------------------
+	// This is writing to the CALIBRATION register (0x05), not the CONFIG register (0x00)!
+	uint8_t ina_calib[2] = {0x20, 0x00};  // Example calibration value
+	result2 = HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x05, 1, ina_calib, 2, 1000);
+
+	// Now write to the CONFIG register (0x00)
+	uint8_t ina_config[2] = {0x01, 0x9F};  // Example: 32V, 2A, 12-bit ADCs
+	result2 |= HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x00, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
 {
-	read_MPU6050(); // Accel/ tilt
+//	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
-	if (!north_cam_on) read_MMC5603(); // Magnetic Field
-	for (int i = 0; i < 10; ++i){
-		read_PA1010D(); // GPS
-	}
+//	if (!north_cam_on) read_MMC5603(); // Magnetic Field
+//	for (int i = 0; i < 10; ++i){
+//		read_PA1010D(); // GPS
+//	}
 	calculate_auto_gyro_speed();
-//	read_INA219(); // Voltage
+	read_INA219(); // Voltage
 }
 
 void reset_MPU6050(void) {
     uint8_t reset_command = 0x80;  // Set the reset bit in PWR_MGMT_1
-    HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDRESS, 0x6B, 1, &reset_command, 1, HAL_MAX_DELAY);
+    HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1, &reset_command, 1, HAL_MAX_DELAY);
     HAL_Delay(100); // Wait for reset to complete
 }
 
 void init_sensors(void)
 {
-	if (HAL_I2C_GetState(&hi2c3) != HAL_I2C_STATE_READY) {
-		reset_MPU6050();
-	}
+//	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+//		reset_MPU6050();
+//	}
 
-	init_MPU6050(); // Must be first
+//	init_MPU6050(); // Must be first
 	init_MPL3115A2();
-	init_MMC5603();
-	init_PA1010D();
-//	init_INA219();
+//	init_MMC5603();
+//	init_PA1010D();
+	init_INA219();
 
-	read_PA1010D();
-	get_mission_time();
-
-	flush_PA1010D();
+//	read_PA1010D();
+//	get_mission_time();
+//
+//	flush_PA1010D();
 }
 
 void init_commands(void)
@@ -1214,12 +1250,12 @@ void reset_state(){
 }
 
 void initial_state_reset(){
-	read_MPL3115A2();
+//	read_MPL3115A2();
 	prev_alt = altitude;
 	reset_delta_buffer();
 
 	// Set North Direction Offset
-	read_MMC5603();
+//	read_MMC5603();
 	set_stepper_north();
 
 	if (altitude > MIN_STATE_MAINTAINED_ALT){
@@ -1242,7 +1278,6 @@ void initial_state_reset(){
 		reset_delta_buffer();
 		telemetry_status = 1;
 		store_flash_data();
-		result = 2;
 	}
 	else{
 		reset_state();
@@ -1281,6 +1316,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 
 }
 
+uint32_t ctrl;
+uint32_t load;
+uint32_t val;
+
 /* USER CODE END 0 */
 
 /**
@@ -1318,7 +1357,13 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  load_flash_data();
+  uint32_t ctrl = SysTick->CTRL;
+  uint32_t load = SysTick->LOAD;
+  uint32_t val  = SysTick->VAL;
+
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+
+//  load_flash_data();
 
   HAL_Delay(100);
   init_sensors();
@@ -1332,6 +1377,8 @@ int main(void)
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
 
   initial_state_reset();
+
+  Stepper_Rotate(500, 0);
 
   /* USER CODE END 2 */
 
@@ -1362,7 +1409,7 @@ int main(void)
 	  if (msCounter >= 1000){
 		  msCounter -= 1000;
 
-		  if (HAL_I2C_GetState(&hi2c3) != HAL_I2C_STATE_READY) {
+		  if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
 			  init_sensors();
 		  }
 

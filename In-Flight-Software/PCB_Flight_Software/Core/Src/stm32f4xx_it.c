@@ -214,7 +214,7 @@ void EXTI9_5_IRQHandler(void)
 	uint32_t current_time = HAL_GetTick(); // Get current system time in milliseconds
 
 	// Check if the interrupt is within the debounce period
-	if (current_time - last_interrupt_time > 10)  // 10 ms debounce time
+	if (current_time - last_interrupt_time > 5)  // 10 ms debounce time
 	{
 		pulse_count++;   // Increment pulse count only if outside debounce period
 		last_interrupt_time = current_time; // Update last interrupt time
