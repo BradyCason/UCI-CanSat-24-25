@@ -499,7 +499,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -721,7 +721,7 @@ void init_MMC5603(void) {
 	uint8_t control_reg2 = 0b00010000;  // Set Cmm_en to enable continuous mode
 
 	// Configure Control Register 1
-	result = HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
 	HAL_Delay(20);
 	uint8_t set_bit = 0b00001000;
 	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
@@ -771,7 +771,7 @@ void init_MPU6050(void)
 	uint8_t clockSource = 0x01;
 
 	// wake up sensor
-	result = HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
+	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x6B, 1,&mpu_config, 1, 1000);
 
 	// set sample rate to 1kHz, config ranges
 	HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDRESS, 0x19, 1, &mpu_set_sample_rate, 1, 1000);
@@ -826,12 +826,12 @@ void init_INA219(void)
 
 void read_sensors(void)
 {
-//	read_MPU6050(); // Accel/ tilt
+	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
-//	if (!north_cam_on) read_MMC5603(); // Magnetic Field
-//	for (int i = 0; i < 10; ++i){
-//		read_PA1010D(); // GPS
-//	}
+	if (!north_cam_on) read_MMC5603(); // Magnetic Field
+	for (int i = 0; i < 10; ++i){
+		read_PA1010D(); // GPS
+	}
 	calculate_auto_gyro_speed();
 	read_INA219(); // Voltage
 }
@@ -844,20 +844,20 @@ void reset_MPU6050(void) {
 
 void init_sensors(void)
 {
-//	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
-//		reset_MPU6050();
-//	}
+	if (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {
+		reset_MPU6050();
+	}
 
-//	init_MPU6050(); // Must be first
+	init_MPU6050(); // Must be first
 	init_MPL3115A2();
-//	init_MMC5603();
-//	init_PA1010D();
+	init_MMC5603();
+	init_PA1010D();
 	init_INA219();
 
-//	read_PA1010D();
-//	get_mission_time();
-//
-//	flush_PA1010D();
+	read_PA1010D();
+	get_mission_time();
+
+	flush_PA1010D();
 }
 
 void init_commands(void)
@@ -1250,12 +1250,12 @@ void reset_state(){
 }
 
 void initial_state_reset(){
-//	read_MPL3115A2();
+	read_MPL3115A2();
 	prev_alt = altitude;
 	reset_delta_buffer();
 
 	// Set North Direction Offset
-//	read_MMC5603();
+	read_MMC5603();
 	set_stepper_north();
 
 	if (altitude > MIN_STATE_MAINTAINED_ALT){
@@ -1316,10 +1316,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 
 }
 
-uint32_t ctrl;
-uint32_t load;
-uint32_t val;
-
 /* USER CODE END 0 */
 
 /**
@@ -1357,13 +1353,9 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  uint32_t ctrl = SysTick->CTRL;
-  uint32_t load = SysTick->LOAD;
-  uint32_t val  = SysTick->VAL;
-
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
-//  load_flash_data();
+  load_flash_data();
 
   HAL_Delay(100);
   init_sensors();
@@ -1378,15 +1370,12 @@ int main(void)
 
   initial_state_reset();
 
-  Stepper_Rotate(500, 0);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
 	  if (command_ready){
 		  handle_command(command_buffer);
 		  command_ready = false;

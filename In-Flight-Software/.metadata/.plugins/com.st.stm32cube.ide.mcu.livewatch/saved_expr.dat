@@ -11,12 +11,12 @@ voltage
 north_cam_on
 delta_buffer
 cmd_echo
-voltage
 ina_ret
 mag_x
 auto_gyro_rotation_rate
 pulse_count
-msCounter
 ctrl
 load
 val
+gps_altitude
+gps_time_sec
