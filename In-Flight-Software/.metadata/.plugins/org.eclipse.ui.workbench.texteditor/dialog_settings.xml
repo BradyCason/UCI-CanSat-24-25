@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="main"/>
+		<item key="selection" value="send"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="main"/>
-			<item value="Stepper_SetStep"/>
-			<item value="stepper_ro"/>
-			<item value="Stepper_Rotate"/>
-			<item value="stepper_rotate"/>
+			<item value="send"/>
+			<item value="main("/>
+			<item value="&amp;mag_x_offset"/>
+			<item value="mag_x_offset ="/>
 			<item value="read_mmc"/>
-			<item value="result ="/>
-			<item value="result2 ="/>
-			<item value="init_sens"/>
-			<item value="read_sens"/>
-			<item value="read_ina219"/>
-			<item value="ina219"/>
-			<item value="init_ina"/>
-			<item value="read_ina"/>
-			<item value="ina"/>
+			<item value="read"/>
+			<item value="stepper_co"/>
+			<item value="dwt_in"/>
+			<item value="_2bx"/>
+			<item value="hy"/>
+			<item value="_2q0mx"/>
+			<item value="beta"/>
+			<item value="Stepper_Rotate"/>
+			<item value="beta ="/>
+			<item value="turn_stepper_north"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
@@ -35,10 +35,10 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1515"/>
-		<item key="DIALOG_Y_ORIGIN" value="695"/>
+		<item key="DIALOG_X_ORIGIN" value="1377"/>
+		<item key="DIALOG_Y_ORIGIN" value="845"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 </section>

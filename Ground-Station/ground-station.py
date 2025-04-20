@@ -40,7 +40,6 @@ BAUDRATE = 115200
 COM_PORT = 3
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
-AUTO_GYRO_ONLY_MODE = True
 if (not SER_DEBUG):
     # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
     ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
@@ -447,10 +446,7 @@ def parse_xbee(data):
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time +'.csv')
     with open(file, 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        if AUTO_GYRO_ONLY_MODE:
-            writer_object.writerow([telemetry["AUTO_GYRO_ROTATION_RATE"]])
-        else:
-            writer_object.writerow(telemetry.values())
+        writer_object.writerow(telemetry.values())
 
 def read_xbee():
     '''

@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "MadgwickAHRS.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,8 +98,8 @@ typedef uint8_t bool;
 #define SERVO_MIN_PULSE_WIDTH 700   // 0° (0.5 ms)
 #define SERVO_MAX_PULSE_WIDTH 2500  // 180° (2.5 ms)
 #define SERVO_FREQUENCY 50
-#define SERVO_ANGLE_CLOSED 180
-#define SERVO_ANGLE_OPEN 135
+#define SERVO_ANGLE_CLOSED 128 // 128
+#define SERVO_ANGLE_OPEN 85 // 90> >80
 
 #define PI 3.141592
 
@@ -228,6 +230,9 @@ double direction = 0;
 double stepper_direction = 0;
 int stepIndex = 1;
 bool north_cam_on = false;
+MadgwickAHRS ahrs;
+uint32_t lastStepperUpdate = 0;
+extern uint32_t SystemCoreClock;
 
 // Commands
 char sim_command[14];
@@ -328,6 +333,24 @@ void Set_Servo_Angle(uint8_t angle) {
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, pulse);
 }
 
+void Servo_Open(){
+//	Set_Servo_Angle(SERVO_ANGLE_OPEN);
+	unsigned char num_partitions = 20;
+	for (int i = 1; i <= num_partitions; ++i){
+		Set_Servo_Angle(SERVO_ANGLE_CLOSED + i * (SERVO_ANGLE_OPEN - SERVO_ANGLE_CLOSED) / num_partitions);
+		HAL_Delay(25);
+	}
+}
+
+void Servo_Close(){
+//	Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+	unsigned char num_partitions = 20;
+	for (int i = 1; i <= num_partitions; ++i){
+		Set_Servo_Angle(SERVO_ANGLE_OPEN + i * (SERVO_ANGLE_CLOSED - SERVO_ANGLE_OPEN) / num_partitions);
+		HAL_Delay(25);
+	}
+}
+
 void Servo_Init() {
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);  // Start PWM signal on TIM2 Channel 3
 }
@@ -362,10 +385,18 @@ void store_flash_data(){
 	uint32_t payload_released_bits = payload_released ? 1 : 0;
 
 	// Copy the float data into the 32-bit unsigned integer variables
-	memcpy(&altitude_offset_bits, &altitude_offset, sizeof(altitude_offset));
-	memcpy(&mag_x_offset_bits, &mag_x_offset, sizeof(mag_x_offset));
-	memcpy(&mag_y_offset_bits, &mag_y_offset, sizeof(mag_y_offset));
-	memcpy(&mag_z_offset_bits, &mag_z_offset, sizeof(mag_z_offset));
+	if (!isnan(altitude_offset)){
+		memcpy(&altitude_offset_bits, &altitude_offset, sizeof(altitude_offset));
+	}
+	if (!isnan(mag_x_offset)){
+		memcpy(&mag_x_offset_bits, &mag_x_offset, sizeof(mag_x_offset));
+	}
+	if (!isnan(mag_y_offset)){
+		memcpy(&mag_y_offset_bits, &mag_y_offset, sizeof(mag_y_offset));
+	}
+	if (!isnan(mag_z_offset)){
+		memcpy(&mag_z_offset_bits, &mag_z_offset, sizeof(mag_z_offset));
+	}
 	memcpy(&apogee_altitude_bits, &apogee_altitude, sizeof(apogee_altitude));
 
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_ALTITUDE_OFFSET_ADDRESS, altitude_offset_bits);
@@ -559,6 +590,32 @@ void read_MPL3115A2(void)
     altitude = calculate_altitude(pressure);
 }
 
+void calibrate_altitude(void)
+{
+    uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
+
+    // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
+    HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+
+    // Combine pressure bytes into a 20-bit integer
+    uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
+    p_raw >>= 4; // Pressure is stored in the upper 20 bits
+
+    // Convert raw pressure to Pascals
+    pressure = p_raw / 4.0 / 1000; // Pressure in KiloPascals
+
+    // Combine temperature bytes into a 12-bit integer
+    int16_t t_raw = ((int16_t)mpl_data[3] << 8) | (mpl_data[4]);
+    t_raw >>= 4; // Temperature is stored in the upper 12 bits
+
+    // Convert raw temperature to degrees Celsius
+    temperature = t_raw / 16.0; // Temperature in Celsius
+
+    altitude_offset = 0;
+    altitude = calculate_altitude(pressure);
+    altitude_offset = -altitude;
+}
+
 void read_MPU6050(void) {
 	uint8_t imu_addr = 0x3B;
 	uint8_t gyro_addr = 0x43;
@@ -707,10 +764,6 @@ void calibrate_mmc(){
 	if (mag_z > mag_z_max){
 		mag_z_max = mag_z;
 	}
-
-	mag_x_offset = (mag_x_min + mag_x_max) / 2;
-	mag_y_offset = (mag_y_min + mag_y_max) / 2;
-	mag_z_offset = (mag_z_min + mag_z_max) / 2;
 }
 
 // Sensor Init Functions -------------------------------------------------------------------
@@ -829,9 +882,10 @@ void read_sensors(void)
 	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
 	if (!north_cam_on) read_MMC5603(); // Magnetic Field
-	for (int i = 0; i < 10; ++i){
-		read_PA1010D(); // GPS
-	}
+	read_PA1010D();
+//	for (int i = 0; i < 10; ++i){
+//		read_PA1010D(); // GPS
+//	}
 	calculate_auto_gyro_speed();
 	read_INA219(); // Voltage
 }
@@ -903,8 +957,71 @@ void Stepper_Rotate(int stepsCount, int delayMs) {
     }
 }
 
+void DWT_Init(void) {
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // Enable TRC
+    DWT->CYCCNT = 0;                                // Reset counter
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;            // Enable counter
+}
+
 // Rotate the motor to correct its direction to all way to the North
 void Stepper_Correction(){
+//	read_MMC5603();
+//	float dir_change = stepper_direction - direction;
+//	if (dir_change > 180) dir_change -= 360;
+//	else if (dir_change < -180) dir_change += 360;
+//
+//	int num_steps = round(dir_change * STEPS_PER_REV / 360);
+//
+//	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
+//	if (stepper_direction > 360) stepper_direction -= 360;
+//	else if (stepper_direction < 0) stepper_direction += 360;
+//
+//	Stepper_Rotate(num_steps, 0);
+
+
+	// Read sensor data (gyroscope, accelerometer, magnetometer)
+	read_MPU6050();
+	read_MMC5603();
+	float gx = gyro_x;
+	float gy = gyro_y;
+	float gz = gyro_z;
+	float ax = accel_x;
+	float ay = accel_y;
+	float az = accel_z;
+	float mx = mag_x;
+	float my = mag_y;
+	float mz = mag_z;
+
+	uint32_t now = DWT->CYCCNT;
+	float dt = (now - lastStepperUpdate) / (float)SystemCoreClock;
+	lastStepperUpdate = now;
+
+	if (dt > 0) {
+	    ahrs.invSampleFreq = dt;
+	}
+	Madgwick_update(&ahrs, gx, -gy, -gz, ax, -ay, -az, mx, my, mz);
+
+	// Get the current yaw from the Madgwick filter (assumed to represent the direction of the system)
+	float current_yaw = Madgwick_getYaw(&ahrs);
+
+	float dir_change = stepper_direction - current_yaw;
+	if (dir_change > 180) dir_change -= 360;
+	else if (dir_change < -180) dir_change += 360;
+
+	int num_steps = round(dir_change * STEPS_PER_REV / 360);
+
+	stepper_direction -= (double)num_steps * 360 / STEPS_PER_REV;
+	if (stepper_direction > 360) stepper_direction -= 360;
+	else if (stepper_direction < 0) stepper_direction += 360;
+
+	Stepper_Rotate(-num_steps, 0);
+}
+
+void set_stepper_north(){
+	stepper_direction = direction;
+}
+
+void turn_stepper_north(){
 	read_MMC5603();
 	float dir_change = stepper_direction - direction;
 	if (dir_change > 180) dir_change -= 360;
@@ -917,10 +1034,10 @@ void Stepper_Correction(){
 	else if (stepper_direction < 0) stepper_direction += 360;
 
 	Stepper_Rotate(num_steps, 0);
-}
 
-void set_stepper_north(){
-	stepper_direction = direction;
+	// Prepare for madgwick filter to take over stepper
+	stepper_direction = Madgwick_getYaw(&ahrs);
+	lastStepperUpdate = DWT->CYCCNT;
 }
 
 // Xbee and Command Functions ----------------------------------------------------------------
@@ -943,7 +1060,7 @@ void send_packet(){
 		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
-		 gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z, mag_x, mag_y, mag_z,
+		 -gyro_z, gyro_x, -gyro_y, -accel_z, accel_x, -accel_y, mag_z, mag_x, mag_y,
 		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
 		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction);
 
@@ -961,7 +1078,7 @@ void send_mmc_plot_packet(){
 
 	snprintf(data, sizeof(data),
 		"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d",
-		 mag_x, mag_y, mag_x_offset, mag_y_offset, mag_x_min, mag_x_max, mag_y_min, mag_y_max, (int)direction);
+		 mag_x, mag_y, (mag_x_min + mag_x_max) / 2, (mag_y_min + mag_y_max) / 2, mag_x_min, mag_x_max, mag_y_min, mag_y_max, (int)direction);
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
@@ -1019,9 +1136,11 @@ void handle_state(){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "PROBE_RELEASE", strlen("PROBE_RELEASE"));
 			// Deploy Auto Gyro
-			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+			Servo_Open();
 			payload_released = true;
 			north_cam_on = true;
+
+			turn_stepper_north();
 		}
 		if (abs(avg_delta) < landing_threshold){
 			memset(state, 0, sizeof(state));
@@ -1135,7 +1254,8 @@ void handle_command(const char *cmd) {
 
 	// Calibrate Altitude
 	else if (strncmp(cmd, cal_alt_command, strlen(cal_alt_command)) == 0) {
-		altitude_offset -= altitude;
+//		altitude_offset -= altitude;
+		calibrate_altitude();
 		store_flash_data();
 		set_cmd_echo("CAL");
 		if (strncmp(state, "PRE-LAUNCH", strlen("PRE-LAUNCH")) == 0) {
@@ -1166,6 +1286,11 @@ void handle_command(const char *cmd) {
 
 	// Calibrate compass On
 	else if (strncmp(cmd, cal_comp_on_command, strlen(cal_comp_on_command)) == 0) {
+		mag_x_offset = 0;
+		mag_y_offset = 0;
+		mag_z_offset = 0;
+		read_MMC5603();
+
 		mag_x_min = mag_x;
 		mag_x_max = mag_x;
 		mag_y_min = mag_y;
@@ -1180,6 +1305,11 @@ void handle_command(const char *cmd) {
 	// Calibrate compass Off
 	else if (strncmp(cmd, cal_comp_off_command, strlen(cal_comp_off_command)) == 0) {
 		calibrating_compass = 0;
+
+		mag_x_offset = (mag_x_min + mag_x_max) / 2;
+		mag_y_offset = (mag_y_min + mag_y_max) / 2;
+		mag_z_offset = (mag_z_min + mag_z_max) / 2;
+
 		store_flash_data();
 		set_cmd_echo("CCOFF");
 		sim_enabled = false;
@@ -1213,7 +1343,7 @@ void handle_command(const char *cmd) {
 	else if (strncmp(cmd, release_payload_command, strlen(release_payload_command)) == 0) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADON");
-		Set_Servo_Angle(SERVO_ANGLE_OPEN);
+		Servo_Open();
 		payload_released = true;
 		sim_enabled = false;
 	}
@@ -1222,7 +1352,7 @@ void handle_command(const char *cmd) {
 	else if (strncmp(cmd, reset_release_payload_command, strlen(reset_release_payload_command)) == 0) {
 		// Update variable
 		set_cmd_echo("MECPAYLOADOFF");
-		Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+		Servo_Close();
 		payload_released = false;
 		sim_enabled = false;
 	}
@@ -1239,7 +1369,7 @@ void handle_command(const char *cmd) {
 void reset_state(){
 	Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 	payload_released = false;
-	north_cam_on = false;
+	north_cam_on = true;
 	prev_alt = altitude;
 	reset_delta_buffer();
 	telemetry_status = 1;
@@ -1247,6 +1377,7 @@ void reset_state(){
 	strncpy(state, "LAUNCH_PAD", strlen("LAUNCH_PAD"));
 	apogee_altitude = DEFAULT_APOGEE_ALT;
 	store_flash_data();
+	msCounter = 0;
 }
 
 void initial_state_reset(){
@@ -1261,17 +1392,17 @@ void initial_state_reset(){
 	if (altitude > MIN_STATE_MAINTAINED_ALT){
 		// Assume there was a power reset during flight. Use configurations from flash
 		if (payload_released)
-			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+			Servo_Open();
 		else
-			Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+			Servo_Close();
 
 		// Lost Power during flight. Reseting to previous state
 		if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
-			Set_Servo_Angle(SERVO_ANGLE_CLOSED);
+			Servo_Close();
 			north_cam_on = false;
 		}
 		else if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0){
-			Set_Servo_Angle(SERVO_ANGLE_OPEN);
+			Servo_Open();
 		}
 
 		prev_alt = altitude;
@@ -1368,7 +1499,21 @@ int main(void)
   HAL_NVIC_EnableIRQ(USART1_IRQn);
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
 
+  DWT_Init();
+  Madgwick_init(&ahrs, 200);
+
   initial_state_reset();
+
+  north_cam_on = 1;
+
+  if (isnan(mag_x_offset)){
+	  mag_x_offset = -0.1;
+	  mag_y_offset = -0.1;
+	  mag_z_offset = 0;
+  }
+  if (isnan(altitude_offset)){
+	  calibrate_altitude();
+  }
 
   /* USER CODE END 2 */
 
@@ -1386,7 +1531,7 @@ int main(void)
 		  Stepper_Correction();
 	  }
 
-	  if (calibrating_compass == 1){
+	  if (calibrating_compass){
 		  calibrate_mmc();
 		  if (msCounter >= 250){
 			  send_mmc_plot_packet();
@@ -1423,8 +1568,6 @@ int main(void)
 			  read_transmit_telemetry();
 		  }
 	  }
-
-	  HAL_Delay(50);
 
     /* USER CODE END WHILE */
 

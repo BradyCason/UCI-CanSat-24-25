@@ -1,0 +1,7 @@
+../Core/Src/MadgwickAHRS.c:7:14:invSqrt	1
+../Core/Src/MadgwickAHRS.c:11:6:Madgwick_init	1
+../Core/Src/MadgwickAHRS.c:21:6:Madgwick_update	4
+../Core/Src/MadgwickAHRS.c:187:6:Madgwick_updateIMU	1
+../Core/Src/MadgwickAHRS.c:245:7:Madgwick_getRoll	1
+../Core/Src/MadgwickAHRS.c:252:7:Madgwick_getPitch	1
+../Core/Src/MadgwickAHRS.c:259:7:Madgwick_getYaw	2
