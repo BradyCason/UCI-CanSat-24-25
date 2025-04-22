@@ -530,7 +530,7 @@ void read_MMC5603(void) {
 	int32_t raw_x, raw_y, raw_z;
 
 	// Perform the I2C write (send the register address) then read 9 bytes of data
-	result = HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c1, MMC5603_ADDRESS, &first_reg, 1, HAL_MAX_DELAY);
 	if (result != HAL_OK) {
 		// Handle transmission error
 		return;
@@ -571,23 +571,25 @@ void read_MPL3115A2(void)
     uint8_t mpl_data[5]; // Buffer to hold pressure and temperature data
 
     // Read 5 bytes from OUT_P_MSB (3 for pressure, 2 for temperature)
-    HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
+    HAL_StatusTypeDef mpl_ret = HAL_I2C_Mem_Read(&hi2c1, MPL3115A2_ADDRESS, MPL3115A2_OUT_P_MSB, I2C_MEMADD_SIZE_8BIT, mpl_data, 9, HAL_MAX_DELAY);
 
-    // Combine pressure bytes into a 20-bit integer
-    uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
-    p_raw >>= 4; // Pressure is stored in the upper 20 bits
+    if (mpl_ret == HAL_OK){
+    	// Combine pressure bytes into a 20-bit integer
+		uint32_t p_raw = ((uint32_t)mpl_data[0] << 16) | ((uint32_t)mpl_data[1] << 8) | (mpl_data[2]);
+		p_raw >>= 4; // Pressure is stored in the upper 20 bits
 
-    // Convert raw pressure to Pascals
-    pressure = p_raw / 4.0 / 1000; // Pressure in KiloPascals
+		// Convert raw pressure to Pascals
+		pressure = p_raw / 4.0 / 1000; // Pressure in KiloPascals
 
-    // Combine temperature bytes into a 12-bit integer
-    int16_t t_raw = ((int16_t)mpl_data[3] << 8) | (mpl_data[4]);
-    t_raw >>= 4; // Temperature is stored in the upper 12 bits
+		// Combine temperature bytes into a 12-bit integer
+		int16_t t_raw = ((int16_t)mpl_data[3] << 8) | (mpl_data[4]);
+		t_raw >>= 4; // Temperature is stored in the upper 12 bits
 
-    // Convert raw temperature to degrees Celsius
-    temperature = t_raw / 16.0; // Temperature in Celsius
+		// Convert raw temperature to degrees Celsius
+		temperature = t_raw / 16.0; // Temperature in Celsius
 
-    altitude = calculate_altitude(pressure);
+		altitude = calculate_altitude(pressure);
+    }
 }
 
 void calibrate_altitude(void)
@@ -629,7 +631,7 @@ void read_MPU6050(void) {
 	int16_t raw_gyro_z = 0;
 
 	mpu_ret = HAL_I2C_IsDeviceReady(&hi2c1, MPU6050_ADDRESS, 3, 5);
-    if (mpu_ret == HAL_OK){
+	if (mpu_ret == HAL_OK){
 		mpu_ret = HAL_I2C_Master_Transmit(&hi2c1, MPU6050_ADDRESS, &imu_addr, 1, 100);
 		if ( mpu_ret == HAL_OK ) {
 			mpu_ret = HAL_I2C_Master_Receive(&hi2c1, MPU6050_ADDRESS, mpu_buf, 6, 100);
@@ -874,7 +876,7 @@ void init_INA219(void)
 
 	// Now write to the CONFIG register (0x00)
 	uint8_t ina_config[2] = {0x01, 0x9F};  // Example: 32V, 2A, 12-bit ADCs
-	result2 |= HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x00, 1, ina_config, 2, 1000);
+	result2 = HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x00, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
@@ -887,7 +889,7 @@ void read_sensors(void)
 //		read_PA1010D(); // GPS
 //	}
 	calculate_auto_gyro_speed();
-	read_INA219(); // Voltage
+//	read_INA219(); // Voltage
 }
 
 void reset_MPU6050(void) {
@@ -906,7 +908,7 @@ void init_sensors(void)
 	init_MPL3115A2();
 	init_MMC5603();
 	init_PA1010D();
-	init_INA219();
+//	init_INA219();
 
 	read_PA1010D();
 	get_mission_time();
@@ -982,6 +984,7 @@ void Stepper_Correction(){
 	// Read sensor data (gyroscope, accelerometer, magnetometer)
 	read_MPU6050();
 	read_MMC5603();
+
 	float gx = gyro_x;
 	float gy = gyro_y;
 	float gz = gyro_z;
@@ -1004,7 +1007,8 @@ void Stepper_Correction(){
 	// Get the current yaw from the Madgwick filter (assumed to represent the direction of the system)
 	float current_yaw = Madgwick_getYaw(&ahrs);
 
-	float dir_change = stepper_direction - current_yaw;
+	float correction_boost = 1.05f;
+	float dir_change = (stepper_direction - current_yaw) * correction_boost;
 	if (dir_change > 180) dir_change -= 360;
 	else if (dir_change < -180) dir_change += 360;
 
@@ -1154,7 +1158,7 @@ void handle_state(){
 	}
 	else if (strncmp(state, "LANDED", strlen("LANDED")) == 0){
 		// stop telemetry transmission
-		telemetry_status = 0;
+//		telemetry_status = 0;
 		// Turn off north cam
 		north_cam_on = false;
 	}
@@ -1265,6 +1269,7 @@ void handle_command(const char *cmd) {
 
 		prev_alt = 0;
 		reset_delta_buffer();
+		read_MPL3115A2();
 
 		sim_enabled = false;
 	}
@@ -1328,6 +1333,7 @@ void handle_command(const char *cmd) {
 		// Update variable
 		set_cmd_echo("MECCAMON");
 		north_cam_on = true;
+		turn_stepper_north();
 		sim_enabled = false;
 	}
 
@@ -1499,21 +1505,22 @@ int main(void)
   HAL_NVIC_EnableIRQ(USART1_IRQn);
   uart_received = HAL_UARTEx_ReceiveToIdle_IT(&huart1, rx_data, RX_BFR_SIZE);
 
+  if (isnan(mag_x_offset)){
+	  mag_x_offset = 0.196062505;
+	  mag_y_offset = 0.279687494;
+	  mag_z_offset = -0.832656264;
+	  read_MMC5603();
+	}
+	if (isnan(altitude_offset)){
+	  calibrate_altitude();
+	}
+
   DWT_Init();
   Madgwick_init(&ahrs, 200);
 
   initial_state_reset();
 
   north_cam_on = 1;
-
-  if (isnan(mag_x_offset)){
-	  mag_x_offset = -0.1;
-	  mag_y_offset = -0.1;
-	  mag_z_offset = 0;
-  }
-  if (isnan(altitude_offset)){
-	  calibrate_altitude();
-  }
 
   /* USER CODE END 2 */
 
