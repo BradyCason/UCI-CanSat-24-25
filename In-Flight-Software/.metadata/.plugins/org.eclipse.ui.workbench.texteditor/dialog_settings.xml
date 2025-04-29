@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="change"/>
+		<item key="selection" value="payload_relea"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="change"/>
-			<item value="direction_change"/>
-			<item value="Stepper_Rotate"/>
-			<item value="steps_per_rev"/>
-			<item value="stepper_cor"/>
-			<item value="turn_stepper_north"/>
-			<item value="meccamon"/>
-			<item value="north"/>
-			<item value="activate north"/>
-			<item value="dt ="/>
-			<item value="dt"/>
-			<item value="load_flash_data"/>
-			<item value="load_flash"/>
-			<item value="store_flash"/>
-			<item value="calibrate_alt"/>
+			<item value="payload_relea"/>
+			<item value="send_pack"/>
+			<item value="send"/>
+			<item value="payload_released"/>
+			<item value="initial_state"/>
+			<item value="servo"/>
+			<item value="read_pa"/>
+			<item value="init_pa"/>
+			<item value="init_mmc"/>
+			<item value="mmc_address"/>
+			<item value="read_mmc"/>
+			<item value="result = "/>
+			<item value="result2 ="/>
+			<item value="result2"/>
+			<item value="read_ina"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
@@ -36,7 +36,7 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item key="DIALOG_X_ORIGIN" value="730"/>
-		<item key="DIALOG_Y_ORIGIN" value="749"/>
+		<item key="DIALOG_Y_ORIGIN" value="695"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>

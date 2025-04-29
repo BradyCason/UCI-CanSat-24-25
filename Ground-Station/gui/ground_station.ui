@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>825</width>
-    <height>881</height>
+    <width>1013</width>
+    <height>1052</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -258,6 +258,36 @@ QPushButton:hover {
                 </widget>
                </item>
                <item>
+                <widget class="QLabel" name="payload_released">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif Collection</family>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Payload Released:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="max_altitude">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif Collection</family>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Max Altitude:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="cmd_echo">
                  <property name="font">
                   <font>
@@ -326,6 +356,36 @@ QPushButton:hover {
                </item>
                <item>
                 <widget class="QLabel" name="STATE">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif Collection</family>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="PAYLOAD_RELEASED">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif Collection</family>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>N/A</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="MAX_ALTITUDE">
                  <property name="font">
                   <font>
                    <family>Sans Serif Collection</family>
@@ -1378,8 +1438,8 @@ QPushButton:hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>825</width>
-     <height>21</height>
+     <width>1013</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

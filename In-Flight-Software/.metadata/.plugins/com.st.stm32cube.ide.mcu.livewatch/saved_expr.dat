@@ -27,3 +27,4 @@ delta_buffer
 altitude_offset
 mag_y_offset
 mag_z_offset
+mag_x

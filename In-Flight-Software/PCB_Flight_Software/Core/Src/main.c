@@ -776,7 +776,7 @@ void init_MMC5603(void) {
 	uint8_t control_reg2 = 0b00010000;  // Set Cmm_en to enable continuous mode
 
 	// Configure Control Register 1
-	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
+	result = HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1C, I2C_MEMADD_SIZE_8BIT, &control_reg1, 1, HAL_MAX_DELAY);
 	HAL_Delay(20);
 	uint8_t set_bit = 0b00001000;
 	HAL_I2C_Mem_Write(&hi2c1, MMC5603_ADDRESS, 0x1B, I2C_MEMADD_SIZE_8BIT, &set_bit, 1, HAL_MAX_DELAY);
@@ -876,7 +876,7 @@ void init_INA219(void)
 
 	// Now write to the CONFIG register (0x00)
 	uint8_t ina_config[2] = {0x01, 0x9F};  // Example: 32V, 2A, 12-bit ADCs
-	result2 = HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x00, 1, ina_config, 2, 1000);
+	HAL_I2C_Mem_Write(&hi2c1, INA219_ADDRESS, 0x00, 1, ina_config, 2, 1000);
 }
 
 void read_sensors(void)
@@ -884,12 +884,12 @@ void read_sensors(void)
 	read_MPU6050(); // Accel/ tilt
 	read_MPL3115A2(); // Temperature/ Pressure
 	if (!north_cam_on) read_MMC5603(); // Magnetic Field
-	read_PA1010D();
-//	for (int i = 0; i < 10; ++i){
-//		read_PA1010D(); // GPS
-//	}
+//	read_PA1010D();
+	for (int i = 0; i < 2; ++i){
+		read_PA1010D(); // GPS
+	}
 	calculate_auto_gyro_speed();
-//	read_INA219(); // Voltage
+	read_INA219(); // Voltage
 }
 
 void reset_MPU6050(void) {
@@ -908,7 +908,7 @@ void init_sensors(void)
 	init_MPL3115A2();
 	init_MMC5603();
 	init_PA1010D();
-//	init_INA219();
+	init_INA219();
 
 	read_PA1010D();
 	get_mission_time();
@@ -1061,12 +1061,13 @@ void send_packet(){
 	packet_count += 1;
 
 	snprintf(data, sizeof(data),
-		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d",
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d,%.1f,%s",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
 		 -gyro_z, gyro_x, -gyro_y, -accel_z, accel_x, -accel_y, mag_z, mag_x, mag_y,
 		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
-		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction);
+		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction,
+		 apogee_alt, payload_released ? "TRUE" : "FALSE");
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
@@ -1375,7 +1376,7 @@ void handle_command(const char *cmd) {
 void reset_state(){
 	Set_Servo_Angle(SERVO_ANGLE_CLOSED);
 	payload_released = false;
-	north_cam_on = true;
+	north_cam_on = false;
 	prev_alt = altitude;
 	reset_delta_buffer();
 	telemetry_status = 1;
@@ -1395,7 +1396,9 @@ void initial_state_reset(){
 	read_MMC5603();
 	set_stepper_north();
 
-	if (altitude > MIN_STATE_MAINTAINED_ALT){
+	read_MPU6050();
+
+	if (altitude > MIN_STATE_MAINTAINED_ALT && ((accel_x ^ 2) + (accel_y ^ 2) + (accel_z ^ 2) > 1)){
 		// Assume there was a power reset during flight. Use configurations from flash
 		if (payload_released)
 			Servo_Open();

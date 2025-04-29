@@ -25,7 +25,7 @@
 ../Core/Src/main.c:821:6:init_MPU6050	32	static
 ../Core/Src/main.c:838:6:init_PA1010D	32	static
 ../Core/Src/main.c:866:6:init_INA219	32	static
-../Core/Src/main.c:882:6:read_sensors	8	static
+../Core/Src/main.c:882:6:read_sensors	16	static
 ../Core/Src/main.c:895:6:reset_MPU6050	32	static
 ../Core/Src/main.c:901:6:init_sensors	8	static
 ../Core/Src/main.c:919:6:init_commands	8	static
