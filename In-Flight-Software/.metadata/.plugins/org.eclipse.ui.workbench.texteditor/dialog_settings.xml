@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="delta_buffer"/>
+		<item key="selection" value="apogee_altitude ="/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="delta_buffer"/>
+			<item value="apogee_altitude ="/>
+			<item value="apogee_alt"/>
+			<item value="apgoee_alt"/>
+			<item value="delta_buff"/>
+			<item value="DEFAULT_APOGEE_ALT"/>
+			<item value="apogee_altitude"/>
+			<item value="noise_threshold"/>
 			<item value="DELTA_BUFFER_SIZE"/>
+			<item value="north_cam_on ="/>
+			<item value="delta_buffer"/>
 			<item value="handle_"/>
 			<item value="payload_relea"/>
 			<item value="send_pack"/>
 			<item value="send"/>
 			<item value="payload_released"/>
-			<item value="initial_state"/>
-			<item value="servo"/>
-			<item value="read_pa"/>
-			<item value="init_pa"/>
-			<item value="init_mmc"/>
-			<item value="mmc_address"/>
-			<item value="read_mmc"/>
-			<item value="result = "/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>

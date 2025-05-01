@@ -111,7 +111,7 @@ typedef uint8_t bool;
 #define I2C_SDA_PIN GPIO_PIN_7
 #define I2C_PORT GPIOB
 
-#define DELTA_BUFFER_SIZE 2
+#define DELTA_BUFFER_SIZE 3
 
 #define MIN_STATE_MAINTAINED_ALT 10
 #define DEFAULT_APOGEE_ALT 0
@@ -1100,7 +1100,7 @@ void reset_delta_buffer(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	float noise_threshold = 1.5;
+	float noise_threshold = 3.0;
 	float landing_threshold = 0.2;
 
 	float delta = altitude - prev_alt;
@@ -1117,6 +1117,9 @@ void handle_state(){
 	avg_delta /= DELTA_BUFFER_SIZE;  // Take the average
 
 	if (strncmp(state, "LAUNCH_PAD", strlen("LAUNCH_PAD")) == 0){
+		if (altitude > apogee_altitude){
+			apogee_altitude = altitude;
+		}
 		if (avg_delta > noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "ASCENDING", strlen("ASCENDING"));
@@ -1124,12 +1127,12 @@ void handle_state(){
 		}
 	}
 	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
+		if (altitude > apogee_altitude){
+			apogee_altitude = altitude;
+		}
 		if (avg_delta < -noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "APOGEE", strlen("APOGEE"));
-			if (altitude > apogee_altitude){
-				apogee_altitude = altitude;
-			}
 			store_flash_data();
 		}
 	}
