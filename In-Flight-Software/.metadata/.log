@@ -10006,3 +10006,33 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-28 16:43:10.348
 !MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-04-29 15:11:13.639 -----------------------------------------------
+eclipse.buildId=Version 1.16.0
+java.version=17.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-29 15:12:02.701
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-29 15:12:02.707
+!MESSAGE Log4j2 initialized with config file C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-29 15:12:08.982
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-04-30 16:01:18.920 -----------------------------------------------
+eclipse.buildId=Version 1.16.0
+java.version=17.0.11
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-30 16:01:37.276
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-30 16:01:37.278
+!MESSAGE Log4j2 initialized with config file C:\Users\brady\repos\UCI-CanSat-24-25\In-Flight-Software\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-30 16:01:48.911
+!MESSAGE Started RMI Server, listening on port 41337

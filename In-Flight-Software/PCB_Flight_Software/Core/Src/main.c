@@ -111,10 +111,10 @@ typedef uint8_t bool;
 #define I2C_SDA_PIN GPIO_PIN_7
 #define I2C_PORT GPIOB
 
-#define DELTA_BUFFER_SIZE 5
+#define DELTA_BUFFER_SIZE 2
 
 #define MIN_STATE_MAINTAINED_ALT 10
-#define DEFAULT_APOGEE_ALT 1000
+#define DEFAULT_APOGEE_ALT 0
 
 /* USER CODE END PD */
 
@@ -1067,7 +1067,7 @@ void send_packet(){
 		 -gyro_z, gyro_x, -gyro_y, -accel_z, accel_x, -accel_y, mag_z, mag_x, mag_y,
 		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
 		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction,
-		 apogee_alt, payload_released ? "TRUE" : "FALSE");
+		 apogee_altitude, payload_released ? "TRUE" : "FALSE");
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
@@ -1100,7 +1100,7 @@ void reset_delta_buffer(){
 
 void handle_state(){
 	// States: ‘LAUNCH_PAD’,‘ASCENT’, ‘APOGEE’, ‘DESCENT’, ‘PROBE_RELEASE’, ‘LANDED’
-	float noise_threshold = 0.75;
+	float noise_threshold = 1.5;
 	float landing_threshold = 0.2;
 
 	float delta = altitude - prev_alt;
@@ -1127,13 +1127,18 @@ void handle_state(){
 		if (avg_delta < -noise_threshold){
 			memset(state, 0, sizeof(state));
 			strncpy(state, "APOGEE", strlen("APOGEE"));
+			if (altitude > apogee_altitude){
+				apogee_altitude = altitude;
+			}
 			store_flash_data();
 		}
 	}
 	else if (strncmp(state, "APOGEE", strlen("APOGEE")) == 0){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
-		apogee_altitude = altitude;
+		if (altitude > apogee_altitude){
+			apogee_altitude = altitude;
+		}
 		store_flash_data();
 	}
 	else if (strncmp(state, "DESCENDING", strlen("DESCENDING")) == 0){
@@ -1398,7 +1403,7 @@ void initial_state_reset(){
 
 	read_MPU6050();
 
-	if (altitude > MIN_STATE_MAINTAINED_ALT && ((accel_x ^ 2) + (accel_y ^ 2) + (accel_z ^ 2) > 1)){
+	if (altitude > MIN_STATE_MAINTAINED_ALT && ((accel_x * accel_x) + (accel_y * accel_y) + (accel_z * accel_z) > 1)){
 		// Assume there was a power reset during flight. Use configurations from flash
 		if (payload_released)
 			Servo_Open();
@@ -1522,8 +1527,6 @@ int main(void)
   Madgwick_init(&ahrs, 200);
 
   initial_state_reset();
-
-  north_cam_on = 1;
 
   /* USER CODE END 2 */
 

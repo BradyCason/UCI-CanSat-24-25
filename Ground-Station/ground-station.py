@@ -469,7 +469,7 @@ def read_xbee():
             try:
                 data, checksum = frame.rsplit(",", 1)
                 if verify_checksum(data, float(checksum)):
-                    if len(data.split(",")) == 26:
+                    if len(data.split(",")) == 28:
                         parse_xbee(data.split(","))
                     elif len(data.split(",")) == 9 and calibrate_comp_on:
                         global w

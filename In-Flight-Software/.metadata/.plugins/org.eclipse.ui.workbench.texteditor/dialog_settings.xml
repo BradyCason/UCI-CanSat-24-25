@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="payload_relea"/>
+		<item key="selection" value="delta_buffer"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="delta_buffer"/>
+			<item value="DELTA_BUFFER_SIZE"/>
+			<item value="handle_"/>
 			<item value="payload_relea"/>
 			<item value="send_pack"/>
 			<item value="send"/>
@@ -20,9 +23,6 @@
 			<item value="mmc_address"/>
 			<item value="read_mmc"/>
 			<item value="result = "/>
-			<item value="result2 ="/>
-			<item value="result2"/>
-			<item value="read_ina"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>

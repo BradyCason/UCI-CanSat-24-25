@@ -1,10 +1,10 @@
-17:33:27 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+17:31:37 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
 make -j20 all 
 arm-none-eabi-size  PCB_Flight_Software.elf 
    text	   data	    bss	    dec	    hex	filename
-  66564	    688	   4080	  71332	  116a4	PCB_Flight_Software.elf
+  66764	    688	   4072	  71524	  11764	PCB_Flight_Software.elf
 Finished building: default.size.stdout
  
 
-17:33:27 Build Finished. 0 errors, 0 warnings. (took 410ms)
+17:31:37 Build Finished. 0 errors, 0 warnings. (took 188ms)
 
