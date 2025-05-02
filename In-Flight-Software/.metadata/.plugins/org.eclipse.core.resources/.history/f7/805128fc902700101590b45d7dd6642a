@@ -69,7 +69,7 @@ typedef uint8_t bool;
 #define INA219_ADDRESS (0x40 << 1)
 
 // LM393 (Auto Gyro Speed)
-#define PULSES_PER_ROTATION 20
+#define PULSES_PER_ROTATION 60
 #define AUTO_GYRO_TIME_INTERVAL_MS 1000
 
 // Flash Memory
