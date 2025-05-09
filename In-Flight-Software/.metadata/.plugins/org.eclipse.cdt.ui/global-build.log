@@ -9964,3 +9964,17 @@ Finished building: default.size.stdout
  
 Finished building: PCB_Flight_Software.list
  
+13:11:07 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  66812	    688	   4072	  71572	  11794	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
+13:11:25 **** Incremental Build of configuration Debug for project PCB_Flight_Software ****
+make -j20 all 
+arm-none-eabi-size  PCB_Flight_Software.elf 
+   text	   data	    bss	    dec	    hex	filename
+  66812	    688	   4072	  71572	  11794	PCB_Flight_Software.elf
+Finished building: default.size.stdout
+ 
