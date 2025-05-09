@@ -46,8 +46,8 @@ def connect_Serial():
     global ser
     if (not SER_DEBUG):
         try:
-            # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
-            ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
+            ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
+            # ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
             print("Connected to Xbee")
         except serial.serialutil.SerialException as e:
             pass
@@ -513,6 +513,10 @@ def read_xbee():
 
             serialConnected = True
         except serial.serialutil.SerialException as e:
+            if (serialConnected):
+                print(f"Serial Connection Lost: {e}")
+            serialConnected = False
+        except OSError as e:
             if (serialConnected):
                 print(f"Serial Connection Lost: {e}")
             serialConnected = False
