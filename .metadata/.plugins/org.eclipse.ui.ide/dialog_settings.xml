@@ -9,8 +9,7 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
-			<item value="/Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Xbee_Test"/>
-			<item value="/Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/Nucleo_Flight_Software"/>
+			<item value="/Users/ruanzhanhao/UCI-CanSat-24-25/In-Flight-Software/PCB_Flight_Software"/>
 		</list>
 	</section>
 </section>
