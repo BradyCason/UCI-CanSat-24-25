@@ -128,7 +128,7 @@ long last_frame_time;
 
 
 // https://github.com/espressif/esp32-camera/issues/182
-#define fbs 64 // was 64 -- how many kb of static ram for psram -> sram buffer for sd write
+#define fbs 32 // was 64 -- how many kb of static ram for psram -> sram buffer for sd write
 uint8_t framebuffer_static[fbs * 1024 + 20];
 
 // CAMERA_MODEL_AI_THINKER
@@ -359,11 +359,11 @@ void major_fail() {
     }
     delay(1000);
 
-    for (int j = 0; j < 3; j++) {
-      digitalWrite(33, LOW);  delay(500);
-      digitalWrite(33, HIGH); delay(500);
-    }
-    delay(1000);
+    // for (int j = 0; j < 3; j++) {
+    //   digitalWrite(33, LOW);  delay(500);
+    //   digitalWrite(33, HIGH); delay(500);
+    // }
+    // delay(1000);
     Serial.print("Major Fail  "); Serial.print(i); Serial.print(" / "); Serial.println(10);
   }
 
