@@ -42,15 +42,19 @@ COM_PORT = 3
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 
 ser = None
+serialConnected = False
 def connect_Serial():
     global ser
     if (not SER_DEBUG):
         try:
-            ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
-            # ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
+            # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
+            ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
+            serialConnected = True
             print("Connected to Xbee")
         except serial.serialutil.SerialException as e:
-            pass
+            if (serialConnected):
+                print(f"Could not connect to Xbee: {e}")
+            serialConnected = False
 
 # telemetry
 # strings as keys and values as values, only last stored
@@ -461,7 +465,7 @@ def read_xbee():
     Read packets from the Xbee module
     '''
     buffer = ""
-    serialConnected = True
+    global serialConnected
     while True:     # Keep running as long as the serial connection is open
         if not serialConnected:
             connect_Serial()
