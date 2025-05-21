@@ -102,7 +102,7 @@ int avi_length = 1800;            // how long a movie in seconds -- 1800 sec = 3
 int frame_interval = 0;          // record at full speed
 int speed_up_factor = 1;          // play at realtime
 int stream_delay = 500;           // minimum of 500 ms delay between frames
-int MagicNumber = 2;                // change this number to reset the eprom in your esp32 for file numbers
+int MagicNumber = 10;                // change this number to reset the eprom in your esp32 for file numbers
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -569,62 +569,8 @@ void read_config_file() {
   int cstreamdelay = 0;
   int cinternet = 0;
   String czone = "GMT";
-  cssid = "ap";
+  cssid = "ssid1234";
   cpass = "mrpeanut";
-
-  File config_file = SD_MMC.open("/config.txt", "r");
-  // if (config_file) {
-  if (false) {
-
-    Serial.println("Reading config.txt");
-    cname = config_file.readStringUntil(' ');
-    junk = config_file.readStringUntil('\n');
-    cframesize = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cquality = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cframesizeconfig = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cqualityconfig = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cbuffersconfig = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    clength = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cinterval = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cspeedup = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cstreamdelay = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    cinternet = config_file.parseInt();
-    junk = config_file.readStringUntil('\n');
-    czone = config_file.readStringUntil(' ');
-    junk = config_file.readStringUntil('\n');
-    cssid = config_file.readStringUntil(' ');
-    junk = config_file.readStringUntil('\n');
-    cpass = config_file.readStringUntil(' ');
-    junk = config_file.readStringUntil('\n');
-    config_file.close();
-
-    if (String(cssid) == "ssid1234" || String(cssid) == "Ssid1234") {
-      cinternet = 0;
-    } else if (String(cssid) == "wifiman" || String(cssid) == "Wifiman") {
-      cinternet = 5;
-    } else if (String(cssid) == "ap" || String(cssid) == "AP") {
-      cinternet = 5;
-    } else {
-      cinternet = 4;
-    }
-  } else {
-    Serial.println("Failed to open config.txt - writing a default");
-
-    // lets make a simple.txt config file
-    File new_simple = SD_MMC.open("/config.txt", "w");
-    new_simple.print(config_txt);
-    new_simple.close();
-    cinternet = 5;
-  }
 
   Serial.printf("=========   Data fram config.txt and defaults  =========\n");
   Serial.printf("Name %s\n", cname); logfile.printf("Name %s\n", cname);
@@ -666,46 +612,12 @@ void read_config_file() {
 //  delete_old_stuff() - delete oldest files to free diskspace
 //
 
-void listDir( const char * dirname, uint8_t levels) {
-
-  Serial.printf("Listing directory: %s\n", "/");
-
-  File root = SD_MMC.open("/");
-  if (!root) {
-    Serial.println("Failed to open directory");
-    return;
-  }
-  if (!root.isDirectory()) {
-    Serial.println("Not a directory");
-    return;
-  }
-
-  File filex = root.openNextFile();
-  while (filex) {
-    if (filex.isDirectory()) {
-      Serial.print("  DIR : ");
-      Serial.println(filex.name());
-      if (levels) {
-        listDir( filex.name(), levels - 1);
-      }
-    } else {
-      Serial.print("  FILE: ");
-      Serial.print(filex.name());
-      Serial.print("  SIZE: ");
-      Serial.println(filex.size());
-    }
-    filex = root.openNextFile();
-  }
-}
-
 
 
 void delete_old_stuff() {
 
   Serial.printf("Total space: %lluMB\n", SD_MMC.totalBytes() / (1024 * 1024));
   Serial.printf("Used space: %lluMB\n", SD_MMC.usedBytes() / (1024 * 1024));
-
-  //listDir( "/", 0);
 
   float full = 1.0 * SD_MMC.usedBytes() / SD_MMC.totalBytes();;
   if (full  <  0.8) {
@@ -715,7 +627,7 @@ void delete_old_stuff() {
     while (full > 0.8) {
 
       double del_number = 999999999;
-      char del_numbername[50];
+      char del_numbername[100];
 
       File f = SD_MMC.open("/");
 
@@ -725,9 +637,9 @@ void delete_old_stuff() {
         //Serial.println(file.name());
         if (!file.isDirectory()) {
 
-          char foldname[50];
+          char foldname[100];
           strcpy(foldname, file.name());
-          for ( int x = 0; x < 50; x++) {
+          for ( int x = 0; x < 99; x++) {
             if ( (foldname[x] >= 0x30 && foldname[x] <= 0x39) || foldname[x] == 0x2E) {
             } else {
               if (foldname[x] != 0) foldname[x] = 0x20;
@@ -1187,8 +1099,8 @@ static void end_avi() {
     Serial.println("Recording screwed up, less than 5 frames, forget index\n");
     idxfile.close();
     avifile.close();
-    int xx = remove("/idx.tmp");
-    int yy = remove(avi_file_name);
+    int xx = SD_MMC.remove("/idx.tmp");
+    int yy = SD_MMC.remove(avi_file_name);
 
   } else {
 
@@ -1395,6 +1307,8 @@ void setup() {
   Serial.println("Try to get parameters from config.txt ...");
 
   read_config_file();
+
+  int xx = SD_MMC.remove("/idx.tmp");
 
 
   char logname[50];
