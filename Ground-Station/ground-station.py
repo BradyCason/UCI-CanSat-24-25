@@ -44,7 +44,7 @@ SER_DEBUG = False       # Set as True whenever testing without XBee connected
 ser = None
 serialConnected = False
 def connect_Serial():
-    global ser
+    global ser, serialConnected
     if (not SER_DEBUG):
         try:
             # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
