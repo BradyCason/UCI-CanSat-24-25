@@ -28,3 +28,8 @@ altitude_offset
 mag_y_offset
 mag_z_offset
 mag_x
+command_buffer
+last_command_count
+rx_packet
+uart_received
+uart_error

@@ -34,27 +34,31 @@ north_cam_on = False
 csv_indexer = 0
 
 packet_count = 0
+last_recieved_packet = -1
+last_recieved_compass_packet = -1
+packets_sent = 0
 
 # xbee communication parameters
 BAUDRATE = 115200
-COM_PORT = 3
+COM_PORT = [3, 6]
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 
-ser = None
-serialConnected = False
-def connect_Serial():
+ser = [None, None]
+serialConnected = [False, False]
+def connect_Serial(xbee_num):
     global ser
+    global serialConnected
     if (not SER_DEBUG):
         try:
             # ser = serial.Serial("/dev/tty.usbserial-AR0JQZCB", BAUDRATE, timeout=0.05)
-            ser = serial.Serial("COM" + str(COM_PORT), BAUDRATE, timeout=0.05)
-            serialConnected = True
-            print("Connected to Xbee")
+            ser[xbee_num] = serial.Serial("COM" + str(COM_PORT[xbee_num]), BAUDRATE, timeout=0.05)
+            serialConnected[xbee_num] = True
+            print("Connected to Xbee: " + str(xbee_num))
         except serial.serialutil.SerialException as e:
-            if (serialConnected):
-                print(f"Could not connect to Xbee: {e}")
-            serialConnected = False
+            if (serialConnected[xbee_num]):
+                print("Could not connect to Xbee " + str(xbee_num) + f": {e}")
+            serialConnected[xbee_num] = False
 
 # telemetry
 # strings as keys and values as values, only last stored
@@ -360,7 +364,7 @@ class CalibrateCompassPlotter:
         global calibrate_comp_on
         if calibrate_comp_on:
             plt.draw()
-    
+
     def close_plot(self):
         # Close the plot window
         self.manual_closing = True
@@ -437,17 +441,24 @@ def verify_checksum(data, checksum):
     '''
     return checksum == calc_checksum(data)
 
-def parse_xbee(data):
+def parse_xbee(data, xbee_num):
     '''
     Parse the data from an incoming Xbee packet
     '''
-    global sim, telemetry, packet_count
+    global sim, telemetry, packet_count, last_recieved_packet
 
-    for i in range(len(data)):
-        telemetry[TELEMETRY_FIELDS[i]] = data[i]
-    
+    # Ensure only recieving each packet once
+    sent_packet_count = int(data[TELEMETRY_FIELDS.index("PACKET_COUNT")])
+    if sent_packet_count <= last_recieved_packet:
+        return
+    last_recieved_packet = sent_packet_count
+
     packet_count += 1
     telemetry["PACKET_COUNT"] = str(packet_count)
+
+    for i in range(len(data)):
+        if TELEMETRY_FIELDS[i] != "PACKET_COUNT":
+            telemetry[TELEMETRY_FIELDS[i]] = data[i]
 
     # if data[3] == "S":
     #     sim = True
@@ -458,72 +469,89 @@ def parse_xbee(data):
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time +'.csv')
     with open(file, 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(telemetry.values())
+        writer_object.writerow(list(telemetry.values()) + [xbee_num])
 
 def read_xbee():
     '''
     Read packets from the Xbee module
     '''
-    buffer = ""
+    buffer = ["", ""]
     global serialConnected
     while True:     # Keep running as long as the serial connection is open
-        if not serialConnected:
-            connect_Serial()
+        for xbee_num in range(2):
+            if not serialConnected[xbee_num]:
+                connect_Serial(xbee_num)
+                continue
 
-        try:
-            if ser.inWaiting() > 0:
-                buffer += ser.read(ser.inWaiting()).decode()
+            try:
+                if ser[xbee_num].inWaiting() > 0:
+                    buffer[xbee_num] += ser[xbee_num].read(ser[xbee_num].inWaiting()).decode(errors='replace')
 
-                start_idx = buffer.find(START_DELIMITER)
-                end_idx = buffer.find("\n")
-                if start_idx == -1 or end_idx == -1:
-                    # Wait for a full packet
-                    continue
+                    start_idx = buffer[xbee_num].find(START_DELIMITER)
+                    end_idx = buffer[xbee_num].find("\n", start_idx)
+                    next_start = buffer[xbee_num].find(START_DELIMITER, start_idx + 1)
 
-                frame = buffer[start_idx + 1:end_idx].strip()
-                buffer = buffer[end_idx + 1:]
-
-                try:
-                    data, checksum = frame.rsplit(",", 1)
-                    if verify_checksum(data, float(checksum)):
-                        if len(data.split(",")) == 28:
-                            parse_xbee(data.split(","))
-                        elif len(data.split(",")) == 9 and calibrate_comp_on:
-                            global w
-                            w.compass_plotter.add_points([float(x) for x in data.split(",")])
-                        else:
-                            print("Incorrect number of fields in frame: ", frame)
+                    if next_start != -1 and (end_idx == -1 or next_start < end_idx):
+                        frame_end = next_start
+                    elif end_idx != -1:
+                        frame_end = end_idx
                     else:
-                        print("Failed to read frame:", frame)
-                except Exception as e:
-                    print(e)
-                    print("Error reading frame: ", frame)
+                        # Wait for a full packet
+                        continue
 
-                # start_byte = ser.read(1)
-                # if start_byte != START_DELIMITER:
-                #     print(start_byte.decode())
+                    frame = buffer[xbee_num][start_idx + 1:frame_end].strip()
+                    buffer[xbee_num] = buffer[xbee_num][frame_end + 1:]
 
-                # if start_byte == START_DELIMITER:
-                #     time.sleep(0.1)
-                #     frame = ser.read_until(b"\n").decode().strip()
-                #     try:
-                #         data, checksum = frame.rsplit(",", 1)
-                #         if verify_checksum(data, float(checksum)):
-                #             parse_xbee(data.split(","))
-                #         else:
-                #             print("Failed to read frame:", frame)
-                #     except:
-                #         print("Failed to read frame:", frame)
+                    try:
+                        data, checksum = frame.rsplit(",", 1)
+                        if verify_checksum(data, float(checksum)):
 
-            serialConnected = True
-        except serial.serialutil.SerialException as e:
-            if (serialConnected):
-                print(f"Serial Connection Lost: {e}")
-            serialConnected = False
-        except OSError as e:
-            if (serialConnected):
-                print(f"Serial Connection Lost: {e}")
-            serialConnected = False
+                            split_data = data.split(",")
+                            if len(split_data) == 28:
+                                parse_xbee(split_data, xbee_num)
+                            elif len(split_data) == 10 and calibrate_comp_on:
+                                global last_recieved_compass_packet
+                                if int(split_data[0]) > last_recieved_compass_packet:
+                                    last_recieved_compass_packet = int(split_data[0])
+                                    global w
+                                    print(data)
+                                    if (w.compass_plotter):
+                                        w.compass_plotter.add_points([float(x) for x in split_data[1:]])
+                            else:
+                                print("Incorrect number of fields in frame: ", frame)
+                        else:
+                            print("Failed to read frame:", frame)
+                    except Exception as e:
+                        print(e)
+                        print("Error reading frame: ", frame)
+
+                    # start_byte = ser.read(1)
+                    # if start_byte != START_DELIMITER:
+                    #     print(start_byte.decode())
+
+                    # if start_byte == START_DELIMITER:
+                    #     time.sleep(0.1)
+                    #     frame = ser.read_until(b"\n").decode().strip()
+                    #     try:
+                    #         data, checksum = frame.rsplit(",", 1)
+                    #         if verify_checksum(data, float(checksum)):
+                    #             parse_xbee(data.split(","))
+                    #         else:
+                    #             print("Failed to read frame:", frame)
+                    #     except:
+                    #         print("Failed to read frame:", frame)
+
+                serialConnected[xbee_num] = True
+            except serial.serialutil.SerialException as e:
+                if (serialConnected[xbee_num]):
+                    print("Serial " + str(xbee_num) + f" Connection Lost: {e}")
+                serialConnected[xbee_num] = False
+            except OSError as e:
+                if (serialConnected[xbee_num]):
+                    print("Serial " + str(xbee_num) + f" Connection Lost: {e}")
+                serialConnected[xbee_num] = False
+
+        time.sleep(0.1)
             
 
 def write_xbee(cmd):
@@ -546,16 +574,24 @@ def write_xbee(cmd):
     '''
 
     # Create Packet
-    checksum = calc_checksum(cmd)
-    frame = f"{START_DELIMITER}{cmd},{checksum:02X}"
+    global packets_sent
+    packets_sent += 1
+    checksum = calc_checksum(f"{packets_sent},{cmd}")
+    frame = f"{START_DELIMITER}{packets_sent},{cmd},{checksum:02X}"
 
     # Send to XBee
-    try:
-        if (not SER_DEBUG):
-            ser.write(frame.encode())
-        print("Packet Sent: " + cmd)
-    except serial.serialutil.SerialException as e:
-            print(f"Packet Not Sent: {e}")
+    if (not SER_DEBUG):
+        sent = []
+        for xbee_num in range(2):
+            try:
+                if (ser[xbee_num]):
+                    ser[xbee_num].write(frame.encode())
+                    sent.append(xbee_num)
+                    time.sleep(0.1)
+            except serial.serialutil.SerialException as e:
+                print(f"Packet Not Sent on Xbee {xbee_num}: {e}")
+        
+        print(f"Packet Sent on Xbees {sent}: {cmd}")
 
 def send_simp_data():
     '''
@@ -578,13 +614,14 @@ def send_simp_data():
 
 
 def main():
-    connect_Serial()
+    # connect_Serial(0)
+    # connect_Serial(1)
 
-    # Create new csv file with header
-    file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time + '.csv')
-    with open(file, 'w', newline='') as f_object:
-        writer_object = writer(f_object)
-        writer_object.writerow(TELEMETRY_FIELDS)
+    # # Create new csv file with header
+    # file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time + '.csv')
+    # with open(file, 'w', newline='') as f_object:
+    #     writer_object = writer(f_object)
+    #     writer_object.writerow(TELEMETRY_FIELDS + ["XBEE_NUM"])
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)

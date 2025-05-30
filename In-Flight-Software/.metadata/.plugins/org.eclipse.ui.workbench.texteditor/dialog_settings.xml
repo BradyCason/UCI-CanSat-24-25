@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="send"/>
+		<item key="selection" value="plot_packet_num"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="send"/>
-			<item value="lastStepperUpdate"/>
-			<item value="stepper_co"/>
-			<item value="stepper"/>
-			<item value="pulse"/>
-			<item value="apogee_altitude ="/>
-			<item value="apogee_alt"/>
-			<item value="apgoee_alt"/>
-			<item value="delta_buff"/>
-			<item value="DEFAULT_APOGEE_ALT"/>
-			<item value="apogee_altitude"/>
-			<item value="noise_threshold"/>
-			<item value="DELTA_BUFFER_SIZE"/>
-			<item value="north_cam_on ="/>
-			<item value="delta_buffer"/>
+			<item value="plot_packet_num"/>
+			<item value="packet_count"/>
+			<item value="send_mmc"/>
+			<item value="send_"/>
+			<item value="result++"/>
+			<item value="result"/>
+			<item value="receiveto"/>
+			<item value="recieveto"/>
+			<item value="receivedto"/>
+			<item value="received"/>
+			<item value="uart_received"/>
+			<item value="command_rea"/>
+			<item value="handle_state"/>
+			<item value="read_sensors"/>
+			<item value="read_transmit_telemetry"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
@@ -39,6 +39,6 @@
 		<item key="DIALOG_Y_ORIGIN" value="695"/>
 		<item key="DIALOG_WIDTH" value="414"/>
 		<item key="DIALOG_HEIGHT" value="454"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
 	</section>
 </section>

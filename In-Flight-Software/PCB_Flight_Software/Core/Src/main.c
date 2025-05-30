@@ -127,6 +127,7 @@ uint8_t tx_data[TX_BFR_SIZE-18];
 uint8_t tx_packet[TX_BFR_SIZE];
 uint8_t tx_count;
 volatile bool command_ready = false;
+volatile int32_t last_command_count = -1;
 char command_buffer[RX_BFR_SIZE-1];
 
 /* USER CODE END PM */
@@ -281,6 +282,7 @@ bool payload_released = false;
 int alt_increasing_count = 0;
 int alt_decreasing_count = 0;
 int alt_non_increasing_count = 0;
+int plot_packet_num = 0;
 
 volatile uint32_t msCounter = 0;
 
@@ -1073,7 +1075,21 @@ void send_packet(){
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
 
 	// Send the packet using HAL_UART_Transmit
-	HAL_UART_Transmit(&huart1, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
+//	HAL_UART_Transmit(&huart1, (uint8_t*)packet, strlen(packet), HAL_MAX_DELAY);
+
+	int packet_len = strlen(packet);
+	int chunk_size = 73;
+
+	for (int i = 0; i < packet_len; i += chunk_size) {
+	    int remaining = packet_len - i;
+	    int send_len = remaining < chunk_size ? remaining : chunk_size;
+
+	    HAL_UART_Transmit(&huart1, (uint8_t*)&packet[i], send_len, HAL_MAX_DELAY);
+
+	    if (i + chunk_size < packet_len) {
+	        HAL_Delay(40);  // Wait 40ms only if more data remains
+	    }
+	}
 }
 
 void send_mmc_plot_packet(){
@@ -1082,8 +1098,8 @@ void send_mmc_plot_packet(){
 	char data[480];    // Buffer for data without checksum
 
 	snprintf(data, sizeof(data),
-		"%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d",
-		 mag_x, mag_y, (mag_x_min + mag_x_max) / 2, (mag_y_min + mag_y_max) / 2, mag_x_min, mag_x_max, mag_y_min, mag_y_max, (int)direction);
+		"%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%d",
+		 ++plot_packet_num, mag_x, mag_y, (mag_x_min + mag_x_max) / 2, (mag_y_min + mag_y_max) / 2, mag_x_min, mag_x_max, mag_y_min, mag_y_max, (int)direction);
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);
@@ -1117,7 +1133,7 @@ void handle_state(){
 	avg_delta /= DELTA_BUFFER_SIZE;  // Take the average
 
 	if (strncmp(state, "LAUNCH_PAD", strlen("LAUNCH_PAD")) == 0){
-		if (altitude > apogee_altitude){
+		if (altitude > apogee_altitude && altitude < 40000){
 			apogee_altitude = altitude;
 		}
 		if (avg_delta > noise_threshold){
@@ -1127,7 +1143,7 @@ void handle_state(){
 		}
 	}
 	else if (strncmp(state, "ASCENDING", strlen("ASCENDING")) == 0){
-		if (altitude > apogee_altitude){
+		if (altitude > apogee_altitude && altitude < 40000){
 			apogee_altitude = altitude;
 		}
 		if (avg_delta < -noise_threshold){
@@ -1139,7 +1155,7 @@ void handle_state(){
 	else if (strncmp(state, "APOGEE", strlen("APOGEE")) == 0){
 		memset(state, 0, sizeof(state));
 		strncpy(state, "DESCENDING", strlen("DESCENDING"));
-		if (altitude > apogee_altitude){
+		if (altitude > apogee_altitude && altitude < 40000){
 			apogee_altitude = altitude;
 		}
 		store_flash_data();
@@ -1432,36 +1448,54 @@ void initial_state_reset(){
 	}
 }
 
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
-	memcpy(rx_packet, rx_data, RX_BFR_SIZE);
+uint32_t uart_error = 0;
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    // Check if it's your UART instance
+    if (huart->Instance == USART1) {
+        // Log or handle the error
+        uart_error++;
 
+        // Try to recover
+        HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
+    }
+}
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+	// Call function for next packet
+
+	memcpy(rx_packet, rx_data, Size);
+	rx_packet[Size] = '\0';
 	memset(rx_data, 0, sizeof(rx_data));
 
 	if (rx_packet[0] == '~') {
 		// Calculate where the comma and checksum should be
-		char *comma_pos = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+		char *last_comma = &rx_packet[Size - 3];  // Comma is 3 characters from the end (2 for checksum, 1 for comma)
+		char *first_comma = strchr(rx_packet, ',');
 
 		// Ensure the expected comma is at the right position
-		if (*comma_pos == ',') {
-			// Null-terminate the data part (exclude comma and checksum)
-			*comma_pos = '\0';
+		if (*last_comma == ',') {
+			*last_comma = '\0'; // Null-terminate before checksum
 
 			// Extract and convert the received checksum (2 characters after the comma)
 			uint8_t received_checksum = (uint8_t)strtol(&rx_packet[Size - 2], NULL, 16);  // Convert checksum to integer
 			// Calculate checksum of the data part (after '~' and before comma)
 			uint8_t calculated_checksum = calculate_checksum(&rx_packet[1]);
+
+			*first_comma = '\0'; // Null-terminate after packet_count
+
+			int32_t packet_count = atoi(&rx_packet[1]);
+
 			// Compare calculated checksum with the received one
-			if (calculated_checksum == received_checksum && command_ready == false) {
-				// Checksum is valid, process the command
-				strcpy(command_buffer, &rx_packet[1]);
+			if (calculated_checksum == received_checksum && command_ready == false && last_command_count != packet_count) {
+				last_command_count = packet_count;
+				// Checksum is valid, and this is new command. Process the command
+				strcpy(command_buffer, &first_comma[1]);
 				command_ready = true;
 			}
 		}
 	}
 
-	// Call function for next packet
 	uart_received = HAL_UARTEx_ReceiveToIdle_IT(huart, rx_data, RX_BFR_SIZE);
-
 }
 
 /* USER CODE END 0 */
@@ -1584,6 +1618,8 @@ int main(void)
 			  read_transmit_telemetry();
 		  }
 	  }
+
+	  HAL_Delay(1);
 
     /* USER CODE END WHILE */
 
