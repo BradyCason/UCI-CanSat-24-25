@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="plot_packet_num"/>
+		<item key="selection" value="STEPS_PER_REV"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="STEPS_PER_REV"/>
+			<item value="rev"/>
+			<item value="ir"/>
+			<item value="ir sensor"/>
 			<item value="plot_packet_num"/>
 			<item value="packet_count"/>
 			<item value="send_mmc"/>
@@ -19,10 +23,6 @@
 			<item value="receivedto"/>
 			<item value="received"/>
 			<item value="uart_received"/>
-			<item value="command_rea"/>
-			<item value="handle_state"/>
-			<item value="read_sensors"/>
-			<item value="read_transmit_telemetry"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>

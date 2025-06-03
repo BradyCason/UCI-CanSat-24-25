@@ -2900,7 +2900,7 @@ void calculate_auto_gyro_speed(void)
  80023b4:	4770      	bx	lr
  80023b6:	bf00      	nop
  80023b8:	2000086c 	.word	0x2000086c
- 80023bc:	cccccccd 	.word	0xcccccccd
+ 80023bc:	88888889 	.word	0x88888889
  80023c0:	20000648 	.word	0x20000648
 
 080023c4 <Set_Servo_Angle>:

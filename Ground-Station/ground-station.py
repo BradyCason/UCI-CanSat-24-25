@@ -60,6 +60,19 @@ def connect_Serial(xbee_num):
                 print("Could not connect to Xbee " + str(xbee_num) + f": {e}")
             serialConnected[xbee_num] = False
 
+def disconnect_Serial(xbee_num):
+    global ser
+    global serialConnected
+    if (not SER_DEBUG):
+        try:
+            if serialConnected[xbee_num] and ser[xbee_num].is_open:
+                ser[xbee_num].close()
+                print("Disconnected from Xbee: " + str(xbee_num))
+            serialConnected[xbee_num] = False
+        except Exception as e:
+            print(f"Error while disconnecting Xbee {xbee_num}: {e}")
+            serialConnected[xbee_num] = False
+
 # telemetry
 # strings as keys and values as values, only last stored
 # need to write all commands to csv files by last filled values
@@ -449,7 +462,7 @@ def parse_xbee(data, xbee_num):
 
     # Ensure only recieving each packet once
     sent_packet_count = int(data[TELEMETRY_FIELDS.index("PACKET_COUNT")])
-    if sent_packet_count <= last_recieved_packet:
+    if sent_packet_count == last_recieved_packet:
         return
     last_recieved_packet = sent_packet_count
 
@@ -511,7 +524,7 @@ def read_xbee():
                                 parse_xbee(split_data, xbee_num)
                             elif len(split_data) == 10 and calibrate_comp_on:
                                 global last_recieved_compass_packet
-                                if int(split_data[0]) > last_recieved_compass_packet:
+                                if int(split_data[0]) != last_recieved_compass_packet:
                                     last_recieved_compass_packet = int(split_data[0])
                                     global w
                                     print(data)
