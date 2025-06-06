@@ -40,7 +40,8 @@ packets_sent = 0
 
 # xbee communication parameters
 BAUDRATE = 115200
-COM_PORT = [3, 6]
+COM_PORT = [6,3]
+NUM_XBEES = 1
 
 SER_DEBUG = False       # Set as True whenever testing without XBee connected
 
@@ -454,7 +455,7 @@ def verify_checksum(data, checksum):
     '''
     return checksum == calc_checksum(data)
 
-def parse_xbee(data, xbee_num):
+def parse_xbee(data):
     '''
     Parse the data from an incoming Xbee packet
     '''
@@ -482,7 +483,7 @@ def parse_xbee(data, xbee_num):
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time +'.csv')
     with open(file, 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(list(telemetry.values()) + [xbee_num])
+        writer_object.writerow(list(telemetry.values()))
 
 def read_xbee():
     '''
@@ -491,7 +492,7 @@ def read_xbee():
     buffer = ["", ""]
     global serialConnected
     while True:     # Keep running as long as the serial connection is open
-        for xbee_num in range(2):
+        for xbee_num in range(NUM_XBEES):
             if not serialConnected[xbee_num]:
                 connect_Serial(xbee_num)
                 continue
@@ -521,7 +522,7 @@ def read_xbee():
 
                             split_data = data.split(",")
                             if len(split_data) == 28:
-                                parse_xbee(split_data, xbee_num)
+                                parse_xbee(split_data)
                             elif len(split_data) == 10 and calibrate_comp_on:
                                 global last_recieved_compass_packet
                                 if int(split_data[0]) != last_recieved_compass_packet:
@@ -627,14 +628,14 @@ def send_simp_data():
 
 
 def main():
-    # connect_Serial(0)
-    # connect_Serial(1)
+    for xbee_num in range(NUM_XBEES):
+        connect_Serial(xbee_num)
 
-    # # Create new csv file with header
-    # file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time + '.csv')
-    # with open(file, 'w', newline='') as f_object:
-    #     writer_object = writer(f_object)
-    #     writer_object.writerow(TELEMETRY_FIELDS + ["XBEE_NUM"])
+    # Create new csv file with header
+    file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time + '.csv')
+    with open(file, 'w', newline='') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(TELEMETRY_FIELDS)
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)
