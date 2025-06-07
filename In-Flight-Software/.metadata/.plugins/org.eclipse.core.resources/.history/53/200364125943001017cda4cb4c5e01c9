@@ -1063,13 +1063,13 @@ void send_packet(){
 	packet_count += 1;
 
 	snprintf(data, sizeof(data),
-		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d,%.1f,%s,%.1f",
+		"%s,%02d:%02d:%02d,%d,%c,%s,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%02d:%02d:%02d,%.1f,%.1f,%.1f,%u,%s,%d,%.1f,%s",
 		 TEAM_ID, mission_time_hr, mission_time_min, mission_time_sec, packet_count,
 		 mode, state, altitude, temperature, pressure, voltage,
 		 -gyro_z, gyro_x, -gyro_y, -accel_z, accel_x, -accel_y, mag_z, mag_x, mag_y,
 		 auto_gyro_rotation_rate, gps_time_hr, gps_time_min, gps_time_sec,
 		 gps_altitude, gps_latitude, gps_longitude, gps_sats, cmd_echo, (int)direction,
-		 apogee_altitude, payload_released ? "TRUE" : "FALSE", stepper_direction);
+		 apogee_altitude, payload_released ? "TRUE" : "FALSE");
 
 	uint8_t checksum = calculate_checksum(data);
 	snprintf(packet, sizeof(packet), "~%s,%u\n", data, checksum);

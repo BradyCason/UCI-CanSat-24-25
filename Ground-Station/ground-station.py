@@ -34,8 +34,8 @@ north_cam_on = False
 csv_indexer = 0
 
 packet_count = 0
-last_recieved_packet = -1
-last_recieved_compass_packet = -1
+# last_recieved_packet = -1
+# last_recieved_compass_packet = -1
 packets_sent = 0
 
 # xbee communication parameters
@@ -459,18 +459,18 @@ def parse_xbee(data):
     '''
     Parse the data from an incoming Xbee packet
     '''
-    global sim, telemetry, packet_count, last_recieved_packet
+    global sim, telemetry, packet_count #, last_recieved_packet
 
     # Ensure only recieving each packet once
-    sent_packet_count = int(data[TELEMETRY_FIELDS.index("PACKET_COUNT")])
-    if sent_packet_count == last_recieved_packet:
-        return
-    last_recieved_packet = sent_packet_count
+    # sent_packet_count = int(data[TELEMETRY_FIELDS.index("PACKET_COUNT")])
+    # if sent_packet_count == last_recieved_packet:
+    #     return
+    # last_recieved_packet = sent_packet_count
 
     packet_count += 1
     telemetry["PACKET_COUNT"] = str(packet_count)
 
-    for i in range(len(data)):
+    for i in range(len(data) - 1):
         if TELEMETRY_FIELDS[i] != "PACKET_COUNT":
             telemetry[TELEMETRY_FIELDS[i]] = data[i]
 
@@ -483,7 +483,7 @@ def parse_xbee(data):
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time +'.csv')
     with open(file, 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(list(telemetry.values()))
+        writer_object.writerow(list(telemetry.values()) + [data[-1]])
 
 def read_xbee():
     '''
@@ -521,14 +521,13 @@ def read_xbee():
                         if verify_checksum(data, float(checksum)):
 
                             split_data = data.split(",")
-                            if len(split_data) == 28:
+                            if len(split_data) == 29:
                                 parse_xbee(split_data)
                             elif len(split_data) == 10 and calibrate_comp_on:
-                                global last_recieved_compass_packet
-                                if int(split_data[0]) != last_recieved_compass_packet:
-                                    last_recieved_compass_packet = int(split_data[0])
+                                # global last_recieved_compass_packet
+                                if int(split_data[0]): # != last_recieved_compass_packet:
+                                    # last_recieved_compass_packet = int(split_data[0])
                                     global w
-                                    print(data)
                                     if (w.compass_plotter):
                                         w.compass_plotter.add_points([float(x) for x in split_data[1:]])
                             else:
@@ -635,7 +634,7 @@ def main():
     file = os.path.join(os.path.dirname(__file__), "Flight_" + TEAM_ID + "_" + readable_time + '.csv')
     with open(file, 'w', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(TELEMETRY_FIELDS)
+        writer_object.writerow(TELEMETRY_FIELDS + ["CAM_DIRECTION"])
 
     # Run the app
     app = QtWidgets.QApplication(sys.argv)

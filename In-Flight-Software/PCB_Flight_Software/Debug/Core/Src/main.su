@@ -36,7 +36,7 @@
 ../Core/Src/main.c:1026:6:set_stepper_north	4	static
 ../Core/Src/main.c:1030:6:turn_stepper_north	24	static
 ../Core/Src/main.c:1050:9:calculate_checksum	24	static
-../Core/Src/main.c:1058:6:send_packet	1416	static
+../Core/Src/main.c:1058:6:send_packet	1432	static
 ../Core/Src/main.c:1095:6:send_mmc_plot_packet	1152	static
 ../Core/Src/main.c:1111:6:reset_delta_buffer	16	static
 ../Core/Src/main.c:1117:6:handle_state	40	static
