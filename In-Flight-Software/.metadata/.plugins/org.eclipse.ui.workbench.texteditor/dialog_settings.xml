@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="DELTA_BUFFER_SIZE"/>
+		<item key="selection" value="send_"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="send_"/>
+			<item value="send"/>
+			<item value="direction"/>
+			<item value="directino"/>
+			<item value="stepper_direction"/>
+			<item value="apogee_altitude"/>
 			<item value="DELTA_BUFFER_SIZE"/>
 			<item value="handle_state"/>
 			<item value="STEPS_PER_REV"/>
@@ -17,12 +23,6 @@
 			<item value="plot_packet_num"/>
 			<item value="packet_count"/>
 			<item value="send_mmc"/>
-			<item value="send_"/>
-			<item value="result++"/>
-			<item value="result"/>
-			<item value="receiveto"/>
-			<item value="recieveto"/>
-			<item value="receivedto"/>
 		</list>
 		<list key="replacehistory">
 			<item value="hi2c1"/>
